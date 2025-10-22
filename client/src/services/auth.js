@@ -28,6 +28,29 @@ export const sendOTP = async (data) => {
   }
 };
 
+export const sendOTPForForgotPassword = async (data) => {
+  try {
+    const { email } = data;
+    const response = await axios.post(
+      `${API_URL}/auth/send-otp`,
+      {
+        email,
+        purpose: "forgot-password",
+      },
+      { withCredentials: true }
+    );
+
+    return response.data.message;
+  } catch (error) {
+    const message =
+      error.response?.data?.error ||
+      error.response?.data?.message ||
+      error?.message ||
+      "Something went wrong";
+    throw new Error(message);
+  }
+};
+
 export const loginUserWithEmail = async (data) => {
   const { email, password } = data;
   try {
@@ -90,24 +113,60 @@ export const onResend = async ({ email, purpose }) => {
 };
 
 export const verifyToken = async (token) => {
-  return await api.get(
-    `/auth/getUser`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  try {
+    return await api.get(
+      `/auth/getUser`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    },
-    { withCredentials: true }
-  );
+      { withCredentials: true }
+    );
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Something went wrong";
+    throw new Error(message);
+  }
 };
 
 export const logout = async () => {
-  await axios.post(
-    `${API_URL}/auth/logout`,
-    {},
-    {
-      withCredentials: true,
-    }
-  );
-  localStorage.removeItem("accessToken");
+  try {
+    await axios.post(
+      `${API_URL}/auth/logout`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+    localStorage.removeItem("accessToken");
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Something went wrong";
+    throw new Error(message);
+  }
+};
+
+export const forgotPassword = async ({ email, password }) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/forgot-password`, {
+      email,
+      password,
+    });
+
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Something went wrong";
+    throw new Error(message);
+  }
 };

@@ -1,7 +1,6 @@
 import { Error } from "mongoose";
 import Otp from "../models/otp.model.js";
 import { sendMail } from "../utility/mailer.js";
-import User from "../models/user.model.js";
 
 // Generate OTP
 export const generateOtp = async (user, purpose) => {

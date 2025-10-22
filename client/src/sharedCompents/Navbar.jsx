@@ -8,12 +8,11 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-
+import { logout } from "../services/auth";
+import { useDispatch } from "react-redux";
+import { logoutUser } from "../Redux/authSlice";
+import { persistor } from "../Redux/store";
 // import { Search, Ticket, User } from "lucide-react";
-// import { logout } from "../services/auth";
-// import { useDispatch } from "react-redux";
-// import { logoutUser } from "../Redux/authSlice";
-// import { persistor } from "../Redux/store";
 
 const navigation = [
   { name: "Dashboard", href: "#", current: true },
@@ -27,6 +26,12 @@ function classNames(...classes) {
 }
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const handleLogout = async () => {
+    await logout();
+    dispatch(logoutUser());
+    persistor.purge();
+  };
   return (
     <Disclosure as="nav" className="relative bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -117,12 +122,12 @@ const Navbar = () => {
                   </a>
                 </MenuItem>
                 <MenuItem>
-                  <a
-                    href="#"
+                  <button
+                    onClick={handleLogout}
                     className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                   >
                     Sign out
-                  </a>
+                  </button>
                 </MenuItem>
               </MenuItems>
             </Menu>
@@ -152,7 +157,7 @@ const Navbar = () => {
       </DisclosurePanel>
     </Disclosure>
   );
-}
+};
 
 // const Navbar = () => {
 //   const dispatch = useDispatch();

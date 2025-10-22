@@ -11,7 +11,7 @@ const OTP_DIGITS_COUNT = 6;
 const RESEND_TIMEOUT = 60;
 
 const OTPInputForm = ({ title, email, purpose }) => {
-  const { closeModal } = useModal();
+  const { openModal, closeModal } = useModal();
   const [inputArr, setInputArr] = useState(
     new Array(OTP_DIGITS_COUNT).fill("")
   );
@@ -103,9 +103,12 @@ const OTPInputForm = ({ title, email, purpose }) => {
       setStat({ ...stat, isLoading: true });
       const data = { otp: inputArr.join(""), email, purpose };
       const response = await verifyOtp(data);
-      dispatch(addUser(response.user));
-      localStorage.setItem("accessToken", response.accessToken);
-      closeModal();
+      if (purpose === ("signup" || "signin")) {
+        dispatch(addUser(response.user));
+        localStorage.setItem("accessToken", response.accessToken);
+        return closeModal();
+      }
+      openModal("forgot-password", { response });
     } catch (error) {
       setStat({ ...stat, isLoading: false, error: error.message });
       setIsButtonDisabled(true);

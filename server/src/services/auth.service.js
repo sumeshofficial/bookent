@@ -32,6 +32,20 @@ export const createUser = async ({
   return user;
 };
 
+// Update password
+export const updaetPassword = async ({ email, password }) => {
+  const user = await User.findOne({ email }).select('+password');
+  
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  user.password = password;
+  await user.save()
+
+  return user;
+};
+
 // handling google authentication
 export const handleGoogleAuth = async (profile) => {
   const email = profile.emails?.[0]?.value;
@@ -40,6 +54,12 @@ export const handleGoogleAuth = async (profile) => {
   const role = profile.role;
 
   let user = await User.findOne({ email });
+
+  if (!user.profileImage) {
+    user.profileImage = profileImage;
+    user.updatedAt = Date.now();
+    user.save()
+  }
 
   if (!user) {
     user = await User.create({

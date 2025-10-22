@@ -7,7 +7,9 @@ import {
   logoutUser,
   loginwithEmail,
   refreshAccessToken,
-  getUser
+  getUser,
+  sendOtp,
+  forgotPassword
 } from "../controller/auth.controller.js";
 import passport from "../middlewares/passport.js";
 import { protect } from "../middlewares/auth.middleware.js";
@@ -32,8 +34,10 @@ authRouter.get('/getUser', protect, getUser);
 authRouter.post('/refresh-token', refreshAccessToken);
 authRouter.post("/email/signup", registerUserWithEmail);
 authRouter.post("/email/signin", loginwithEmail);
+authRouter.post("/send-otp", sendOtp);
 authRouter.post("/resend-otp", resendOTP);
 authRouter.post("/verify-otp", verifyOtp);
+authRouter.post("/forgot-password", forgotPassword);
 authRouter.post("/logout", logoutUser);
 
 export default authRouter;

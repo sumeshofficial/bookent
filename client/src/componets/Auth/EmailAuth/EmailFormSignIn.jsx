@@ -1,8 +1,10 @@
 import InputBox from "../../../sharedCompents/InputBox";
-import { useContextForm } from "../../../utils/constants";
+import { useContextForm, useModal } from "../../../utils/constants";
 
 const EmailFormSignIn = ({ onSubmit }) => {
-  const { register, errors, isSubmitting, handleSubmit } = useContextForm();
+  const { register, errors, isSubmitting, handleSubmit, reset } =
+    useContextForm();
+  const { openModal } = useModal();
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col gap-2 mt-5 mb-10">
@@ -30,6 +32,17 @@ const EmailFormSignIn = ({ onSubmit }) => {
           errors={errors}
           placeholder="Enter your password"
         />
+
+        <button
+          type="button"
+          onClick={() => {
+            openModal("forgot");
+            reset();
+          }}
+          className="text-end"
+        >
+          Forgot Password
+        </button>
       </div>
 
       {/* Button */}

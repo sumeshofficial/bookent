@@ -4,6 +4,7 @@ import {
   createUser,
   finduser,
   isUserExists,
+  updaetPassword,
 } from "../services/auth.service.js";
 import { sendTokens } from "../utility/sendTokens.js";
 import {
@@ -76,10 +77,6 @@ export const resendOTP = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.isVerified) {
-      return res.status(400).json({ message: "User already verified" });
-    }
-
     await generateOtp(user, purpose);
     res.status(201).json({
       success: true,
@@ -102,7 +99,7 @@ export const verifyOtp = async (req, res) => {
     const user = await finduser(email);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (user.isVerified)
+    if (user.isVerified && purpose === ("signup" || "signin"))
       return res.status(400).json({ message: "User already verified" });
 
     const otpDoc = await checkOtp(user._id);
@@ -110,14 +107,21 @@ export const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired OTP" });
 
     const verifiedUser = await verifyUser(user, purpose);
+    if (purpose === ("signup" || "signin")) {
+      const accessToken = await sendTokens(res, user);
 
-    const accessToken = await sendTokens(res, user);
+      return res.status(200).json({
+        success: true,
+        message: "User verified successfully",
+        user: verifiedUser,
+        accessToken,
+      });
+    }
 
     res.status(200).json({
       success: true,
+      user,
       message: "User verified successfully",
-      user: verifiedUser,
-      accessToken,
     });
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
@@ -248,4 +252,66 @@ export const getUser = (req, res) => {
   return res
     .status(200)
     .json({ success: true, message: "User found", user: req.user });
+};
+
+// Send OTP
+export const sendOtp = async (req, res) => {
+  const { email, purpose } = req.body;
+  try {
+    if (!email || !purpose) {
+      return res.status(422).json({
+        success: false,
+        error: "email and purpose required",
+      });
+    }
+
+    const user = await finduser(email);
+
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    await generateOtp(user, purpose);
+
+    return res.status(200).json({
+      success: true,
+      isVerified: false,
+      message: `OTP sent successfully to ${email}`,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Somthing went wrong" });
+  }
+};
+
+// Forgot password
+export const forgotPassword = async (req, res) => {
+  const { password, email } = req.body;
+  try {
+    if (!password || !email) {
+      return res
+        .status(422)
+        .json({ success: false, message: "email and pasword required" });
+    }
+
+    const user = await finduser(email);
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    await updaetPassword({
+      email,
+      password,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Somthing went wrong" });
+  }
 };
