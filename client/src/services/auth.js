@@ -3,14 +3,15 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const sendOTP = async (data) => {
+export const sendOTPForSignup = async (data) => {
   try {
-    const { fullname, email, password } = data;
+    const { fullname, email, password, role } = data;
     const response = await axios.post(
       `${API_URL}/auth/email/signup`,
       {
         fullname,
         email,
+        role,
         password,
         purpose: "signup",
       },
@@ -28,14 +29,15 @@ export const sendOTP = async (data) => {
   }
 };
 
-export const sendOTPForForgotPassword = async (data) => {
+export const sendOTP = async ({ data, purpose}) => {
   try {
     const { email } = data;
+    
     const response = await axios.post(
       `${API_URL}/auth/send-otp`,
       {
         email,
-        purpose: "forgot-password",
+        purpose,
       },
       { withCredentials: true }
     );
@@ -78,6 +80,7 @@ export const loginUserWithEmail = async (data) => {
 export const verifyOtp = async (data) => {
   try {
     const { email, otp, purpose } = data;
+    console.log(data);
     const response = await axios.post(
       `${API_URL}/auth/verify-otp`,
       {
@@ -159,6 +162,22 @@ export const forgotPassword = async ({ email, password }) => {
       email,
       password,
     });
+
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Something went wrong";
+    throw new Error(message);
+  }
+};
+
+export const editProfile = async ({ data }) => {
+  try {
+    console.log(data);
+    const response = await api.patch('/me', data);
 
     return response.data;
   } catch (error) {

@@ -1,11 +1,11 @@
 import EmailFormSignUp from "./EmailFormSignUp";
 import { useEffect, useState } from "react";
 import EmailFormSignIn from "./EmailFormSignIn";
-import { loginUserWithEmail, sendOTP } from "../../../services/auth";
+import { loginUserWithEmail, sendOTPForSignup } from "../../../services/auth";
 import { useContextForm, useModal } from "../../../utils/constants";
 import { Loader } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { addUser } from "../../../Redux/authSlice";
+import { addUser } from "../../../Redux/userSlice";
 import toast from "react-hot-toast";
 
 const EmailInputFormModal = () => {
@@ -26,7 +26,7 @@ const EmailInputFormModal = () => {
   const onSubmit = async (data) => {
     try {
       if (form === "signup") {
-        const response = await sendOTP(data);
+        const response = await sendOTPForSignup(data);
         toast.success("OTP sent successfully");
         reset();
         openModal("otp", { title: response, email: data.email, purpose: form });

@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 // Check user is already exists
 export const isUserExists = async (email) => {
@@ -15,33 +15,21 @@ export const finduser = async (email) => {
 };
 
 // Create a new user
-export const createUser = async ({
-  fullname,
-  email,
-  password,
-  authProvider,
-}) => {
-  const newUser = {
-    fullname,
-    email,
-    password,
-    authProvider,
-  };
-
-  const user = await User.create(newUser);
+export const createUser = async ({ ...data }) => {
+  const user = await User.create(data);
   return user;
 };
 
 // Update password
 export const updaetPassword = async ({ email, password }) => {
-  const user = await User.findOne({ email }).select('+password');
-  
+  const user = await User.findOne({ email }).select("+password");
+
   if (!user) {
     throw new Error("User not found");
   }
 
   user.password = password;
-  await user.save()
+  await user.save();
 
   return user;
 };
@@ -50,18 +38,18 @@ export const updaetPassword = async ({ email, password }) => {
 export const handleGoogleAuth = async (profile) => {
   const email = profile.emails?.[0]?.value;
   const displayName = profile.displayName;
-  const profileImage = profile.photos?.[0]?.value;
+  const profileImage = profile?.photos?.[0]?.value;
   const role = profile.role;
 
   let user = await User.findOne({ email });
 
-  if (!user.profileImage) {
-    user.profileImage = profileImage;
-    user.updatedAt = Date.now();
-    user.save()
-  }
-
-  if (!user) {
+  if (user) {
+    if (!user.profileImage) {
+      user.profileImage = profileImage;
+      user.updatedAt = Date.now();
+      await user.save();
+    }
+  } else {
     user = await User.create({
       fullname: displayName,
       email,

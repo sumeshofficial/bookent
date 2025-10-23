@@ -2,15 +2,22 @@ import EventCard from "./EventCards";
 
 const RecommendedSection = () => {
   return (
-    <div className="mt-12">
-      <h2 className="text-3xl font-black text-gray-900 mb-6">Recommended</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-8">
+    <section className="px-4 py-8">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+        Recommended Events
+      </h2>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <EventCard />
+        <EventCard />
+        <EventCard />
+        <EventCard />
         <EventCard />
         <EventCard />
         <EventCard />
         <EventCard />
       </div>
-    </div>
+    </section>
   );
 };
 

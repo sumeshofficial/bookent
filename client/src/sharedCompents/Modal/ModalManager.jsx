@@ -3,8 +3,9 @@ import AuthModal from "../../componets/Auth/AuthModal";
 import OTPInputForm from "../../componets/Auth/OTPVerify/OTPInputForm";
 import Modal from "./Modal";
 import EmailInputFormModal from "../../componets/Auth/EmailAuth/EmailInputModal";
-import ForgotPasswordEmailVerification from "../../componets/Auth/EmailAuth/ForgotPasswordEmailVerification";
-import ForgotPasswordInput from "../../componets/Auth/EmailAuth/ForgotPasswordInput";
+import EmailVerification from "../EmailVerification";
+import ForgotPasswordInput from "../../componets/Auth/EmailAuth/ForgotPassword/ForgotPasswordInput";
+import ForgotPasswordEmail from "../../componets/Auth/EmailAuth/ForgotPassword/ForgotPasswordEmail";
 
 const ModalManager = () => {
 
@@ -27,10 +28,13 @@ const ModalManager = () => {
             content = <OTPInputForm {...modalData} />
             break;
         case "forgot":
-            content = <ForgotPasswordEmailVerification {...modalData}/>
+            content = <ForgotPasswordEmail {...modalData}/>
             break;
         case "forgot-password":
             content = <ForgotPasswordInput {...modalData}/>
+            break;
+        case "email-verify":
+            content = <EmailVerification {...modalData}/>
             break;
         default:
             return null;

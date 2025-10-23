@@ -1,7 +1,7 @@
 import { Loader } from "lucide-react";
-import InputBox from "../../../sharedCompents/InputBox";
-import { useContextForm, useModal } from "../../../utils/constants";
-import { forgotPassword } from "../../../services/auth";
+import InputBox from "../../../../sharedCompents/InputBox";
+import { useContextForm, useModal } from "../../../../utils/constants";
+import { forgotPassword } from "../../../../services/auth";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -16,7 +16,6 @@ const ForgotPasswordInput = ({ response }) => {
   const onSubmit = async (data) => {
     try {
         const res = await forgotPassword({ email: response.user.email, password: data.password });
-        console.log(res);
         toast.success(res.message)
         reset();
         openModal('signup');

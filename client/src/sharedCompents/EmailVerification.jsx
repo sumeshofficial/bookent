@@ -1,31 +1,10 @@
-import { useContextForm, useModal } from "../../../utils/constants";
-import InputBox from "../../../sharedCompents/InputBox";
-import toast from "react-hot-toast";
-import { sendOTPForForgotPassword } from "../../../services/auth";
-import { useState } from "react";
+import { useContextForm } from "../utils/constants";
+import InputBox from "./InputBox";
 import { Loader } from "lucide-react";
 
-const ForgotPasswordEmailVerification = () => {
-  const { register, errors, isSubmitting, handleSubmit, reset } =
+const EmailVerification = ({ title, onSubmit, error }) => {
+  const { register, errors, isSubmitting, handleSubmit } =
     useContextForm();
-  const { openModal } = useModal();
-
-  const [error, setError] = useState();
-
-  const onSubmit = async (data) => {
-    try {
-      const response = await sendOTPForForgotPassword(data);
-      toast.success("OTP sent successfully");
-      reset();
-      openModal("otp", {
-        title: response,
-        email: data.email,
-        purpose: "forgot-password",
-      });
-    } catch (error) {
-      setError(error.message);
-    }
-  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -37,7 +16,7 @@ const ForgotPasswordEmailVerification = () => {
         )}
         <div className="flex flex-col gap-2 mt-5 mb-10">
           <h2 className="text-2xl font-bold mb-3 text-center">
-            Forgot Password
+            {title}
           </h2>
 
           {error && <p className="text-red-500 mb-5">{error}</p>}
@@ -71,4 +50,4 @@ const ForgotPasswordEmailVerification = () => {
   );
 };
 
-export default ForgotPasswordEmailVerification;
+export default EmailVerification;

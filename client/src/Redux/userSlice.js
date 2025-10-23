@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { verifyToken } from "../services/auth";
+import { editProfile, verifyToken } from "../services/auth";
 
 export const getUser = createAsyncThunk(
   "auth/getUser",
@@ -7,7 +7,7 @@ export const getUser = createAsyncThunk(
     try {
       const token = localStorage.getItem("accessToken");
 
-      if(!token) return;
+      if (!token) return;
       const res = await verifyToken(token);
 
       return res.data.user;
@@ -17,6 +17,19 @@ export const getUser = createAsyncThunk(
           error.response.data.error ||
           "Something went wrong"
       );
+    }
+  }
+);
+
+export const updateUserProfile = createAsyncThunk(
+  "auth/updateUserProfile",
+  async ({ data }, { rejectWithValue }) => {
+    try {
+      if (!data) return;
+      const res = await editProfile({ data });
+      return res.data.user;
+    } catch (error) {
+      return rejectWithValue(error.response.data.error);
     }
   }
 );
@@ -38,7 +51,7 @@ const authSlice = createSlice({
     },
     logoutUser: (state) => {
       state.user = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -51,6 +64,18 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(getUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateUserProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

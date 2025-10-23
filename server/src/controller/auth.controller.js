@@ -33,7 +33,7 @@ export const googleAuth = async (req, res) => {
 
 // User signup with email controoler
 export const registerUserWithEmail = async (req, res) => {
-  const { fullname, email, password, purpose } = req.body;
+  const { fullname, email, password, purpose, role = 'user' } = req.body;
   try {
     if (!fullname || !email || !password || !purpose) {
       return res
@@ -48,6 +48,7 @@ export const registerUserWithEmail = async (req, res) => {
     const user = await createUser({
       fullname,
       email,
+      role,
       password,
       authProvider: "email",
     });
@@ -103,6 +104,7 @@ export const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: "User already verified" });
 
     const otpDoc = await checkOtp(user._id);
+    console.log(otpDoc);
     if (!otpDoc || otpDoc.otp !== otp || otpDoc.purpose !== purpose)
       return res.status(400).json({ message: "Invalid or expired OTP" });
 
@@ -127,6 +129,7 @@ export const verifyOtp = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 
 // Generate RefreshAccessToken
 export const refreshAccessToken = async (req, res) => {

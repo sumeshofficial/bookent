@@ -1,23 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import { onResend, verifyOtp } from "../../../services/auth";
+import { onResend } from "../../../services/auth";
 import { Loader } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { addUser, updateUserProfile } from "../../../Redux/userSlice";
 import { useModal } from "../../../utils/constants";
 import toast from "react-hot-toast";
 
 const OTP_DIGITS_COUNT = 6;
 const RESEND_TIMEOUT = 60;
 
-const OTPInputForm = ({ title, email, purpose, data }) => {
-  const { openModal, closeModal } = useModal();
+const OTPForm = ({ title, email, purpose }) => {
   const [inputArr, setInputArr] = useState(
     new Array(OTP_DIGITS_COUNT).fill("")
   );
   const [timer, setTimer] = useState(RESEND_TIMEOUT);
   const [isDisabled, setIsDisabled] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const dispatch = useDispatch();
   const [stat, setStat] = useState({
     error: "",
     isLoading: false,
@@ -96,31 +92,6 @@ const OTPInputForm = ({ title, email, purpose, data }) => {
     }
   };
 
-  const handleOTP = async () => {
-    try {
-      setStat({ ...stat, isLoading: true });
-      const data = { otp: inputArr.join(""), email, purpose };
-      const response = await verifyOtp(data);
-      if (purpose === ("signup" || "signin")) {
-        dispatch(addUser(response.user));
-        localStorage.setItem("accessToken", response.accessToken);
-        return closeModal();
-      }
-
-      if (purpose === 'email-edit'){
-        const updateData = {
-          user: response.user,
-          data,
-        }
-        dispatch(updateUserProfile({ data: updateData }));
-      }
-      openModal(purpose, { response });
-    } catch (error) {
-      setStat({ ...stat, isLoading: false, error: error.message });
-      setIsButtonDisabled(true);
-    }
-  };
-
   return (
     <div className="w-full sm:h-90 flex justify-center mt-3 mb-5 px-4">
       <div className="w-full max-w-md flex flex-col justify-between">
@@ -189,4 +160,4 @@ const OTPInputForm = ({ title, email, purpose, data }) => {
   );
 };
 
-export default OTPInputForm;
+export default OTPForm;

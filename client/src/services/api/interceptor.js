@@ -78,7 +78,7 @@ api.interceptors.response.use(
       processQueue(refreshError, null);
 
       const { default: store, persistor } = await import("../../Redux/store");
-      const { logoutUser } = await import("../../Redux/authSlice");
+      const { logoutUser } = await import("../../Redux/userSlice");
 
       await logout();
       store.dispatch(logoutUser());

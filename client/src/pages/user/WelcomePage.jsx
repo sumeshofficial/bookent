@@ -1,6 +1,6 @@
-import bgImage from "../assets/welcomePage-bg.png";
-import bookentLogo from "../assets/bookent-logo-white.png";
-import { useModal } from "../utils/constants";
+import bgImage from "../../assets/welcomePage-bg.png";
+import bookentLogo from "../../assets/bookent-logo-white.png";
+import { useModal } from "../../utils/constants";
 
 const WelcomePage = () => {
   const { openModal } = useModal();
