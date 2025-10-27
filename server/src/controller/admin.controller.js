@@ -1,4 +1,4 @@
-import { findUserById } from "../services/auth.service.js";
+import { findOrganizerById, findUserById } from "../services/auth.service.js";
 import {
   approveRequest,
   getAllOrganizers,
@@ -73,6 +73,26 @@ export const getUserDetails = async (req, res) => {
     return res
       .status(200)
       .json({ success: true, message: "User fetch successfully", user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Something went wrong" });
+  }
+};
+
+export const getOrganizersDetails = async (req, res) => {
+  const id = req.params.id;
+  try {
+    if (!id) {
+      return res.status(422).json({ success: false, error: "Missing field" });
+    }
+
+    const organizer = await findOrganizerById(id);
+
+    if (!organizer)
+      return res.status(404).json({ success: false, error: "Organizer not found" });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Organizer fetch successfully", organizer });
   } catch (error) {
     res.status(500).json({ success: false, message: "Something went wrong" });
   }

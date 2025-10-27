@@ -100,3 +100,17 @@ export const getUserDeatils = async (userId) => {
     throw new Error(message);
   }
 };
+
+export const getOrganizerDetails = async (id) => {
+  try {
+    const organizer =  await adminApi.get(`/admin/organizers/${id}`);
+    return organizer;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Something went wrong";
+    throw new Error(message);
+  }
+};

@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import dotenv from "dotenv";
 dotenv.config();
 import jwt from "jsonwebtoken";
+import Organizer from "../models/organizer.model.js";
 
 // Check user is already exists
 export const isUserExists = async (email) => {
@@ -69,6 +70,10 @@ export const handleGoogleAuth = async (profile) => {
 // Checking the user is still active
 export const findUserById = async (id) => {
   return await User.findById(id);
+};
+
+export const findOrganizerById = async (id) => {
+  return await Organizer.findById(id);
 };
 
 // Verify Token and Get User

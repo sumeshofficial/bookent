@@ -15,6 +15,7 @@ import NormalizeSlash from "../sharedCompents/NormalizeSlash";
 import UserDetailsPage from "../pages/Admin/UserDetailsPage";
 import OrganizersList from "../pages/Admin/OrganizersList";
 import OrganizerAccRejected from "../pages/organizer/OrganizerAccRejected";
+import OrganizerDetailsPage from "../pages/Admin/OrganizerDetailsPage";
 
 const DynamicRoutes = () => {
   return (
@@ -48,7 +49,6 @@ const DynamicRoutes = () => {
         <Route path="requested" element={<OrganizerAccRequested />} />
         <Route path="dashboard" element={<OrganizerDashboard />} />
         <Route path="rejected" element={<OrganizerAccRejected />} />
-        <Route path={"organizers/:id"} element={<UserDetailsPage />} />
       </Route>
 
       <Route path={"/admin"} element={<AdminProtected />}>
@@ -58,6 +58,7 @@ const DynamicRoutes = () => {
         <Route path={"users"} element={<UsersList />} />
         <Route path={"organizers"} element={<OrganizersList />} />
         <Route path={"users/:id"} element={<UserDetailsPage />} />
+        <Route path={"organizers/:id"} element={<OrganizerDetailsPage />} />
         <Route path="*" element={<AdminNotFoundPage />} />
       </Route>
     </Routes>
