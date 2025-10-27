@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { editProfile, verifyToken } from "../services/auth";
+import { updateProfile } from "../services/user";
 
 export const getUser = createAsyncThunk(
   "user/getUser",
@@ -24,10 +25,11 @@ export const getUser = createAsyncThunk(
 
 export const updateUserProfile = createAsyncThunk(
   "user/updateUserProfile",
-  async ({ data }, { rejectWithValue }) => {
+  async ({ id, data }, { rejectWithValue }) => {
     try {
-      if (!data) return;
-      const res = await editProfile({ data });
+      if (!id || !data) return;
+      const res = await updateProfile({ id, data });
+
       return res.data.user;
     } catch (error) {
       return rejectWithValue(error.response.data.error);

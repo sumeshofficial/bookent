@@ -3,16 +3,16 @@ import { updateUserService } from "../services/user.service.js";
 dotenv.config();
 
 export const updateUser = async (req, res) => {
-  const { data } = req.body;
+  const { id, data } = req.body;
 
   try {
-    if (!data._id) {
+    if (!id || !data) {
       return res
         .status(422)
-        .json({ success: false, message: "UserId required" });
+        .json({ success: false, message: "Missing fields" });
     }
 
-    const user = await updateUserService({ data });
+    const user = await updateUserService({ id, data });
 
     if (!user) {
       return res

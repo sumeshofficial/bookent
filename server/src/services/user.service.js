@@ -3,16 +3,15 @@ import User from "../models/user.model.js";
 dotenv.config();
 
 // Update user
-export const updateUserService = async ({ data }) => {
+export const updateUserService = async ({ id, data }) => {
   try {
-    const { _id, ...updateData } = data;
 
     const updatedUser = await User.findOneAndUpdate(
-      { _id },
-      { $set: updateData },
-      { new: true, runValidators: true }
+      { _id: id },
+      { $set: data },
+      { new: true }
     );
-
+    
     return updatedUser;
   } catch (error) {
     throw new Error(error.message);

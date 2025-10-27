@@ -6,6 +6,7 @@ import EmailInputFormModal from "../../componets/Auth/EmailAuth/EmailInputModal"
 import EmailVerification from "../EmailVerification";
 import ForgotPasswordInput from "../../componets/Auth/EmailAuth/ForgotPassword/ForgotPasswordInput";
 import ForgotPasswordEmail from "../../componets/Auth/EmailAuth/ForgotPassword/ForgotPasswordEmail";
+import EditUserProfile from "../../pages/user/EditUserProfile";
 
 const ModalManager = () => {
 
@@ -35,6 +36,9 @@ const ModalManager = () => {
             break;
         case "email-verify":
             content = <EmailVerification {...modalData}/>
+            break;
+        case "edit-profile":
+            content = <EditUserProfile {...modalData}/>
             break;
         default:
             return null;
