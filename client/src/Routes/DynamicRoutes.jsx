@@ -16,10 +16,12 @@ import UserDetailsPage from "../pages/Admin/UserDetailsPage";
 import OrganizersList from "../pages/Admin/OrganizersList";
 import OrganizerAccRejected from "../pages/organizer/OrganizerAccRejected";
 import OrganizerDetailsPage from "../pages/Admin/OrganizerDetailsPage";
+import UserNotFoundPage from "../pages/user/UserNotFound";
 
 const DynamicRoutes = () => {
   return (
     <Routes>
+      <Route path="*" element={<UserNotFoundPage />} />
       <Route path="*" element={<NormalizeSlash />} />
       <Route
         path={"/"}

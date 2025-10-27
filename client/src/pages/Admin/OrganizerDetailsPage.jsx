@@ -43,7 +43,6 @@ const OrganizerDetailsPage = () => {
       const { data } = await getOrganizerDetails(id);
       if (data.success) setOrganizer(data.organizer);
     } catch (err) {
-      console.error(err);
       toast.error("Failed to fetch organizer details");
     } finally {
       setLoading(false);
