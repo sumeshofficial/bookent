@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock, DollarSign, List, Users, Menu, User2Icon, UserCircle2Icon } from "lucide-react";
+import { Clock, DollarSign, List, Users, Menu, UserCircle2Icon } from "lucide-react";
 
 const OrganizerDashboard = () => {
   const [selectedMenu, setSelectedMenu] = useState("Dashboard");

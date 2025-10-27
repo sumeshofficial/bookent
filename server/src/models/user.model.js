@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
   },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
   password: {
     type: String,
     minlength: 6,
@@ -23,7 +28,7 @@ const userSchema = new mongoose.Schema({
   },
   profileImage: {
     type: String,
-    default: null
+    default: null,
   },
   location: {
     type: String,
@@ -50,7 +55,7 @@ const userSchema = new mongoose.Schema({
     type: Object,
     default: {},
   },
-  totalSpentings: {
+  spending: {
     type: Number,
     default: 0,
   },
@@ -61,7 +66,12 @@ const userSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false,
-  }
+  },
+  status: {
+    type: String,
+    enum: ["active", "blocked"],
+    default: "active",
+  },
 });
 
 // Password bcrypt/hash
@@ -81,7 +91,7 @@ userSchema.pre("save", async function (next) {
 // Passowrd compare
 userSchema.methods.isValidPassword = async function (password) {
   try {
-    if(!this.password) return false;
+    if (!this.password) return false;
     return await bcrypt.compare(password, this.password);
   } catch (error) {
     throw new Error("Password comparison failed");

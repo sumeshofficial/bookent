@@ -12,6 +12,7 @@ export const protect = async (req, res, next) => {
     const token = authHeader.split(" ")[1];
     const user = await verifyTokenAndGetUser(token);
 
+    if(user && user?.status === 'blocked') return res.status(401).json({ message: "You are bloked by admin" });
     req.user = user;
     next();
   } catch (error) {

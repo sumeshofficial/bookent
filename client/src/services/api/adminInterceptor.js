@@ -1,7 +1,11 @@
 import axios from "axios";
-import { api } from "./axiosSetup";
-import { logout } from "../auth";
+import { adminLogout } from "../auth";
 const API_URL = import.meta.env.VITE_API_URL;
+
+const adminApi = axios.create({
+  baseURL: `${API_URL}`,
+  withCredentials: true
+});
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -17,9 +21,9 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-api.interceptors.request.use(
+adminApi.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("adminAccessToken");
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
@@ -30,7 +34,7 @@ api.interceptors.request.use(
   }
 );
 
-api.interceptors.response.use(
+adminApi.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -48,7 +52,7 @@ api.interceptors.response.use(
         });
 
         originalRequest.headers["Authorization"] = `Bearer ${token}`;
-        return await api(originalRequest);
+        return await adminApi(originalRequest);
       } catch (err) {
         return Promise.reject(err);
       }
@@ -59,29 +63,29 @@ api.interceptors.response.use(
 
     try {
       const response = await axios.post(
-        `${API_URL}/auth/refresh-token`,
+        `${API_URL}/admin/refresh-token`,
         {},
         { withCredentials: true }
       );
 
       const { accessToken } = response.data;
 
-      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("adminAccessToken", accessToken);
 
       originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
 
       processQueue(null, accessToken);
 
-      return await api(originalRequest);
+      return await adminApi(originalRequest);
     } catch (refreshError) {
 
       processQueue(refreshError, null);
 
       const { default: store } = await import("../../Redux/store");
-      const { logoutUser } = await import("../../Redux/userSlice");
+      const { logoutAdmin } = await import("../../Redux/adminSlice");
 
-      await logout();
-      store.dispatch(logoutUser());
+      await adminLogout();
+      store.dispatch(logoutAdmin());
 
       return Promise.reject(refreshError);
     } finally {
@@ -90,4 +94,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default adminApi;

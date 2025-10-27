@@ -3,20 +3,23 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { logout } from "../services/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../Redux/userSlice";
-import { persistor } from "../Redux/store";
 
 import logo from "../assets/bookent-logo-black.png";
 import { Link } from "react-router-dom";
-import { Search, Ticket } from "lucide-react";
+import { Search, Ticket, UserCircle2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
-  const { user } = useSelector((store) => store.auth);
+  const { user } = useSelector((store) => store.user);
   const dispatch = useDispatch();
 
   const handleLogout = async () => {
-    await logout();
-    dispatch(logoutUser());
-    persistor.purge();
+    try {
+      await logout();
+      dispatch(logoutUser());
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const navLinks = ["Events", "Venues", "Teams", "Live"];
@@ -50,7 +53,11 @@ const Navbar = () => {
 
                   {/* Logo */}
                   <Link to="/" className="flex-shrink-0">
-                    <img className="h-10 sm:h-12 w-auto" src={logo} alt="Bookent" />
+                    <img
+                      className="h-10 sm:h-12 w-auto"
+                      src={logo}
+                      alt="Bookent"
+                    />
                   </Link>
 
                   {/* Desktop search */}
@@ -81,11 +88,11 @@ const Navbar = () => {
                   <Menu as="div" className="relative ml-3">
                     <Menu.Button className="flex rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                       <span className="sr-only">Open user menu</span>
-                      <img
+                      {user?.profileImage ? (<img
                         className="h-10 w-10 rounded-full object-cover"
-                        src={user?.profileImage}
+                        src={user.profileImage}
                         alt="User"
-                      />
+                      />) : (<UserCircle2 className="w-8 h-8" />)}
                     </Menu.Button>
 
                     <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg focus:outline-none z-50">

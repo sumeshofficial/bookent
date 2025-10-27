@@ -32,7 +32,6 @@ export const organizarAccountRegister = async (req, res) => {
       data: organization,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ success: false, error: "Something went wrong" });
   }
 };

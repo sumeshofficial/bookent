@@ -7,6 +7,7 @@ import authRouter from "./routes/auth.router.js";
 import userRouter from "./routes/user.router.js";
 import passport from "./middlewares/passport.js";
 import organizerRouter from "./routes/organizer.router.js";
+import adminRouter from "./routes/admin.router.js";
 dotenv.config();
 
 const app = express();
@@ -33,8 +34,11 @@ app.use("/api/auth", authRouter);
 // user route
 app.use("/api/me", userRouter);
 
-//organizar route
+// organizar route
 app.use("/api/organizer", organizerRouter);
+
+// admin route
+app.use("/api/admin", adminRouter);
 
 // Server listening
 app.listen(PORT, () => {

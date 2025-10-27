@@ -21,7 +21,7 @@ export const createUser = async ({ ...data }) => {
 };
 
 // Update password
-export const updaetPassword = async ({ email, password }) => {
+export const updatePassword = async ({ email, password }) => {
   const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
@@ -40,12 +40,14 @@ export const handleGoogleAuth = async (profile) => {
   const displayName = profile.displayName;
   const profileImage = profile?.photos?.[0]?.value;
   const role = profile.role;
+  const googleId = profile.id;
 
   let user = await User.findOne({ email });
 
   if (user) {
     if (!user.profileImage) {
-      user.profileImage = profileImage;
+      if (!user.googleId) user.googleId = googleId;
+      if (!user.profileImage && profileImage) user.profileImage = profileImage;
       user.updatedAt = Date.now();
       await user.save();
     }
@@ -54,6 +56,7 @@ export const handleGoogleAuth = async (profile) => {
       fullname: displayName,
       email,
       role,
+      googleId,
       profileImage,
       isVerified: true,
       authProvider: "google",
@@ -77,3 +80,7 @@ export const verifyTokenAndGetUser = async (token) => {
 
   return user;
 };
+
+export const findAdmin = async ({ email }) => {
+  return await User.findOne({ email })
+}

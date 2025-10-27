@@ -1,11 +1,19 @@
 import { configureStore } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
-import authReducer from "./userSlice";
+import userReducer from "./userSlice";
+import adminReducer from "./adminSlice";
 import organizerReducer from "./organizerSlice";
+import usersReducer from "./usersSlice";
+import organizersReducer from "./organizersSlice";
 
-const persistConfig = {
-  key: "root",
+const UserPersistConfig = {
+  key: "user",
+  storage,
+};
+
+const adminPersistConfig = {
+  key: "admin",
   storage,
 };
 
@@ -14,13 +22,17 @@ const organizerPersistConfig = {
   storage,
 };
 
-const persistedAuthReducer = persistReducer(persistConfig, authReducer);
+const persistedUserReducer = persistReducer(UserPersistConfig, userReducer);
+const persistedAdminReducer = persistReducer(adminPersistConfig, adminReducer);
 const persistedOrganizerReducer = persistReducer(organizerPersistConfig, organizerReducer);
 
 const store = configureStore({
   reducer: {
-    auth: persistedAuthReducer,
+    user: persistedUserReducer,
+    admin: persistedAdminReducer,
     organizer: persistedOrganizerReducer,
+    users: usersReducer,
+    organizers: organizersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

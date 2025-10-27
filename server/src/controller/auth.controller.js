@@ -4,9 +4,9 @@ import {
   createUser,
   finduser,
   isUserExists,
-  updaetPassword,
+  updatePassword,
 } from "../services/auth.service.js";
-import { sendTokens } from "../utility/sendTokens.js";
+import { sendTokens, sendTokensForAdmin } from "../utility/sendTokens.js";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -18,22 +18,47 @@ dotenv.config();
 // Google Authentication controller
 export const googleAuth = async (req, res) => {
   const user = req.user;
+  const FRONTEND_URL = process.env.FRONTEND_URL;
+
+  // Blocked user check
+  if (user && user.status === "blocked") {
+    return res.send(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage(
+              { error: "Unable to log in" },
+              "${FRONTEND_URL}"
+            );
+            window.close();
+          </script>
+        </body>
+      </html>
+    `);
+  }
+
+  // Generate tokens
   const accessToken = await sendTokens(res, user);
 
+  // Send user + token back to frontend popup
   return res.send(`
-    <script>
-      window.opener.postMessage(
-        ${JSON.stringify({ accessToken, user })},
-        "http://localhost:5173"
-      );
-      window.close();
-    </script>
+    <html>
+      <body>
+        <script>
+          window.opener.postMessage(
+            { accessToken: "${accessToken}", user: ${JSON.stringify(user)} },
+            "${FRONTEND_URL}"
+          );
+          window.close();
+        </script>
+      </body>
+    </html>
   `);
 };
 
 // User signup with email controoler
 export const registerUserWithEmail = async (req, res) => {
-  const { fullname, email, password, purpose, role = 'user' } = req.body;
+  const { fullname, email, password, purpose, role = "user" } = req.body;
   try {
     if (!fullname || !email || !password || !purpose) {
       return res
@@ -104,7 +129,6 @@ export const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: "User already verified" });
 
     const otpDoc = await checkOtp(user._id);
-    console.log(otpDoc);
     if (!otpDoc || otpDoc.otp !== otp || otpDoc.purpose !== purpose)
       return res.status(400).json({ message: "Invalid or expired OTP" });
 
@@ -129,7 +153,6 @@ export const verifyOtp = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 
 // Generate RefreshAccessToken
 export const refreshAccessToken = async (req, res) => {
@@ -165,12 +188,78 @@ export const refreshAccessToken = async (req, res) => {
   }
 };
 
+// Generate RefreshAccessToken for admin
+export const refreshAccessTokenForAdmin = async (req, res) => {
+  try {
+    const token = req.cookies.admin_refreshToken;
+    if (!token) throw new Error("No refresh token");
+
+    const payload = await verifyRefreshToken(token);
+
+    await revokeRefreshToken(payload.tokenId);
+
+    const newAccessToken = generateAccessToken({
+      userId: payload.userId,
+      role: payload.role,
+    });
+    const newRefreshToken = await generateRefreshToken({
+      userId: payload.userId,
+      role: payload.role,
+    });
+
+    res.cookie("admin_refreshToken", newRefreshToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.status(200).json({ accessToken: newAccessToken });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Invalid or expired refresh token" });
+  }
+};
+
 // Logout controller
 export const logoutUser = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
     res.clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    if (!refreshToken) {
+      return res
+        .status(200)
+        .json({ success: true, message: "Already logged out" });
+    }
+
+    const payload = await verifyRefreshToken(refreshToken);
+
+    await revokeRefreshToken(payload.tokenId);
+
+    return res.status(200).json({
+      success: true,
+      message: "User logged out successfully",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
+  }
+};
+
+// Admin logout
+export const logoutAdmin = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.admin_refreshToken;
+
+    res.clearCookie("admin_refreshToken", {
       httpOnly: true,
       sameSite: "strict",
       secure: process.env.NODE_ENV === "production",
@@ -220,6 +309,13 @@ export const loginwithEmail = async (req, res) => {
       return res
         .status(401)
         .json({ success: false, error: "Invalid credentials" });
+    }
+
+    if (user.status === 'blocked') {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid credentials",
+      });
     }
 
     if (!user.isVerified) {
@@ -303,7 +399,7 @@ export const forgotPassword = async (req, res) => {
       return res.status(404).json({ success: false, error: "User not found" });
     }
 
-    await updaetPassword({
+    await updatePassword({
       email,
       password,
     });
@@ -316,5 +412,56 @@ export const forgotPassword = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, error: "Somthing went wrong" });
+  }
+};
+
+// Admin login
+export const adminLogin = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    if (!email || !password) {
+      return res
+        .status(422)
+        .json({ success: false, message: "Missing fields" });
+    }
+
+    const user = await finduser(email);
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User not found" });
+    }
+
+    if (user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Access denied. Not an admin." });
+    }
+
+    const isPasswordValid = await user.isValidPassword(password);
+    if (!isPasswordValid) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
+    }
+
+    const accessToken = await sendTokensForAdmin(res, user);
+
+    return res.status(200).json({
+      success: true,
+      message: "Admin login successful",
+      admin: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
+      accessToken,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
   }
 };

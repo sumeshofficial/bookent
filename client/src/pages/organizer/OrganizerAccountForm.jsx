@@ -34,7 +34,7 @@ const OrganizarAccountForm = () => {
     };
   }, [isSubmitting]);
 
-  const { user } = useSelector((store) => store.auth);
+  const { user } = useSelector((store) => store.user);
 
   const onSubmit = async (data) => {
     const organizationDetails = {

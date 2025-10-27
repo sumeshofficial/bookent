@@ -1,8 +1,11 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useDispatch } from "react-redux";
+import { clearError } from "../../Redux/userSlice";
 
 const Modal = ({ onClose, isOpen, children }) => {
+  const dispatch = useDispatch();
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -20,7 +23,10 @@ const Modal = ({ onClose, isOpen, children }) => {
   return createPortal(
     <div
       className="fixed inset-0 flex items-center bg-gray-600/75 justify-center z-50 "
-      onClick={onClose}
+      onClick={() => {
+        onClose();
+        dispatch(clearError());
+      }}
     >
       <div
         className="bg-white rounded-2xl shadow-lg p-6 w-11/12 max-w-md relative"
@@ -35,7 +41,7 @@ const Modal = ({ onClose, isOpen, children }) => {
         {children}
       </div>
     </div>,
-    document.getElementById('modal-root')
+    document.getElementById("modal-root")
   );
 };
 

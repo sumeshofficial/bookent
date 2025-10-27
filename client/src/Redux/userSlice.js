@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { editProfile, verifyToken } from "../services/auth";
 
 export const getUser = createAsyncThunk(
-  "auth/getUser",
+  "user/getUser",
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -13,8 +13,9 @@ export const getUser = createAsyncThunk(
       return res.data.user;
     } catch (error) {
       return rejectWithValue(
+        error.message ||
         error.response.data.message ||
-          error.response.data.error ||
+        error.response.data.error ||
           "Something went wrong"
       );
     }
@@ -22,7 +23,7 @@ export const getUser = createAsyncThunk(
 );
 
 export const updateUserProfile = createAsyncThunk(
-  "auth/updateUserProfile",
+  "user/updateUserProfile",
   async ({ data }, { rejectWithValue }) => {
     try {
       if (!data) return;
@@ -34,8 +35,8 @@ export const updateUserProfile = createAsyncThunk(
   }
 );
 
-const authSlice = createSlice({
-  name: "auth",
+const userSlice = createSlice({
+  name: "user",
   initialState: {
     user: null,
     isLoading: false,
@@ -51,6 +52,9 @@ const authSlice = createSlice({
     },
     logoutUser: (state) => {
       state.user = null;
+    },
+    addError: (state, action) => {
+      state.error = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -82,5 +86,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, logoutUser, addUser } = authSlice.actions;
-export default authSlice.reducer;
+export const { clearError, logoutUser, addUser, addError } = userSlice.actions;
+export default userSlice.reducer;

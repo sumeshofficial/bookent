@@ -1,13 +1,13 @@
 import { useDispatch } from "react-redux";
-import { addUser } from "../../../Redux/userSlice";
+import { addError, addUser, clearError } from "../../../Redux/userSlice";
 import { useModal } from "../../../utils/constants";
 
 const GoogleButton = ({ role = "user" }) => {
   const { closeModal } = useModal();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleGoogleLogin = () => {
-    closeModal();
+    dispatch(clearError());
     const popup = window.open(
       "http://localhost:3000/api/auth/google?state=" +
         encodeURIComponent(JSON.stringify({ role })),
@@ -18,13 +18,16 @@ const GoogleButton = ({ role = "user" }) => {
     const listener = (event) => {
       if (event.origin !== "http://localhost:3000") return;
 
-      const { accessToken, user } = event.data;
-      if (accessToken, user) {
-        popup.close();
-        window.removeEventListener("message", listener);
+      const { accessToken, user, error } = event.data;
+      if (accessToken && user) {
         localStorage.setItem("accessToken", accessToken);
         dispatch(addUser(user));
+        closeModal();
+      } else {
+        popup.close();
       }
+      window.removeEventListener("message", listener);
+      dispatch(addError(error));
     };
 
     window.addEventListener("message", listener);

@@ -7,8 +7,7 @@ import { sendOTP } from "../../services/auth";
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
-  const { user } = useSelector((store) => store.auth);
-//   console.log(user);
+  const { user } = useSelector((store) => store.user);
   const { openModal } = useModal();
   const { reset } = useContextForm();
   const [error, setError] = useState();
@@ -19,7 +18,6 @@ const ProfilePage = () => {
         return setError("same email");
       }
       const response = await sendOTP({ data, purpose: "email-edit" });
-      console.log(response)
       toast.success("OTP sent successfully");
       reset();
       openModal("otp", {

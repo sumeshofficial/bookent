@@ -8,7 +8,7 @@ const OrganizerProtected = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { organizer, isLoading } = useSelector((store) => store.organizer);
-  const { user } = useSelector((store) => store.auth);
+  const { user } = useSelector((store) => store.user);
 
   const [fetched, setFetched] = useState(false);
 
@@ -18,7 +18,7 @@ const OrganizerProtected = () => {
         setFetched(true)
       );
     } else {
-      setFetched(true); // no user, still allow rendering
+      setFetched(true);
     }
   }, [dispatch, user?._id]);
 
@@ -30,7 +30,7 @@ const OrganizerProtected = () => {
     );
   }
 
-  // Case 1: No organizer data
+
   if (!organizer) {
     return location.pathname === "/listmyShow/register" ? (
       <Outlet />
@@ -39,8 +39,7 @@ const OrganizerProtected = () => {
     );
   }
 
-  // Case 2: Organizer exists but not verified
-  if (!organizer.isVerified) {
+  if (organizer.status === 'pending') {
     return location.pathname === "/listmyShow/requested" ? (
       <Outlet />
     ) : (
@@ -48,7 +47,14 @@ const OrganizerProtected = () => {
     );
   }
 
-  // Case 3: Verified organizer
+  if (organizer.status === 'rejected') {
+    return location.pathname === "/listmyShow/rejected" ? (
+      <Outlet />
+    ) : (
+      <Navigate to="/listmyShow/rejected" replace />
+    );
+  }
+
   return location.pathname === "/listmyShow/dashboard" ? (
     <Outlet />
   ) : (

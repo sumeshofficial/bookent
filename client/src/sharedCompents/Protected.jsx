@@ -5,7 +5,7 @@ import WelcomePage from "../pages/user/WelcomePage"
 
 const Protected = ({ children }) => {
   const dispatch = useDispatch();
-  const { user } = useSelector((store) => store.auth);
+  const { user } = useSelector((store) => store.user);
 
   useEffect(() => {
     dispatch(getUser());

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { onResend } from "../../../services/auth";
 import { Loader } from "lucide-react";
-import { useModal } from "../../../utils/constants";
 import toast from "react-hot-toast";
 
 const OTP_DIGITS_COUNT = 6;
