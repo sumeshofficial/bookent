@@ -1,23 +1,19 @@
-import { useState } from "react";
-import axios from "axios";
-import { useEffect } from "react";
+import ModalManager from "./sharedCompents/Modal/ModalManager";
+import ModalProvider from "./context/ModalContext";
+import DynamicRoutes from "./Routes/DynamicRoutes";
+import { Toaster } from "react-hot-toast";
+import AuthProvider from "./context/FormContext";
 
 function App() {
-  const [data, setData] = useState(null);
-  const baseUrl = "http://localhost:3000";
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const obj = await axios(`${baseUrl}/api/data`);
-      setData(obj.data);
-    };
-
-    fetchData();
-  },[]);
-
   return (
     <>
-      <p>data: {data?.message}</p>
+      <AuthProvider>
+        <ModalProvider>
+          <Toaster position="top-center" reverseOrder={false} />
+          <ModalManager />
+          <DynamicRoutes />
+        </ModalProvider>
+      </AuthProvider>
     </>
   );
 }
