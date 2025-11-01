@@ -1,7 +1,7 @@
 import adminApi from "./api/adminInterceptor";
 
 export const getAllUsers = async ({
-  role,
+  role = 'user',
   page,
   limit,
   search,
@@ -57,24 +57,9 @@ export const toggleUserStatusAPI = async ({ userId, newStatus }) => {
     throw new Error(message);
   }
 };
-export const rejectOrganizerRequest = async ( id ) => {
+export const handleOrganizerRequest = async ({id, status}) => {
   try {
-    const res = await adminApi.patch(`/admin/organizers/${id}/reject`);
-
-    return res.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
-};
-
-export const approveOrganizerRequest = async (id ) => {
-  try {
-    const res = await adminApi.patch(`/admin/organizers/${id}/approve`);
+    const res = await adminApi.patch(`/admin/organizers/${id}/${status}`);
 
     return res.data;
   } catch (error) {
@@ -89,7 +74,7 @@ export const approveOrganizerRequest = async (id ) => {
 
 export const getUserDeatils = async (userId) => {
   try {
-    const user =  await adminApi.get(`/admin/users/${userId}`);
+    const user = await adminApi.get(`/admin/users/${userId}`);
     return user;
   } catch (error) {
     const message =
@@ -103,7 +88,7 @@ export const getUserDeatils = async (userId) => {
 
 export const getOrganizerDetails = async (id) => {
   try {
-    const organizer =  await adminApi.get(`/admin/organizers/${id}`);
+    const organizer = await adminApi.get(`/admin/organizers/${id}`);
     return organizer;
   } catch (error) {
     const message =

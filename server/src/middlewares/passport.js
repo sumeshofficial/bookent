@@ -34,7 +34,6 @@ passport.use(
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
-
         profile.role = "user";
         if (req.query.state) {
           const stateData = JSON.parse(req.query.state);

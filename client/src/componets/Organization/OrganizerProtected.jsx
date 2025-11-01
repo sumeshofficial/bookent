@@ -1,28 +1,23 @@
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 import { getOrganizer } from "../../Redux/organizerSlice";
 
 const OrganizerProtected = () => {
   const dispatch = useDispatch();
   const location = useLocation();
-  const { organizer, isLoading } = useSelector((store) => store.organizer);
-  const { user } = useSelector((store) => store.user);
 
-  const [fetched, setFetched] = useState(false);
+  const { organizer, isLoading } = useSelector((state) => state.organizer);
+  const { user } = useSelector((state) => state.user);
 
   useEffect(() => {
     if (user?._id) {
-      dispatch(getOrganizer({ userId: user._id })).finally(() =>
-        setFetched(true)
-      );
-    } else {
-      setFetched(true);
+      dispatch(getOrganizer({ userId: user._id }));
     }
-  }, [dispatch, user?._id]);
+  }, [dispatch, user]);
 
-  if (isLoading || !fetched) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader className="w-12 h-12 animate-spin text-violet-600" />
@@ -30,36 +25,42 @@ const OrganizerProtected = () => {
     );
   }
 
-
   if (!organizer) {
-    return location.pathname === "/listmyShow/register" ? (
-      <Outlet />
-    ) : (
-      <Navigate to="/listmyShow/register" replace />
-    );
+    if (location.pathname.includes("/register")) {
+      return <Outlet />;
+    }
+    return <Navigate to="/listmyshow/register" replace />;
   }
 
-  if (organizer.status === 'pending') {
-    return location.pathname === "/listmyShow/requested" ? (
-      <Outlet />
-    ) : (
-      <Navigate to="/listmyShow/requested" replace />
-    );
+  const status = organizer.status;
+  const path = location.pathname;
+
+  if (status === "pending") {
+    if (!path.includes("/requested")) {
+      return <Navigate to="/listmyshow/requested" replace />;
+    }
+    return <Outlet />;
   }
 
-  if (organizer.status === 'rejected') {
-    return location.pathname === "/listmyShow/rejected" ? (
-      <Outlet />
-    ) : (
-      <Navigate to="/listmyShow/rejected" replace />
-    );
+  if (status === "rejected") {
+    if (!path.includes("/rejected")) {
+      return <Navigate to="/listmyshow/rejected" replace />;
+    }
+    return <Outlet />;
   }
 
-  return location.pathname === "/listmyShow/dashboard" ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/listmyShow/dashboard" replace />
-  );
+  if (status === "approved") {
+    if (
+      path.includes("/register") ||
+      path.includes("/requested") ||
+      path.includes("/rejected")
+    ) {
+      return <Navigate to="/listmyshow/dashboard" replace />;
+    }
+    return <Outlet />;
+  }
+
+  return <Outlet />;
 };
 
 export default OrganizerProtected;

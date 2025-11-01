@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import Navbar from "../../sharedCompents/Navbar";
 import { Edit, User } from "lucide-react";
@@ -6,9 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
 import { updateUserProfile } from "../../Redux/userSlice";
+import { isEqual } from "lodash";
 
 const ProfilePage = () => {
   const { user } = useSelector((store) => store.user);
+  const [location, setLocation] = useState({
+    defaultLocation: null,
+    formattedLocation: null,
+  });
   const { openModal } = useModal();
   const dispatch = useDispatch();
 
@@ -16,16 +21,56 @@ const ProfilePage = () => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      location: "Kerala, India",
       sport: "Football",
       venue: "Kochi",
       matchTime: "Afternoon",
       priceRange: "500 - 2000",
     },
   });
+
+  useEffect(() => {
+    const fullAddress = user.location?.address || "";
+    const parts = fullAddress.split(",");
+    const city = parts[parts.length - 2]?.trim() || "";
+    const state = parts[parts.length - 1]?.trim() || "";
+    const formatted = `${city}, ${state}`;
+    
+    if (fullAddress) {
+      setLocation({
+        formattedLocation: formatted,
+        defaultLocation: city,
+      });
+    }
+  }, [user]);
+
+  const watchedValues = watch();
+
+  const initialPreferences = useMemo(() => {
+    return (
+      user?.preferences || {
+        sport: "Football",
+        venue: "Kochi",
+        matchTime: "Afternoon",
+        priceRange: "500 - 2000",
+      }
+    );
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.preferences) {
+      Object.entries(user.preferences).forEach(([key, value]) => {
+        setValue(key, value);
+      });
+    }
+  }, [user, setValue]);
+
+  const isChanged = useMemo(() => {
+    return !isEqual(watchedValues, initialPreferences);
+  }, [watchedValues, initialPreferences]);
 
   const sports = [
     "Football",
@@ -46,21 +91,13 @@ const ProfilePage = () => {
   const matchTimes = ["Morning", "Afternoon", "Evening", "Night"];
   const priceRanges = ["0 - 500", "500 - 2000", "2000 - 5000", "5000+"];
 
-  useEffect(() => {
-    if (user?.preferences) {
-      Object.entries(user.preferences).forEach(([key, value]) => {
-        setValue(key, value);
-      });
-    }
-  }, [user, setValue]);
-
   const onSubmit = async (formData) => {
     const data = {
       preferences: {
-        ...formData
-      }
-    }
-    dispatch(updateUserProfile({id: user._id, data}));
+        ...formData,
+      },
+    };
+    dispatch(updateUserProfile({ id: user._id, data }));
     toast.success("Preferences updated successfully!");
   };
 
@@ -92,6 +129,11 @@ const ProfilePage = () => {
 
                 <div className="text-left space-y-3">
                   <p className="text-gray-600 text-sm">{user.email}</p>
+                </div>
+                <div className="text-left space-y-3 mt-2">
+                  <p className="text-gray-600 text-sm">
+                    {location.formattedLocation}
+                  </p>
                 </div>
               </div>
             </div>
@@ -213,17 +255,19 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                <div className="mt-8 justify-end flex">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full md:w-auto px-8 py-3 bg-black hover:bg-gray-700
+                {isChanged && (
+                  <div className="mt-8 justify-end flex">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full md:w-auto px-8 py-3 bg-black hover:bg-gray-700
                                text-white font-semibold rounded-lg transition duration-200
                                disabled:opacity-50"
-                  >
-                    {isSubmitting ? "Saving..." : "Save"}
-                  </button>
-                </div>
+                    >
+                      {isSubmitting ? "Saving..." : "Save"}
+                    </button>
+                  </div>
+                )}
               </form>
             </div>
           </div>

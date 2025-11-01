@@ -16,7 +16,7 @@ const EmailInputFormModal = () => {
   const [error, setError] = useState();
 
   useEffect(() => {
-    const subscribe = watch((data) => {
+    const subscribe = watch(() => {
       setError("");
     });
 
@@ -33,13 +33,6 @@ const EmailInputFormModal = () => {
       } else {
         const response = await loginUserWithEmail(data);
         reset();
-        if (!response.data.isVerified) {
-          return openModal("otp", {
-            title: response.data.message,
-            email: data.email,
-            purpose: form,
-          });
-        }
         dispatch(addUser(response.data.user));
         localStorage.setItem("accessToken", response.data.accessToken);
         closeModal();

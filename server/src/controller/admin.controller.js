@@ -1,8 +1,7 @@
 import { findOrganizerById, findUserById } from "../services/auth.service.js";
 import {
-  approveRequest,
   getAllOrganizers,
-  rejectRequest,
+  updateRequest,
 } from "../services/organizer.service.js";
 import { getAllUsers, updateUserStatus } from "../services/user.service.js";
 
@@ -132,31 +131,14 @@ export const getOrganizers = async (req, res) => {
   }
 };
 
-export const approveOrganizerRequest = async (req, res) => {
+export const handleOrganizerRequest = async (req, res) => {
   try {
-    const id  = req.params.id;
-    if (!id) {
+    const { id, status } = req.params;
+    if (!id || !status) {
       return res.status(422).json({ success: false, error: "Missing field" });
     }
 
-    await approveRequest(id);
-
-    res.status(200).json({ success: true, message: "Organizer Updated" });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Something went wrong",
-    });
-  }
-};
-export const rejectOrganizerRequest = async (req, res) => {
-  try {
-    const id  = req.params.id;
-    if (!id) {
-      return res.status(422).json({ success: false, error: "Missing field" });
-    }
-
-    await rejectRequest(id);
+    await updateRequest({ id, status});
 
     res.status(200).json({ success: true, message: "Organizer Updated" });
   } catch (error) {

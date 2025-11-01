@@ -10,6 +10,7 @@ export const loginAdmin = createAsyncThunk(
       const response = await adminLogin({ email, password });
       
       localStorage.setItem('adminAccessToken', response.accessToken);
+      localStorage.getItem('adminAccessToken', response.accessToken);
 
       return response.admin;
     } catch (error) {
