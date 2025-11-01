@@ -10,7 +10,7 @@ const ErrorPage = () => {
   const errorCode = error?.status || "500";
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white px-6 text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-linear-to-b from-gray-900 via-gray-800 to-gray-900 text-white px-6 text-center">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

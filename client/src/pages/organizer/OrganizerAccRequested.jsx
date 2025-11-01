@@ -69,17 +69,17 @@ const OrganizerAccRequested = () => {
             </h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start gap-2">
-                <span className="w-2 h-2 mt-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                <span className="w-2 h-2 mt-2 bg-blue-500 rounded-full shrink-0"></span>
                 <span>
                   Our admin team will review your submitted information
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="w-2 h-2 mt-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                <span className="w-2 h-2 mt-2 bg-blue-500 rounded-full shrink-0"></span>
                 <span>You'll receive an email notification once approved</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="w-2 h-2 mt-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                <span className="w-2 h-2 mt-2 bg-blue-500 rounded-full shrink-0"></span>
                 <span>
                   Access to the organizer dashboard will be granted upon
                   approval
