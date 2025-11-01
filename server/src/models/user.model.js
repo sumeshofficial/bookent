@@ -31,9 +31,8 @@ const userSchema = new mongoose.Schema({
     default: null,
   },
   location: {
-    type: String,
+    type: Object,
     default: null,
-    trim: true,
   },
   authProvider: {
     type: String,

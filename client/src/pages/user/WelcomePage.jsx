@@ -16,7 +16,10 @@ const WelcomePage = () => {
           alt="Bookent Logo"
           className="w-24 sm:w-32 md:w-36 h-auto"
         />
-        <button onClick={() => openModal("auth")} className="bg-black bg-opacity-60 py-1 px-4 sm:py-2 sm:px-6 rounded-full border border-white ">
+        <button
+          onClick={() => openModal("auth")}
+          className="bg-black bg-opacity-60 py-1 px-4 sm:py-2 sm:px-6 rounded-full border border-white "
+        >
           <span className="text-sm sm:text-base font-medium">Get Started</span>
         </button>
       </div>
@@ -33,7 +36,10 @@ const WelcomePage = () => {
           <p className="mt-5 text-lg sm:text-2xl text-gray-200 max-w-2xl">
             Welcome to Bookent — your ticket to the best sports experiences.
           </p>
-          <button onClick={() => openModal("auth")} className="bg-black mt-8 bg-opacity-60 py-2 px-6 sm:py-3 sm:px-8 rounded-full border border-white hover:bg-opacity-80 transition">
+          <button
+            onClick={() => openModal("auth")}
+            className="bg-black mt-8 bg-opacity-60 py-2 px-6 sm:py-3 sm:px-8 rounded-full border border-white hover:bg-opacity-80 transition"
+          >
             <span className="text-sm sm:text-lg font-medium">Book Now</span>
           </button>
         </div>

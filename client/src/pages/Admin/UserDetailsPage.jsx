@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from "react";
 import {
   User,
   Mail,
-  Phone,
   ShoppingCart,
   Wallet,
   Calendar,
   Filter,
   ChevronDown,
+  Loader,
+  ArrowLeft,
 } from "lucide-react";
-import AdminSidebar from "../../sharedCompents/Admin/AdminSidebar";
-import AdminNavbar from "../../sharedCompents/Admin/AdminNavbar";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getUserDeatils } from "../../services/admin";
+import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
 
 const UserDetailsPage = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { id } = useParams();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -27,7 +25,6 @@ const UserDetailsPage = () => {
       case "Pending":
         return "bg-cyan-100 text-cyan-700";
       case "Canceled":
-        return "bg-orange-100 text-orange-700";
       case "Refunded":
         return "bg-orange-100 text-orange-700";
       default:
@@ -35,33 +32,40 @@ const UserDetailsPage = () => {
     }
   };
 
-  
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const { data } = await getUserDeatils(id);
-        if (data.success) setUser(data.user);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-  }, [id]);
+  const { data, isLoading } = useQuery({
+    queryKey: ["user", id],
+    queryFn: () => getUserDeatils(id),
+    onError: (error) => toast.error(error.message)
+  });
 
-  if (loading) return <p className="p-6">Loading...</p>;
-  if (!user) return <p className="p-6">User not found</p>;
+  const user = data?.data?.user;
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+    <main className="flex-1 p-1 lg:p-8">
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        <AdminNavbar setSidebarOpen={setSidebarOpen}/>
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 mb-6 text-gray-600 hover:text-gray-800 transition"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span className="font-medium">Back to Organizers</span>
+      </button>
 
-        <main className="flex-1 p-6 lg:p-8">
+      {isLoading && (
+        <div className="flex justify-center items-center h-96">
+          <Loader className="w-8 h-8 animate-spin text-gray-600" />
+          <span className="ml-2 text-gray-600">Loading user details...</span>
+        </div>
+      )}
+
+      {!isLoading && !user && (
+        <div className="flex justify-center items-center h-96">
+          <p className="text-gray-600">User not found.</p>
+        </div>
+      )}
+
+      {!isLoading && user && (
+        <>
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-800 mb-2">
               User Details
@@ -71,9 +75,9 @@ const UserDetailsPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex flex-col items-center mb-6">
-                <div className="w-full h-32 bg-gradient-to-r from-gray-700 to-gray-800 rounded-t-lg -mx-6 -mt-6 mb-16"></div>
+                <div className="w-full h-32 bg-linear-to-r from-gray-700 to-gray-800 rounded-t-lg -mx-6 -mt-6 mb-16"></div>
                 <div className="w-32 h-32 text-5xl rounded-full border-4 bg-gray-200 border-white -mt-28 flex items-center justify-center text-gray-600 font-medium">
-                  {user.fullname.charAt(0)}
+                  {user.fullname?.charAt(0)}
                 </div>
                 <h2 className="text-xl font-semibold text-gray-800 mt-3">
                   {user.fullname}
@@ -119,9 +123,7 @@ const UserDetailsPage = () => {
               </div>
             </div>
 
-            {/* Right Side Content */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <div className="flex items-center gap-3 mb-3">
@@ -148,7 +150,6 @@ const UserDetailsPage = () => {
                 </div>
               </div>
 
-              {/* Transaction History */}
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-semibold text-gray-800">
@@ -166,7 +167,6 @@ const UserDetailsPage = () => {
                   </div>
                 </div>
 
-                {/* Table */}
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -199,7 +199,7 @@ const UserDetailsPage = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {user?.transactions?.length > 0 ? (
-                        user?.transactions?.map((transaction) => (
+                        user.transactions.map((transaction) => (
                           <tr key={transaction.id} className="hover:bg-gray-50">
                             <td className="px-4 py-4">
                               <span className="text-blue-600 font-medium text-sm">
@@ -247,9 +247,9 @@ const UserDetailsPage = () => {
               </div>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+        </>
+      )}
+    </main>
   );
 };
 

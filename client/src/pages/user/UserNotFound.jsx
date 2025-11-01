@@ -15,7 +15,7 @@ const UserNotFoundPage = () => {
         </div>
 
         <div className="relative mb-6">
-          <div className="text-[150px] font-extrabold text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-indigo-500 leading-none select-none">
+          <div className="text-[150px] font-extrabold text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-purple-600  leading-none select-none">
             404
           </div>
 
@@ -38,7 +38,7 @@ const UserNotFoundPage = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+            className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-500 to-purple-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
           >
             <ArrowLeft className="w-5 h-5" />
             Go Back

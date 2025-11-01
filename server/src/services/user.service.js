@@ -1,17 +1,17 @@
 import dotenv from "dotenv";
 import User from "../models/user.model.js";
+import axios from "axios";
 dotenv.config();
 
 // Update user
 export const updateUserService = async ({ id, data }) => {
   try {
-
     const updatedUser = await User.findOneAndUpdate(
       { _id: id },
       { $set: data },
       { new: true }
     );
-    
+
     return updatedUser;
   } catch (error) {
     throw new Error(error.message);
@@ -46,7 +46,7 @@ export const getAllUsers = async ({
     if (sort === "highestSpend") sortOption = { spending: -1 };
     if (sort === "lowestSpend") sortOption = { spending: 1 };
 
-    const users = await User.find( query )
+    const users = await User.find(query)
       .sort(sortOption)
       .skip(skip)
       .limit(limit);
@@ -67,6 +67,24 @@ export const updateUserStatus = async ({ userId, newStatus }) => {
         status: newStatus,
       }
     );
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+// Reverse Geocoding
+export const reverseGeocoding = async ({ lat, lng }) => {
+  try {
+    const LOCATION_API_KEY = process.env.LOCATION_API_KEY;
+    const response = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${LOCATION_API_KEY}`
+    );
+    if (response.data.status === "OK") {
+      const formattedAddress = response.data.results[0].formatted_address;
+      return formattedAddress;
+    } else {
+      return null;
+    }
   } catch (error) {
     throw new Error(error.message);
   }

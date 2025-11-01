@@ -52,7 +52,7 @@ const Navbar = () => {
                   </div>
 
                   {/* Logo */}
-                  <Link to="/" className="flex-shrink-0">
+                  <Link to="/" className="shrink-0">
                     <img
                       className="h-10 sm:h-12 w-auto"
                       src={logo}
@@ -77,7 +77,7 @@ const Navbar = () => {
                   <div className="hidden sm:flex items-center gap-1">
                     <Ticket className="w-5 h-5 text-gray-600" />
                     <Link
-                      to="/listmyShow"
+                      to="/listmyshow"
                       className="text-base font-medium text-gray-700 hover:text-gray-900"
                     >
                       Sell Ticket
@@ -159,7 +159,7 @@ const Navbar = () => {
               <div className="flex items-center gap-2 px-3 py-2">
                 <Ticket className="w-5 h-5 text-gray-600" />
                 <Link
-                  to="/listmyShow"
+                  to="/listmyshow"
                   className="text-base font-medium text-gray-700 hover:text-gray-900"
                 >
                   Sell Ticket

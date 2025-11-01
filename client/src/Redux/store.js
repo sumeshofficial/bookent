@@ -4,8 +4,6 @@ import { persistReducer, persistStore } from "redux-persist";
 import userReducer from "./userSlice";
 import adminReducer from "./adminSlice";
 import organizerReducer from "./organizerSlice";
-import usersReducer from "./usersSlice";
-import organizersReducer from "./organizersSlice";
 
 const UserPersistConfig = {
   key: "user",
@@ -24,15 +22,16 @@ const organizerPersistConfig = {
 
 const persistedUserReducer = persistReducer(UserPersistConfig, userReducer);
 const persistedAdminReducer = persistReducer(adminPersistConfig, adminReducer);
-const persistedOrganizerReducer = persistReducer(organizerPersistConfig, organizerReducer);
+const persistedOrganizerReducer = persistReducer(
+  organizerPersistConfig,
+  organizerReducer
+);
 
 const store = configureStore({
   reducer: {
     user: persistedUserReducer,
     admin: persistedAdminReducer,
     organizer: persistedOrganizerReducer,
-    users: usersReducer,
-    organizers: organizersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

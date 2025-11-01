@@ -4,9 +4,8 @@ import logo from '../../assets/bookent-logo-black.png'
 
 const AdminNotFoundPage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full text-center">
-        {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="flex items-center space-x-3">
             <img
@@ -19,7 +18,7 @@ const AdminNotFoundPage = () => {
 
         {/* 404 Illustration */}
         <div className="relative mb-8">
-          <div className="text-[180px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 leading-none select-none">
+          <div className="text-[180px] font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-purple-600 leading-none select-none">
             404
           </div>
 
@@ -45,7 +44,7 @@ const AdminNotFoundPage = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+            className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
           >
             <ArrowLeft className="w-5 h-5" />
             Go Back

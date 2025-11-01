@@ -67,9 +67,9 @@ const EditUserProfile = () => {
           <button
             type="submit"
             disabled={isSubmitting || sameFullname}
-            className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-70"
+            className="px-5 py-2 rounded-lg bg-black text-white hover:bg-gray-700 disabled:opacity-70"
           >
-            {isSubmitting ? "Saving..." : "Save Changes"}
+            {isSubmitting ? "Saving..." : "Save"}
           </button>
         </div>
       </form>

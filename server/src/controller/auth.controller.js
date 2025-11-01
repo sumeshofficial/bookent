@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
-import { checkOtp, generateOtp, verifyUser } from "../services/otp.service.js";
+import { checkOtp, delOtp, generateOtp } from "../services/otp.service.js";
 import {
   createUser,
   finduser,
+  findUserByEmail,
   isUserExists,
   updatePassword,
 } from "../services/auth.service.js";
@@ -27,7 +28,7 @@ export const googleAuth = async (req, res) => {
         <body>
           <script>
             window.opener.postMessage(
-              { error: "Unable to log in" },
+              { error: "You are blocked by the admin" },
               "${FRONTEND_URL}"
             );
             window.close();
@@ -37,10 +38,8 @@ export const googleAuth = async (req, res) => {
     `);
   }
 
-  // Generate tokens
   const accessToken = await sendTokens(res, user);
 
-  // Send user + token back to frontend popup
   return res.send(`
     <html>
       <body>
@@ -59,26 +58,20 @@ export const googleAuth = async (req, res) => {
 // User signup with email controoler
 export const registerUserWithEmail = async (req, res) => {
   const { fullname, email, password, purpose, role = "user" } = req.body;
+
   try {
     if (!fullname || !email || !password || !purpose) {
-      return res
-        .status(422)
-        .json({ message: "name, email, purpose and password are required" });
+      return res.status(422).json({ message: "All fields are required" });
     }
 
     if (await isUserExists(email)) {
       return res.status(409).json({ error: "Email already exists" });
     }
 
-    const user = await createUser({
-      fullname,
-      email,
-      role,
-      password,
-      authProvider: "email",
-    });
+    const userData = { fullname, email, password, role, authProvider: "email" };
 
-    await generateOtp(user, purpose);
+    await generateOtp({ email, userData, purpose });
+
     res.status(201).json({
       success: true,
       message: `OTP sent successfully to ${email}`,
@@ -98,15 +91,16 @@ export const resendOTP = async (req, res) => {
         .json({ message: "email and purpose are required" });
     }
 
-    const user = await finduser(email);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const userData = await checkOtp(email, purpose);
+    if (!userData) {
+      return res.status(404).json({ message: "No pending OTP found for user" });
     }
 
-    await generateOtp(user, purpose);
+    await generateOtp({ email, userData, purpose });
+
     res.status(201).json({
       success: true,
-      message: `OTP resend successfully`,
+      message: `OTP resent successfully`,
     });
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
@@ -116,30 +110,46 @@ export const resendOTP = async (req, res) => {
 // Verify OTP
 export const verifyOtp = async (req, res) => {
   const { email, otp, purpose } = req.body;
+
   try {
     if (!email || !otp || !purpose)
       return res
         .status(422)
         .json({ message: "email, purpose and otp are required" });
 
-    const user = await finduser(email);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const userData = await checkOtp(email, purpose);
+    if (!userData)
+      return res.status(404).json({ message: "OTP expired or not found" });
 
-    if (user.isVerified && purpose === ("signup" || "signin"))
-      return res.status(400).json({ message: "User already verified" });
+    if (userData.otp !== otp || userData.purpose !== purpose)
+      return res.status(400).json({ message: "Invalid OTP" });
 
-    const otpDoc = await checkOtp(user._id);
-    if (!otpDoc || otpDoc.otp !== otp || otpDoc.purpose !== purpose)
-      return res.status(400).json({ message: "Invalid or expired OTP" });
+    let user;
+    if (purpose === "signup") {
+      user = await createUser({
+        fullname: userData.fullname,
+        email: userData.email,
+        role: userData.email,
+        password: userData.password,
+        role: userData.role,
+        authProvider: userData.authProvider,
+        isVerified: true,
+      });
+    }
 
-    const verifiedUser = await verifyUser(user, purpose);
-    if (purpose === ("signup" || "signin")) {
+    if (purpose === "forgot-password") {
+      user = await findUserByEmail( email );
+      if (!user) return res.status(404).json({ message: "User not found" });
+    }
+
+    await delOtp(email, purpose);
+
+    if (purpose === "signup") {
       const accessToken = await sendTokens(res, user);
-
       return res.status(200).json({
         success: true,
         message: "User verified successfully",
-        user: verifiedUser,
+        user,
         accessToken,
       });
     }
@@ -311,20 +321,10 @@ export const loginwithEmail = async (req, res) => {
         .json({ success: false, error: "Invalid credentials" });
     }
 
-    if (user.status === 'blocked') {
+    if (user.status === "blocked") {
       return res.status(401).json({
         success: false,
-        error: "Invalid credentials",
-      });
-    }
-
-    if (!user.isVerified) {
-      await generateOtp(user, purpose);
-
-      return res.status(200).json({
-        success: true,
-        isVerified: false,
-        message: `OTP sent successfully to ${email}`,
+        error: "You are blocked by the admin",
       });
     }
 
@@ -370,7 +370,7 @@ export const sendOtp = async (req, res) => {
       return res.status(404).json({ success: false, error: "User not found" });
     }
 
-    await generateOtp(user, purpose);
+    await generateOtp({ email, userData: user, purpose });
 
     return res.status(200).json({
       success: true,

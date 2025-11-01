@@ -29,7 +29,7 @@ export const getAllOrganizers = async ({
       ...(search
         ? {
             $or: [
-              { 'organizationDetails.name': { $regex: search, $options: "i" } },
+              { "organizationDetails.name": { $regex: search, $options: "i" } },
             ],
           }
         : {}),
@@ -38,14 +38,13 @@ export const getAllOrganizers = async ({
 
     let sortOption = { createdAt: -1 };
     if (sort === "oldest") sortOption = { createdAt: 1 };
-    if (sort === "a-z") sortOption = { 'organizationDetails.name': -1 };
-    if (sort === "z-a") sortOption = { 'organizationDetails.name': 1 };
-    
+    if (sort === "a-z") sortOption = { "organizationDetails.name": 1 };
+    if (sort === "z-a") sortOption = { "organizationDetails.name": -1 };
+
     const organizers = await Organizer.find(query)
       .sort(sortOption)
       .skip(skip)
       .limit(limit);
-
 
     const totalOrganizers = await Organizer.countDocuments({ ...query });
     return { totalOrganizers, organizers };
@@ -54,18 +53,12 @@ export const getAllOrganizers = async ({
   }
 };
 
-export const approveRequest = async (id) => {
-    const organizer = await Organizer.findById(id);
+export const updateRequest = async ({ id, status }) => {
+  const organizer = await Organizer.findById(id);
 
-    organizer.status = 'approved';
-    organizer.isVerified = true
-    await organizer.save();
-}
-
-export const rejectRequest = async (id) => {
-    const organizer = await Organizer.findById(id);
-
-    organizer.status = 'rejected';
-    organizer.isVerified = false;
-    await organizer.save();
-}
+  organizer.status = status;
+  if (status === "approved") {
+    organizer.isVerified = true;
+  }
+  await organizer.save();
+};

@@ -3,18 +3,14 @@ import {
   ChevronRight,
   CreditCard,
   Grid,
-  Image,
   List,
   Package,
-  Ticket,
-  UserCircle,
-  Users,
 } from "lucide-react";
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import logo from "../../assets/bookent-logo-black.png";
 
-const AdminSidebar = ({ setSidebarOpen, sidebarOpen }) => {
+const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
   const [showEventsDropdown, setShowEventsDropdown] = useState(false);
 
   const menuItems = [
@@ -22,20 +18,11 @@ const AdminSidebar = ({ setSidebarOpen, sidebarOpen }) => {
       id: "dashboard",
       label: "Dashboard",
       icon: Grid,
-      path: "/admin/dashboard",
+      path: "/listmyshow/dashboard",
     },
     { id: "events", label: "Events", icon: Package, hasDropdown: true },
-    {
-      id: "organizers",
-      label: "Organizers",
-      icon: Users,
-      path: "/admin/organizers",
-    },
-    { id: "orderList", label: "Order List", icon: List, path: "/admin/orders" },
-    { id: "users", label: "Users", icon: UserCircle, path: "/admin/users" },
-    { id: "sales", label: "Sales", icon: CreditCard, path: "/admin/sales" },
-    { id: "coupons", label: "Coupons", icon: Ticket, path: "/admin/coupons" },
-    { id: "banner", label: "Banner", icon: Image, path: "/admin/banner" },
+    { id: "orderList", label: "Order List", icon: List, path: "/listmyshow/orders" },
+    { id: "sales", label: "Sales", icon: CreditCard, path: "/listmyshow/sales" },
   ];
 
   return (
@@ -47,13 +34,13 @@ const AdminSidebar = ({ setSidebarOpen, sidebarOpen }) => {
       >
         <div className="px-6 py-4 sm:py-3 border-b">
           <div className="flex items-center gap-2">
-            <div className="flex items-center space-x-3">
+            <Link to='/' className="flex items-center space-x-3">
               <img
                 src={logo}
                 alt="Bookent"
                 className="h-12 sm:h-12 w-auto object-contain"
               />
-            </div>
+            </Link>
           </div>
         </div>
 
@@ -100,7 +87,7 @@ const AdminSidebar = ({ setSidebarOpen, sidebarOpen }) => {
                 {item.id === "events" && showEventsDropdown && (
                   <div className="ml-12 space-y-1 mb-2">
                     <NavLink
-                      to="/admin/events"
+                      to="/listmyshow/events"
                       onClick={() => setSidebarOpen(false)}
                       className={({ isActive }) =>
                         `block px-4 py-2 text-sm rounded-lg cursor-pointer ${
@@ -111,6 +98,19 @@ const AdminSidebar = ({ setSidebarOpen, sidebarOpen }) => {
                       }
                     >
                       All Events
+                    </NavLink>
+                    <NavLink
+                      to="/listmyshow/create-event"
+                      onClick={() => setSidebarOpen(false)}
+                      className={({ isActive }) =>
+                        `block px-4 py-2 text-sm rounded-lg cursor-pointer ${
+                          isActive
+                            ? "text-blue-600 bg-blue-50"
+                            : "text-gray-600 hover:bg-gray-50"
+                        }`
+                      }
+                    >
+                      Create Events
                     </NavLink>
                   </div>
                 )}
@@ -130,4 +130,4 @@ const AdminSidebar = ({ setSidebarOpen, sidebarOpen }) => {
   );
 };
 
-export default AdminSidebar;
+export default OrganizerSidebar;

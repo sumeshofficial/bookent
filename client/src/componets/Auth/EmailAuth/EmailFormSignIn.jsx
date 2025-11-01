@@ -1,8 +1,5 @@
-import toast from "react-hot-toast";
 import InputBox from "../../../sharedCompents/InputBox";
 import { useContextForm, useModal } from "../../../utils/constants";
-import { sendOTP } from "../../../services/auth";
-import { useState } from "react";
 
 const EmailFormSignIn = ({ onSubmit }) => {
   const { register, errors, isSubmitting, handleSubmit, reset } =

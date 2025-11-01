@@ -42,6 +42,10 @@ const AdminProtected = () => {
     return <Navigate to="/admin/dashboard" replace />;
   }
 
+  if (admin && location.pathname === "/admin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
   return <Outlet />;
 };
 

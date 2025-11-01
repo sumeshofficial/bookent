@@ -1,28 +1,25 @@
-import React, { useEffect, useState } from "react";
 import {
   Building2,
-  MapPin,
   Banknote,
   User,
   Calendar,
   CheckCircle,
   XCircle,
+  Loader,
+  ArrowLeft,
 } from "lucide-react";
-import AdminSidebar from "../../sharedCompents/Admin/AdminSidebar";
-import AdminNavbar from "../../sharedCompents/Admin/AdminNavbar";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
-    approveOrganizerRequest,
   getOrganizerDetails,
-  rejectOrganizerRequest
+  handleOrganizerRequest,
 } from "../../services/admin";
 import toast from "react-hot-toast";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const OrganizerDetailsPage = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { id } = useParams();
-  const [organizer, setOrganizer] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -37,55 +34,59 @@ const OrganizerDetailsPage = () => {
     }
   };
 
-  const fetchOrganizer = async () => {
-    try {
-      setLoading(true);
-      const { data } = await getOrganizerDetails(id);
-      if (data.success) setOrganizer(data.organizer);
-    } catch (err) {
-      toast.error("Failed to fetch organizer details");
-    } finally {
-      setLoading(false);
-    }
+  const { data, isLoading } = useQuery({
+    queryKey: ["organizer", id],
+    queryFn: () => getOrganizerDetails(id),
+    onError: (error) => toast.error(error.message),
+  });
+
+  const organizer = data?.data?.organizer;
+
+  const handleRequestMutation = useMutation({
+    mutationFn: handleOrganizerRequest,
+    onSuccess: () => {
+      toast.dismiss();
+      toast.success("Organizer request updated successfully");
+      queryClient.invalidateQueries(["organizer", id]);
+    },
+    onError: (err) => {
+      toast.dismiss();
+      toast.error(err.message || "Something went wrong");
+    },
+  });
+
+  const handleRequest = (status) => {
+    handleRequestMutation.mutate({ id, status });
   };
-
-  const handleApprove = async () => {
-    try {
-      await approveOrganizerRequest(id);
-      toast.success("Organizer approved successfully");
-      fetchOrganizer();
-    } catch (err) {
-      toast.error("Failed to approve organizer");
-    }
-  };
-
-  const handleReject = async () => {
-    try {
-      await rejectOrganizerRequest(id);
-      toast.success("Organizer rejected successfully");
-      fetchOrganizer();
-    } catch (err) {
-      toast.error("Failed to reject organizer");
-    }
-  };
-
-  useEffect(() => {
-    fetchOrganizer();
-  }, [id]);
-
-  if (loading) return <p className="p-6">Loading...</p>;
-  if (!organizer) return <p className="p-6">Organizer not found</p>;
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+    <main className="flex-1 p-6 lg:p-8">
+      
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 mb-6 text-gray-600 hover:text-gray-800 transition"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span className="font-medium">Back to Organizers</span>
+      </button>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        <AdminNavbar setSidebarOpen={setSidebarOpen} />
+      {isLoading && (
+        <div className="flex justify-center items-center h-96">
+          <Loader className="w-8 h-8 animate-spin text-gray-600" />
+          <span className="ml-2 text-gray-600">
+            Loading organizer details...
+          </span>
+        </div>
+      )}
 
-        <main className="flex-1 p-6 lg:p-8">
-          {/* Header */}
+      {!isLoading && !organizer && (
+        <div className="flex justify-center items-center h-96">
+          <p className="text-gray-600">Organizer not found.</p>
+        </div>
+      )}
+
+      {!isLoading && organizer && (
+        <>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-800 mb-1">
@@ -96,28 +97,31 @@ const OrganizerDetailsPage = () => {
               </p>
             </div>
 
-            {/* Action Buttons */}
-            {organizer.status === 'pending' && <div className="flex gap-3 mt-4 sm:mt-0">
-              <button
-                onClick={handleApprove}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
-              >
-                <CheckCircle className="w-5 h-5" />
-                Approve
-              </button>
-              <button
-                onClick={handleReject}
-                className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
-              >
-                <XCircle className="w-5 h-5" />
-                Reject
-              </button>
-            </div>}
+            {organizer.status === "pending" && (
+              <div className="flex gap-3 mt-4 sm:mt-0">
+                <button
+                  onClick={() => handleRequest("approved")}
+                  disabled={handleRequestMutation.isPending}
+                  className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  {handleRequestMutation.isPending
+                    ? "Processing..."
+                    : "Approve"}
+                </button>
+                <button
+                  onClick={() => handleRequest("rejected")}
+                  disabled={handleRequestMutation.isPending}
+                  className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                >
+                  <XCircle className="w-5 h-5" />
+                  Reject
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Organizer Info */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Organization Details */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Building2 className="w-6 h-6 text-blue-600" />
@@ -149,7 +153,6 @@ const OrganizerDetailsPage = () => {
               </div>
             </div>
 
-            {/* Bank Account Details */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Banknote className="w-6 h-6 text-green-600" />
@@ -179,7 +182,7 @@ const OrganizerDetailsPage = () => {
                 </p>
                 <p>
                   <strong>Verified:</strong>{" "}
-                  {organizer.bankAccountDetails?.isVerified ? (
+                  {organizer.isVerified ? (
                     <span className="text-green-600 font-semibold">Yes</span>
                   ) : (
                     <span className="text-red-600 font-semibold">No</span>
@@ -189,7 +192,6 @@ const OrganizerDetailsPage = () => {
             </div>
           </div>
 
-          {/* Created & Updated Info */}
           <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
             <div className="flex items-center gap-3 mb-4">
               <Calendar className="w-6 h-6 text-gray-600" />
@@ -207,21 +209,20 @@ const OrganizerDetailsPage = () => {
             </p>
           </div>
 
-          {/* Linked User Info */}
           <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
             <div className="flex items-center gap-3 mb-4">
               <User className="w-6 h-6 text-indigo-600" />
               <h2 className="text-lg font-semibold text-gray-800">
-                User Linked to this Organizer
+                Linked User
               </h2>
             </div>
             <p className="text-gray-700 text-sm">
               <strong>User ID:</strong> {organizer.userId}
             </p>
           </div>
-        </main>
-      </div>
-    </div>
+        </>
+      )}
+    </main>
   );
 };
 

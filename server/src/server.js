@@ -8,6 +8,8 @@ import userRouter from "./routes/user.router.js";
 import passport from "./middlewares/passport.js";
 import organizerRouter from "./routes/organizer.router.js";
 import adminRouter from "./routes/admin.router.js";
+import morgan from "morgan";
+import { connectRedis } from "./config/redis.conf.js";
 dotenv.config();
 
 const app = express();
@@ -16,6 +18,10 @@ const PORT = process.env.PORT;
 
 // Database connect
 await connectDB();
+await connectRedis();
+
+// Logger
+app.use(morgan("dev"));
 
 // Middleware
 app.use(express.json());

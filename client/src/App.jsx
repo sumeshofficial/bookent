@@ -1,8 +1,9 @@
 import ModalManager from "./sharedCompents/Modal/ModalManager";
 import ModalProvider from "./context/ModalContext";
-import DynamicRoutes from "./Routes/DynamicRoutes";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "./context/FormContext";
+import { Outlet } from "react-router-dom";
+import ErrorBoundary from "./componets/ErrorBoundary";
 
 function App() {
   return (
@@ -11,7 +12,9 @@ function App() {
         <ModalProvider>
           <Toaster position="top-center" reverseOrder={false} />
           <ModalManager />
-          <DynamicRoutes />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </ModalProvider>
       </AuthProvider>
     </>
