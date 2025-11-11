@@ -1,5 +1,3 @@
-import { Error } from "mongoose";
-import Otp from "../models/otp.model.js";
 import { sendMail } from "../utility/mailer.js";
 import { redisClient } from "../config/redis.conf.js";
 

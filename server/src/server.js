@@ -10,6 +10,7 @@ import organizerRouter from "./routes/organizer.router.js";
 import adminRouter from "./routes/admin.router.js";
 import morgan from "morgan";
 import { connectRedis } from "./config/redis.conf.js";
+import s3Router from "./routes/s3.router.js";
 dotenv.config();
 
 const app = express();
@@ -28,7 +29,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://unfamiliarized-duskiest-joycelyn.ngrok-free.dev",
+    ],
     credentials: true,
   })
 );
@@ -45,6 +49,9 @@ app.use("/api/organizer", organizerRouter);
 
 // admin route
 app.use("/api/admin", adminRouter);
+
+// s3 route
+app.use("/api/s3", s3Router);
 
 // Server listening
 app.listen(PORT, () => {

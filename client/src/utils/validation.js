@@ -1,0 +1,180 @@
+import * as yup from "yup";
+
+export const validationSchema = [
+  // Step 1
+  yup.object({
+    eventTitle: yup
+      .string()
+      .required("Event title is required")
+      .min(10, "Event title must be at least 10 characters long")
+      .max(50, "Event title cannot exceed 50 characters"),
+
+    sportType: yup.string().required("Sport type is required"),
+
+    eventDescription: yup
+      .string()
+      .required("Event description is required")
+      .min(50, "Event description must be at least 50 characters long")
+      .max(500, "Event description cannot exceed 500 characters"),
+
+    tags: yup
+      .array()
+      .of(yup.string().max(10, "Each tag cannot exceed 10 characters"))
+      .max(5, "You can add up to 5 tags only")
+      .required("At least one tag is required")
+      .test("unique-tags", "Tags must be unique", (value) => {
+        if (!value) return true;
+        const uniqueTags = new Set(
+          value.map((tag) => tag.toLowerCase().trim())
+        );
+        return uniqueTags.size === value.length;
+      }),
+  }),
+
+  // Step 2
+  yup.object({
+    stadium: yup.string().required("Stadium is required"),
+
+    ticketSetup: yup
+      .array()
+      .of(
+        yup.object().shape({
+          totalSeats: yup
+            .number()
+            .typeError("Total seats must be a valid number")
+            .required("Total seats are required")
+            .min(1, "There must be at least 1 seat")
+            .max(99999, "Too many seats"),
+          seatPrice: yup
+            .number()
+            .typeError("Seat price must be a valid number")
+            .required("Seat price is required")
+            .min(1, "Seat price must be greater than 0")
+            .max(100000, "Seat price is too high"),
+          perUserLimit: yup
+            .number()
+            .typeError("Seats per user must be a valid number")
+            .required("Seats per user is required")
+            .min(1, "At least one seat per user")
+            .max(10, "Max 10 seats per user"),
+        })
+      )
+      .required("Ticket setup is required"),
+  }),
+
+  // Step 3
+  yup.object({
+    matchDate: yup
+      .date()
+      .typeError("Please enter a valid date")
+      .required("Match date is required")
+      .min(new Date(), "Match date cannot be in the past"),
+
+    matchTime: yup.string().required("Match time is required"),
+
+    gateOpenTime: yup
+      .string()
+      .required("Gate open time is required")
+      .test(
+        "is-before",
+        "Gate open time must be before match time",
+        function (value) {
+          const matchTime = this.parent.matchTime;
+          if (!value || !matchTime) return true;
+
+          const [gateHours, gateMinutes] = value.split(":").map(Number);
+          const [matchHours, matchMinutes] = matchTime.split(":").map(Number);
+          return gateHours * 60 + gateMinutes < matchHours * 60 + matchMinutes;
+        }
+      ),
+
+    matchDuration: yup
+      .number()
+      .typeError("Match duration must be a number")
+      .required("Match duration is required")
+      .min(30, "Duration must be at least 30 minutes")
+      .max(300, "Duration cannot exceed 5 hours"),
+  }),
+
+  // Step 4
+
+  yup.object({
+    bannerImage: yup.mixed().required("Banner image is required"),
+    thumbnailImage: yup.mixed().required("Thumbnail image is required"),
+  }),
+
+  // Step 5
+
+  // Step 5
+  yup.object({
+    ageRestriction: yup
+      .string()
+      .required("Age restriction is required")
+      .min(3, "Age restriction must be at least 3 characters long")
+      .max(30, "Age restriction cannot exceed 30 characters"),
+
+    refundPolicy: yup
+      .string()
+      .required("Refund policy is required")
+      .min(10, "Refund policy must be at least 10 characters long")
+      .max(300, "Refund policy cannot exceed 300 characters"),
+
+    termsAndConditions: yup
+      .string()
+      .required("Terms and conditions are required")
+      .min(20, "Terms must be at least 20 characters long")
+      .max(1000, "Terms cannot exceed 1000 characters"),
+
+    eventStatus: yup
+      .string()
+      .required("Event status is required")
+      .oneOf(["Draft", "Published"], "Invalid event status"),
+  }),
+];
+
+export const createStadiumValidationSchema = yup.object({
+  stadiumName: yup
+    .string()
+    .required("Stadium name is required")
+    .min(10, "Stadium name must be at least 10 characters long")
+    .max(30, "Stadium name cannot exceed 30 characters"),
+
+  capacity: yup
+    .number()
+    .typeError("Please enter a valid number")
+    .required("Stadium Capacity is required")
+    .min(100, "Must be at least 3 digits")
+    .max(99999999, "Cannot exceed 8 digits"),
+
+  address: yup
+    .string()
+    .required("Address is required")
+    .min(10, "Address must be at least 10 characters long")
+    .max(50, "Address cannot exceed 50 characters"),
+
+  city: yup
+    .string()
+    .required("City is required")
+    .min(3, "City must be at least 3 characters long")
+    .max(20, "City cannot exceed 20 characters"),
+
+  state: yup
+    .string()
+    .required("State is required")
+    .min(3, "State must be at least 3 characters long")
+    .max(20, "State cannot exceed 20 characters"),
+
+  pincode: yup
+    .string()
+    .required("Pincode is required")
+    .matches(/^\d{6}$/, "Pincode must be a 6-digit number"),
+
+  location: yup
+    .string()
+    .required("Google Map location URL is required")
+    .url("Enter a valid URL")
+    .matches(
+      /^(https?:\/\/)?(www\.)?(google\.com\/maps|maps\.app\.goo\.gl)\/.+$/,
+      "Enter a valid Google Maps URL"
+    ),
+});

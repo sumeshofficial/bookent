@@ -5,7 +5,8 @@ import { registerOrganizationAccount } from "../../services/organization";
 import { useDispatch, useSelector } from "react-redux";
 import { Loader } from "lucide-react";
 import toast from "react-hot-toast";
-import { addOrganizer } from "../../Redux/organizerSlice";
+import { addOrganizer } from "../../redux/organizerSlice";
+import { Link } from "react-router-dom";
 
 const OrganizarAccountForm = () => {
   const {
@@ -71,7 +72,6 @@ const OrganizarAccountForm = () => {
     reset();
   };
 
-  // Auto uppercase IFSC
   const handleIFSCChange = (e) => {
     const value = e.target.value.toUpperCase();
     setValue("bankIFSC", value, { shouldValidate: true });
@@ -85,16 +85,15 @@ const OrganizarAccountForm = () => {
         </div>
       )}
 
-      {/* Header */}
       <div className="bg-slate-800 px-6 py-4 shadow-sm">
         <div className="max-w-6xl">
-          <div className="flex items-center space-x-3">
+          <Link to={"/"} className="flex items-center space-x-3">
             <img
               src={logo}
               alt="Bookent"
               className="h-8 sm:h-12 w-auto object-contain"
             />
-          </div>
+          </Link>
         </div>
       </div>
 
@@ -111,7 +110,6 @@ const OrganizarAccountForm = () => {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100">
-            {/* Organisation Details */}
             <div className="mb-10">
               <h3 className="text-xl font-semibold text-gray-800 mb-6">
                 Organisation Details
@@ -142,7 +140,6 @@ const OrganizarAccountForm = () => {
                   )}
                 </div>
 
-                {/* Address */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Organisation Address
@@ -162,7 +159,6 @@ const OrganizarAccountForm = () => {
                   )}
                 </div>
 
-                {/* State */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     State
@@ -189,14 +185,12 @@ const OrganizarAccountForm = () => {
               </div>
             </div>
 
-            {/* Bank Details */}
             <div className="mb-10">
               <h3 className="text-xl font-semibold text-gray-800 mb-6">
                 Bank Details
               </h3>
 
               <div className="space-y-6">
-                {/* Beneficiary + Type */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -239,7 +233,6 @@ const OrganizarAccountForm = () => {
                   </div>
                 </div>
 
-                {/* Bank name, Account number, IFSC */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

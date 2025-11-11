@@ -3,7 +3,7 @@ import { api } from "./api/axiosSetup";
 export const registerOrganizationAccount = async ({
   bankAccountDetails,
   organizationDetails,
-  userId
+  userId,
 }) => {
   try {
     const res = await api.post(
@@ -11,13 +11,12 @@ export const registerOrganizationAccount = async ({
       {
         bankAccountDetails,
         organizationDetails,
-        userId
+        userId,
       },
       { withCredentials: true }
     );
 
     return res.data;
-
   } catch (error) {
     const message =
       error.response?.data?.message ||
@@ -28,7 +27,18 @@ export const registerOrganizationAccount = async ({
   }
 };
 
-
 export const checkOrganizer = async ({ userId }) => {
-    return await api.get(`/organizer/${userId}/dashboard`);
+  return await api.get(`/organizer/${userId}/dashboard`);
+};
+
+export const createStadium = async (payload) => {
+  return await api.post("/organizer/create-stadium", payload);
+};
+
+export const getStadiums = async () => {
+  return await api.get('/organizer/stadiums');
+}
+
+export const checkStadiumExists = async (name) => {
+  return await api.get(`/organizer/stadium/check-name?name=${encodeURIComponent(name)}`);
 }

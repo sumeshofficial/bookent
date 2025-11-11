@@ -1,6 +1,6 @@
 import { Clock, DollarSign, List, Users } from "lucide-react";
-import OrganizerSidebar from "../../sharedCompents/Organizer/OrganizerSidebar";
-import OrganizerNavbar from "../../sharedCompents/Organizer/OrganizerNavbar";
+import OrganizerSidebar from "../../sharedComponents/organizer/OrganizerSidebar";
+import OrganizerNavbar from "../../sharedComponents/organizer/OrganizerNavbar";
 
 const OrganizerDashboard = () => {
   const stats = [
@@ -50,7 +50,6 @@ const OrganizerDashboard = () => {
 
   return (
     <div className="flex-1 p-4 md:p-8">
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
@@ -80,13 +79,11 @@ const OrganizerDashboard = () => {
         })}
       </div>
 
-      {/* Sales Section */}
       <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">
         Sales Details
       </h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sales Progress */}
         <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div>

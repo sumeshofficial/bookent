@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const OrganizerRow = React.memo(({ org, handleRequest }) => {
   return (
-    <tr key={org._id} className="hover:bg-gray-50 transition-all">
+    <tr key={org._id} className="fade-in hover:bg-gray-50 transition-all duration-300">
       <td className="px-6 py-4 font-medium text-gray-900">
         {org.organizationDetails.name}
         <div className="text-xs text-gray-400 mt-1">

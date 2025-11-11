@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import Navbar from "../../sharedCompents/Navbar";
+import Navbar from "../../sharedComponents/Navbar";
 import { Edit, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
-import { updateUserProfile } from "../../Redux/userSlice";
 import { isEqual } from "lodash";
+import { updateUserProfile } from "../../redux/userSlice";
 
 const ProfilePage = () => {
   const { user } = useSelector((store) => store.user);

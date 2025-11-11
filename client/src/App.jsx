@@ -1,11 +1,14 @@
-import ModalManager from "./sharedCompents/Modal/ModalManager";
+import ModalManager from "./sharedComponents/modal/ModalManager";
 import ModalProvider from "./context/ModalContext";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "./context/FormContext";
 import { Outlet } from "react-router-dom";
-import ErrorBoundary from "./componets/ErrorBoundary";
+import ErrorBoundary from "./components/ErrorBoundary";
+import useOfflineTracker from "./hooks/useOfflineTracker";
 
 function App() {
+  useOfflineTracker();
+
   return (
     <>
       <AuthProvider>

@@ -48,7 +48,7 @@ const UserDetailsPage = () => {
         className="flex items-center gap-2 mb-6 text-gray-600 hover:text-gray-800 transition"
       >
         <ArrowLeft className="w-5 h-5" />
-        <span className="font-medium">Back to Organizers</span>
+        <span className="font-medium">Back to Users</span>
       </button>
 
       {isLoading && (

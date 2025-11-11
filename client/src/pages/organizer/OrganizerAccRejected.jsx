@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import logo from "../../assets/bookent-logo-white.png";
 
 const OrganizerAccRejected = () => {
@@ -6,13 +7,13 @@ const OrganizerAccRejected = () => {
       {/* Header */}
       <div className="bg-slate-800 px-6 py-4 shadow-sm">
         <div className="max-w-6xl">
-          <div className="flex items-center space-x-3">
+          <Link to={'/'} className="flex items-center space-x-3">
             <img
               src={logo}
               alt="Bookent"
               className="h-8 sm:h-12 w-auto object-contain"
             />
-          </div>
+          </Link>
         </div>
       </div>
 

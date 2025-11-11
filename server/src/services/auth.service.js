@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import jwt from "jsonwebtoken";
 import Organizer from "../models/organizer.model.js";
-import { reverseGeocoding } from "./user.service.js";
 
 // Check user is already exists
 export const isUserExists = async (email) => {
@@ -46,11 +45,11 @@ export const handleGoogleAuth = async (profile) => {
 
   const existingUser = await User.findOne({ email });
 
-  if (existingUser && existingUser.authProvider !== "google") {
+  if (existingUser && existingUser?.authProvider !== "google") {
     throw new Error("User already exists. Please login instead.");
   }
 
-  if (existingUser.authProvider === "google") {
+  if (existingUser?.authProvider === "google") {
     return existingUser;
   }
 
@@ -84,18 +83,6 @@ export const verifyTokenAndGetUser = async (token) => {
 
   const user = await User.findById(decoded.id).select("-password");
   if (!user) throw new Error("User not found");
-
-  if (user.role === "user" && user.location) {
-    const response = await reverseGeocoding({
-      lat: user.location.latitude,
-      lng: user.location.longitude,
-    });
-
-    user.location = {
-      ...user.location,
-      address: response,
-    };
-  }
 
   return user;
 };

@@ -86,9 +86,9 @@ const OrganizersList = () => {
   );
 
   return (
-    <main className="flex-1 p-4 md:p-8 pt-10 sm:pt-25">
+    <main className="flex-1 p-4 md:p-8">
       <div className="flex flex-col sm:flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-        <h1 className="text-3xl font-semibold text-gray-900">Organizer List</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">Organizer List</h1>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <div className="flex flex-col">
@@ -230,14 +230,14 @@ const OrganizersList = () => {
                   <strong>State:</strong> {org.organizationDetails.state}
                 </p>
                 <p>
-                  <strong>Beneficiary:</strong>{" "}
+                  <strong>Beneficiary:</strong>
                   {org.bankAccountDetails.beneficiaryName}
                 </p>
                 <p>
                   <strong>Bank:</strong> {org.bankAccountDetails.bankName}
                 </p>
                 <p>
-                  <strong>Status:</strong>{" "}
+                  <strong>Status:</strong>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       org.status === "approved"

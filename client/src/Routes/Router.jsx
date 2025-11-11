@@ -1,27 +1,28 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import Protected from "../sharedCompents/Protected";
+import Protected from "../components/Protected";
 import HomePage from "../pages/user/HomePage";
 import ProfilePage from "../pages/user/ProfilePage";
-import GlobalLoader from "../componets/GlobalLoader";
+import GlobalLoader from "../components/GlobalLoader";
 import App from "../App";
-import ErrorPage from "../componets/ErrorPage";
+import ErrorPage from "../components/ErrorPage";
 import UserNotFoundPage from "../pages/user/UserNotFound";
-import AdminProtected from "../componets/Admin/AdminProtected";
-import AdminDashboard from "../pages/Admin/AdminDashboard";
-import AdminLogin from "../pages/Admin/AdminLogin";
-import AdminNotFoundPage from "../pages/Admin/AdminNotFoundPage";
-import UsersList from "../pages/Admin/UsersList";
-import OrganizersList from "../pages/Admin/OrganizersList";
-import UserDetailsPage from "../pages/Admin/UserDetailsPage";
-import OrganizerDetailsPage from "../pages/Admin/OrganizerDetailsPage";
-import OrganizerProtected from "../componets/Organization/OrganizerProtected";
+import AdminProtected from "../components/admin/AdminProtected";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import AdminLogin from "../pages/admin/AdminLogin";
+import AdminNotFoundPage from "../pages/admin/AdminNotFoundPage";
+import UsersList from "../pages/admin/UsersList";
+import OrganizersList from "../pages/admin/OrganizersList";
+import UserDetailsPage from "../pages/admin/UserDetailsPage";
+import OrganizerDetailsPage from "../pages/admin/OrganizerDetailsPage";
+import OrganizerProtected from "../components/organization/OrganizerProtected";
 import OrganizerAccountForm from "../pages/organizer/OrganizerAccountForm";
 import OrganizerAccRequested from "../pages/organizer/OrganizerAccRequested";
 import OrganizerAccRejected from "../pages/organizer/OrganizerAccRejected";
 import OrganizerDashboard from "../pages/organizer/OrganizerDashboard";
-import CreateEventForm from "../pages/organizer/CreateEvent/CreateEventForm";
-import OrganizerLayout from "../sharedCompents/Organizer/OrganizerLayout";
-import AdminLayout from "../sharedCompents/Admin/AdminLayout";
+import OrganizerLayout from "../sharedComponents/organizer/OrganizerLayout";
+import AdminLayout from "../sharedComponents/admin/AdminLayout";
+import CreateEventForm from "../pages/organizer/CreateEventForm";
+import CreateStadium from "../pages/organizer/CreateStadium";
 
 const router = createBrowserRouter([
   {
@@ -53,7 +54,11 @@ const router = createBrowserRouter([
           // Organizer routes
           {
             path: "listmyshow",
-            element: <OrganizerProtected />,
+            element: (
+              <Protected>
+                <OrganizerProtected />
+              </Protected>
+            ),
             children: [
               {
                 element: <OrganizerLayout />,
@@ -69,6 +74,10 @@ const router = createBrowserRouter([
                   {
                     path: "create-event",
                     element: <CreateEventForm />,
+                  },
+                  {
+                    path: "create-stadium",
+                    element: <CreateStadium />,
                   },
                 ],
               },

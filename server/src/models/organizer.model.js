@@ -8,7 +8,7 @@ const bankAccountDetailsSchema = new mongoose.Schema(
     ifsc: { type: String },
     bankName: { type: String },
   },
-  { _id: false }
+  { _id: false, versionKey: false }
 );
 
 const organizationDetailsSchema = new mongoose.Schema(
@@ -17,7 +17,7 @@ const organizationDetailsSchema = new mongoose.Schema(
     address: { type: String },
     state: { type: String },
   },
-  { _id: false }
+  { _id: false, versionKey: false }
 );
 
 const organizerSchema = new mongoose.Schema(
@@ -36,12 +36,13 @@ const organizerSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'],
-      default: 'pending'
-    }
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
   },
   {
     timestamps: true,
+    versionKey: false,
   }
 );
 

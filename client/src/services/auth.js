@@ -55,7 +55,7 @@ export const sendOTP = async ({ data, purpose }) => {
 };
 
 export const loginUserWithEmail = async (data) => {
-  const { email, password } = data;
+  console.log(email, password)
   try {
     const response = await axios.post(
       `${API_URL}/auth/email/signin`,

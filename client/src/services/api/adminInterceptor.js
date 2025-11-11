@@ -4,7 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const adminApi = axios.create({
   baseURL: `${API_URL}`,
-  withCredentials: true
+  withCredentials: true,
 });
 
 let isRefreshing = false;
@@ -78,11 +78,10 @@ adminApi.interceptors.response.use(
 
       return await adminApi(originalRequest);
     } catch (refreshError) {
-
       processQueue(refreshError, null);
 
-      const { default: store } = await import("../../Redux/store");
-      const { logoutAdmin } = await import("../../Redux/adminSlice");
+      const { default: store } = await import("../../redux/store");
+      const { logoutAdmin } = await import("../../redux/adminSlice");
 
       await adminLogout();
       store.dispatch(logoutAdmin());

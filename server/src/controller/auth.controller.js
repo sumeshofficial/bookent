@@ -14,6 +14,7 @@ import {
   revokeRefreshToken,
   verifyRefreshToken,
 } from "../services/token.service.js";
+import { reverseGeocoding } from "../services/user.service.js";
 dotenv.config();
 
 // Google Authentication controller
@@ -138,7 +139,7 @@ export const verifyOtp = async (req, res) => {
     }
 
     if (purpose === "forgot-password") {
-      user = await findUserByEmail( email );
+      user = await findUserByEmail(email);
       if (!user) return res.status(404).json({ message: "User not found" });
     }
 
@@ -226,6 +227,7 @@ export const refreshAccessTokenForAdmin = async (req, res) => {
 
     res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
+    console.log(error.message);
     res
       .status(500)
       .json({ success: false, message: "Invalid or expired refresh token" });
@@ -344,13 +346,34 @@ export const loginwithEmail = async (req, res) => {
   }
 };
 
-export const getUser = (req, res) => {
-  if (!req.user) {
-    return res.status(404).json({ error: "User not found" });
+export const getUser = async (req, res) => {
+  const { user } = req;
+
+  try {
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (user.role === "user" && user.location) {
+      const response = await reverseGeocoding({
+        lat: user.location.latitude,
+        lng: user.location.longitude,
+      });
+
+      user.location = {
+        ...user.location,
+        address: response,
+      };
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "User found", user: req.user });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Somthing went wrong" });
   }
-  return res
-    .status(200)
-    .json({ success: true, message: "User found", user: req.user });
 };
 
 // Send OTP

@@ -57,6 +57,7 @@ export const toggleUserStatusAPI = async ({ userId, newStatus }) => {
     throw new Error(message);
   }
 };
+
 export const handleOrganizerRequest = async ({id, status}) => {
   try {
     const res = await adminApi.patch(`/admin/organizers/${id}/${status}`);

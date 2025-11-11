@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { data, useNavigate } from "react-router-dom";
 import { useModal } from "../../utils/constants";
-import { updateUserProfile } from "../../Redux/userSlice";
+import { updateUserProfile } from "../../redux/userSlice";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 

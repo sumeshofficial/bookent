@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import logo from "../../assets/bookent-logo-black.png";
-import AdminLoginInput from "../../componets/Admin/AdminLoginInput";
+import AdminLoginInput from "../../components/admin/AdminLoginInput";
 
 const AdminLogin = () => {
   const { error } = useSelector((store) => store.admin);

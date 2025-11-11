@@ -37,6 +37,8 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    console.log(error);
+
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
@@ -74,14 +76,15 @@ api.interceptors.response.use(
 
       return await api(originalRequest);
     } catch (refreshError) {
-
       processQueue(refreshError, null);
 
-      const { default: store } = await import("../../Redux/store");
-      const { logoutUser } = await import("../../Redux/userSlice");
+      const { default: store } = await import("../../redux/store");
+      const { logoutUser } = await import("../../redux/userSlice");
+      const { logoutOrganizer } = await import("../../redux/organizerSlice");
 
       await logout();
       store.dispatch(logoutUser());
+      store.dispatch(logoutOrganizer());
 
       return Promise.reject(refreshError);
     } finally {

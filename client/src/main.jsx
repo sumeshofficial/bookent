@@ -1,12 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import store, { persistor } from "./Redux/store.js";
+import store, { persistor } from "./redux/store.js";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
-import router from "./Routes/Router.jsx";
-import Loader from "./componets/Loader.jsx";
+import Loader from "./components/Loader.jsx";
+import router from "./routes/Router.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryCliecnt = new QueryClient();

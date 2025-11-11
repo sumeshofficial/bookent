@@ -1,4 +1,7 @@
 import Organizer from "../models/organizer.model.js";
+import dotenv from "dotenv";
+import Stadium from "../models/stadium.model.js";
+dotenv.config();
 
 export const createOrganizer = async ({
   userId,
@@ -17,7 +20,6 @@ export const checkOrganizer = ({ userId }) => {
 };
 
 export const getAllOrganizers = async ({
-  role,
   limit,
   skip,
   search,
@@ -61,4 +63,23 @@ export const updateRequest = async ({ id, status }) => {
     organizer.isVerified = true;
   }
   await organizer.save();
+};
+
+export const createStadiumFn = async (payload) => {
+  const stadium = await Stadium.create(payload);
+  return stadium;
+};
+
+export const findStadiums = async (organizerId) => {
+  const stadiums = await Stadium.find({ organizerId }).lean();
+  return stadiums;
+};
+
+export const stadiumExists = async (name, organizerId) => {
+  const exists = await Stadium.exists({
+    "stadiumDetails.stadiumName": { $regex: new RegExp(`^${name}$`, "i") },
+    organizerId,
+  });
+
+  return exists;
 };

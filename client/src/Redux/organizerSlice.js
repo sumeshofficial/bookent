@@ -31,6 +31,9 @@ const organizerSlice = createSlice({
     addOrganizer: (state, action) => {
       state.organizer = action.payload;
     },
+    logoutOrganizer: (state) => {
+      state.organizer = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -49,5 +52,5 @@ const organizerSlice = createSlice({
   },
 });
 
-export const { addOrganizer } = organizerSlice.actions;
+export const { addOrganizer, logoutOrganizer } = organizerSlice.actions;
 export default organizerSlice.reducer;

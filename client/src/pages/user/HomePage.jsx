@@ -1,9 +1,9 @@
-import Navbar from "../../sharedCompents/Navbar";
-import HeroCarousel from "../../componets/HeroCarousel";
-import RecommendedSection from "../../componets/RecommendedSection";
+import Navbar from "../../sharedComponents/Navbar";
+import HeroCarousel from "../../components/HeroCarousel";
+import RecommendedSection from "../../components/RecommendedSection";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { updateUserProfile } from "../../Redux/userSlice";
+import { updateUserProfile } from "../../redux/userSlice";
 import useGeoLocation from "../../hooks/useGeoLocation";
 
 const HomePage = () => {
