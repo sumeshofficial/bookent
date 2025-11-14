@@ -15,14 +15,12 @@ import OrganizersList from "../pages/admin/OrganizersList";
 import UserDetailsPage from "../pages/admin/UserDetailsPage";
 import OrganizerDetailsPage from "../pages/admin/OrganizerDetailsPage";
 import OrganizerProtected from "../components/organization/OrganizerProtected";
-import OrganizerAccountForm from "../pages/organizer/OrganizerAccountForm";
-import OrganizerAccRequested from "../pages/organizer/OrganizerAccRequested";
-import OrganizerAccRejected from "../pages/organizer/OrganizerAccRejected";
 import OrganizerDashboard from "../pages/organizer/OrganizerDashboard";
 import OrganizerLayout from "../sharedComponents/organizer/OrganizerLayout";
 import AdminLayout from "../sharedComponents/admin/AdminLayout";
 import CreateEventForm from "../pages/organizer/CreateEventForm";
 import CreateStadium from "../pages/organizer/CreateStadium";
+import OrganizerEventsPage from "../pages/organizer/OrganizerEventsPage";
 
 const router = createBrowserRouter([
   {
@@ -72,26 +70,18 @@ const router = createBrowserRouter([
                     element: <OrganizerDashboard />,
                   },
                   {
-                    path: "create-event",
+                    path: "event/create",
                     element: <CreateEventForm />,
                   },
                   {
-                    path: "create-stadium",
+                    path: "stadium/create",
                     element: <CreateStadium />,
                   },
+                  {
+                    path: "events",
+                    element: <OrganizerEventsPage />,
+                  },
                 ],
-              },
-              {
-                path: "register",
-                element: <OrganizerAccountForm />,
-              },
-              {
-                path: "requested",
-                element: <OrganizerAccRequested />,
-              },
-              {
-                path: "rejected",
-                element: <OrganizerAccRejected />,
               },
             ],
           },

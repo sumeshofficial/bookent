@@ -1,4 +1,4 @@
-import { api } from "./api/axiosSetup";
+import { api } from "./api/apiSetup";
 
 export const updateProfile = async ({ id, data }) => {
   try {

@@ -1,15 +1,17 @@
 import { createClient } from "redis";
 import dotenv from "dotenv";
+import logger from "./logger.js";
 dotenv.config();
 
-const REDIS_URI = process.env.REDIS_URI || "redis://127.0.0.1:6379";
+const REDIS_URI = process.env.REDIS_URI;
 
+// Redis configuration
 const redisClient = createClient({
   url: REDIS_URI,
 });
 
-redisClient.on("error", (err) => console.error("Redis Error:", err));
-redisClient.on("connect", () => console.log("Redis Connected"));
+redisClient.on("error", (err) => logger.error("Redis Error:", err));
+redisClient.on("connect", () => logger.info("Redis Connected"));
 
 const connectRedis = async () => {
   try {
@@ -17,7 +19,7 @@ const connectRedis = async () => {
       await redisClient.connect();
     }
   } catch (error) {
-    console.error("Redis connection failed:", error);
+    logger.error("Redis connection failed:", error);
   }
 };
 

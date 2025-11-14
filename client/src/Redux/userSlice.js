@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { editProfile, verifyToken } from "../services/auth";
+import { verifyToken } from "../services/auth";
 import { updateProfile } from "../services/user";
 
 export const getUser = createAsyncThunk(

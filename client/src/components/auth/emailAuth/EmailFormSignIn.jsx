@@ -8,7 +8,6 @@ const EmailFormSignIn = ({ onSubmit }) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col gap-2 mt-5 mb-10">
-        {/* Email Input */}
         <InputBox
           label="Email"
           type="email"
@@ -44,8 +43,7 @@ const EmailFormSignIn = ({ onSubmit }) => {
           Forgot Password
         </button>
       </div>
-
-      {/* Button */}
+      
       <div className="text-center">
         <button
           type="submit"

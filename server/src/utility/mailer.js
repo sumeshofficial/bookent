@@ -2,6 +2,8 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();
 
+const logo = process.env.LOGO_URL;
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -13,8 +15,7 @@ const transporter = nodemailer.createTransport({
 // Sent OTP to Email
 export const sendMail = async (recipient, otp, fullname) => {
   const companyName = "Bookent";
-  const logoUrl =
-    "https://firebasestorage.googleapis.com/v0/b/sel-resell-application.firebasestorage.app/o/products%2Fbookent-logo-white.png?alt=media&token=47bc5a0d-1de7-4ee0-ac2e-0dca162ed1c0";
+  const logoUrl = logo;
 
   const mailOptions = {
     from: `${companyName} <${process.env.EMAIL}>`,
@@ -64,7 +65,7 @@ function getEmailTemplate(otp, companyName, logoUrl, fullname) {
               <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0;">
                 <tr>
                   <td>
-                    <div style="display: inline-block; padding: 10px 30px; border-radius: 8px;background-color: #2f2f2f !important; color: #ffffff !important; font-size: 14px; font-weight: bold; letter-spacing: 8px; font-family: 'Courier New', monospace;">
+                    <div style="display: inline-block; padding: 10px 30px; border-radius: 8px;background-color: #2f2f2f !important; color: #ffffff !important; font-size: 18px; font-weight: bold; letter-spacing: 8px; font-family: 'Courier New', monospace;">
                       ${otp}
                     </div>
                   </td>

@@ -35,6 +35,30 @@ export const validationSchema = [
   yup.object({
     stadium: yup.string().required("Stadium is required"),
 
+    minPrice: yup
+      .number()
+      .typeError("Min price must be a number")
+      .required("Min price is required")
+      .min(1, "Min price must be at least ₹1")
+      .max(500000, "Min price is too high"),
+
+    maxPrice: yup
+      .number()
+      .typeError("Max price must be a number")
+      .required("Max price is required")
+      .min(1, "Max price must be at least ₹1")
+      .max(500000, "Max price is too high")
+      .when("minPrice", (minPrice, schema) =>
+        schema.test({
+          name: "is-greater",
+          message: "Max price must be greater than min price",
+          test: (maxPrice) => {
+            if (!minPrice || !maxPrice) return true;
+            return maxPrice > minPrice;
+          },
+        })
+      ),
+
     ticketSetup: yup
       .array()
       .of(
@@ -72,21 +96,7 @@ export const validationSchema = [
 
     matchTime: yup.string().required("Match time is required"),
 
-    gateOpenTime: yup
-      .string()
-      .required("Gate open time is required")
-      .test(
-        "is-before",
-        "Gate open time must be before match time",
-        function (value) {
-          const matchTime = this.parent.matchTime;
-          if (!value || !matchTime) return true;
-
-          const [gateHours, gateMinutes] = value.split(":").map(Number);
-          const [matchHours, matchMinutes] = matchTime.split(":").map(Number);
-          return gateHours * 60 + gateMinutes < matchHours * 60 + matchMinutes;
-        }
-      ),
+    gateOpenTime: yup.string().required("Gate open time is required"),
 
     matchDuration: yup
       .number()
@@ -104,14 +114,12 @@ export const validationSchema = [
   }),
 
   // Step 5
-
-  // Step 5
   yup.object({
     ageRestriction: yup
       .string()
       .required("Age restriction is required")
       .min(3, "Age restriction must be at least 3 characters long")
-      .max(30, "Age restriction cannot exceed 30 characters"),
+      .max(100, "Age restriction cannot exceed 100 characters"),
 
     refundPolicy: yup
       .string()
@@ -166,8 +174,7 @@ export const createStadiumValidationSchema = yup.object({
 
   pincode: yup
     .string()
-    .required("Pincode is required")
-    .matches(/^\d{6}$/, "Pincode must be a 6-digit number"),
+    .required("Pincode is required"),
 
   location: yup
     .string()

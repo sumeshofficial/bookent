@@ -9,13 +9,12 @@ import {
   refreshAccessToken,
   getUser,
   sendOtp,
-  forgotPassword
+  forgotPassword,
 } from "../controller/auth.controller.js";
 import passport from "../middlewares/passport.js";
 import { protect } from "../middlewares/auth.middleware.js";
 const authRouter = express.Router();
 
-// Google login
 authRouter.get("/google", (req, res, next) => {
   const state = req.query.state;
   passport.authenticate("google", {
@@ -65,10 +64,9 @@ authRouter.get("/google/callback", (req, res, next) => {
   })(req, res, next);
 });
 
-authRouter.get('/getUser', protect, getUser);
+authRouter.get("/getUser", protect, getUser);
 
-
-authRouter.post('/refresh-token', refreshAccessToken);
+authRouter.post("/refresh-token", refreshAccessToken);
 authRouter.post("/email/signup", registerUserWithEmail);
 authRouter.post("/email/signin", loginwithEmail);
 authRouter.post("/send-otp", sendOtp);

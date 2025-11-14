@@ -10,24 +10,82 @@ import useNavigationGuard from "../../hooks/useNavigationGuard";
 import MatchTime from "../../components/organization/createEvent/MatchTime";
 import UploadMedia from "../../components/organization/createEvent/UploadMedia";
 import PublishAndPreview from "../../components/organization/createEvent/PublishAndPreview";
+import {
+  createEventFinish,
+  createEventValidate,
+} from "../../services/organization";
+import { uploadFile } from "../../services/s3";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const CreateEventForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const { organizer } = useSelector((store) => store.organizer);
+  const [isSubmitSuccess, setIsSubmitSuccess] = useState(false);
+
+  const navigate = useNavigate();
 
   const currentValidationSchema = validationSchema[currentStep - 1];
   const method = useForm({
-    shouldUnregister: true,
     resolver: yupResolver(currentValidationSchema),
     mode: "all",
   });
 
-  const { register, handleSubmit, formState, setValue, watch, trigger } =
+  const { register, handleSubmit, formState, setValue, watch, trigger, reset } =
     method;
   const { errors, isSubmitting, isDirty } = formState;
 
-  useNavigationGuard(isDirty)
+  const onSubmit = async (data) => {
+    try {
+      const { bannerImage, thumbnailImage, ...dataWithoutImage } = data;
 
-  const handleNextStep = async () => {
+      const totalTickets = dataWithoutImage.ticketSetup.reduce(
+        (sum, tier) => sum + tier.totalSeats,
+        0
+      );
+
+      dataWithoutImage.totalTickets = totalTickets;
+      dataWithoutImage.availableTickets = totalTickets;
+      dataWithoutImage.soldTickets = 0;
+
+      dataWithoutImage.organizer = organizer._id;
+      const resData = await createEventValidate(dataWithoutImage);
+
+      const { sessionId, uploadUrls } = resData;
+
+      console.log(sessionId, uploadUrls);
+
+      await uploadFile({
+        file: bannerImage,
+        contentType: bannerImage.type,
+        signedUrl: uploadUrls.bannerImage.bannerURL,
+      });
+      await uploadFile({
+        file: thumbnailImage,
+        contentType: thumbnailImage.type,
+        signedUrl: uploadUrls.thumbnailImage.thumbnailURL,
+      });
+
+      const res = await createEventFinish({
+        sessionId,
+        bannerImage: uploadUrls.bannerImage.key,
+        thumbnailImage: uploadUrls.thumbnailImage.key,
+      });
+
+      reset();
+      setIsSubmitSuccess(true);
+      toast.success("Event created successfully");
+      navigate("/listmyshow");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  };
+
+  useNavigationGuard(!isSubmitSuccess && isDirty);
+
+  const handleNextStep = async (e) => {
     const isStepValid = await trigger();
     if (isStepValid) setCurrentStep((prev) => Math.min(prev + 1, 5));
   };
@@ -37,7 +95,7 @@ const CreateEventForm = () => {
   };
 
   return (
-    <div>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <ProgressSteps currentStep={currentStep} />
       <div className="sm:w-11/12 mx-auto my-2">
         {currentStep === 1 && (
@@ -86,8 +144,9 @@ const CreateEventForm = () => {
         currentStep={currentStep}
         handleNextStep={handleNextStep}
         handlePreviousStep={handlePreviousStep}
+        isSubmitting={isSubmitting}
       />
-    </div>
+    </form>
   );
 };
 

@@ -55,7 +55,9 @@ const UsersList = () => {
     onSuccess: () => {
       toast.dismiss();
       toast.success("User status updated");
-      queryClient.invalidateQueries(["users"]);
+      queryClient.invalidateQueries({
+        queryKey: ["users", page, limit, debounceSearch, sort, statusFilter],
+      });
     },
     onError: (err) => {
       toast.dismiss();

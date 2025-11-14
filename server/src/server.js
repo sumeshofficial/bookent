@@ -8,9 +8,9 @@ import userRouter from "./routes/user.router.js";
 import passport from "./middlewares/passport.js";
 import organizerRouter from "./routes/organizer.router.js";
 import adminRouter from "./routes/admin.router.js";
-import morgan from "morgan";
 import { connectRedis } from "./config/redis.conf.js";
 import s3Router from "./routes/s3.router.js";
+import logger from "./config/logger.js";
 dotenv.config();
 
 const app = express();
@@ -22,7 +22,10 @@ await connectDB();
 await connectRedis();
 
 // Logger
-app.use(morgan("dev"));
+// app.use((req, res, next) => {
+//   logger.http(`${req.method} ${req.url}`);
+//   next();
+// });
 
 // Middleware
 app.use(express.json());
@@ -31,29 +34,21 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://unfamiliarized-duskiest-joycelyn.ngrok-free.dev",
+      "https://8vqh4xwd-5173.inc1.devtunnels.ms",
     ],
     credentials: true,
   })
 );
 app.use(passport.initialize());
 
-// auth route
+// Routes
 app.use("/api/auth", authRouter);
-
-// user route
 app.use("/api/me", userRouter);
-
-// organizar route
 app.use("/api/organizer", organizerRouter);
-
-// admin route
 app.use("/api/admin", adminRouter);
-
-// s3 route
 app.use("/api/s3", s3Router);
 
 // Server listening
 app.listen(PORT, () => {
-  console.log(`server running at http://localhost:${PORT}`);
+  logger.info(`server running at http://localhost:${PORT}`);
 });

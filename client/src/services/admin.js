@@ -1,7 +1,6 @@
-import adminApi from "./api/adminInterceptor";
+import { adminApi } from "./api/apiSetup";
 
 export const getAllUsers = async ({
-  role = 'user',
   page,
   limit,
   search,
@@ -10,7 +9,7 @@ export const getAllUsers = async ({
 }) => {
   try {
     return await adminApi.get(
-      `/admin/users?role=${role}&page=${page}&limit=${limit}&search=${search}&sort=${sort}&status=${status}`
+      `/admin/users?page=${page}&limit=${limit}&search=${search}&sort=${sort}&status=${status}`
     );
   } catch (error) {
     const message =

@@ -1,4 +1,4 @@
-import { api } from "./api/axiosSetup";
+import { api } from "./api/apiSetup";
 
 export const registerOrganizationAccount = async ({
   bankAccountDetails,
@@ -32,13 +32,38 @@ export const checkOrganizer = async ({ userId }) => {
 };
 
 export const createStadium = async (payload) => {
-  return await api.post("/organizer/create-stadium", payload);
+  return await api.post("/organizer/stadium/create", payload);
 };
 
 export const getStadiums = async () => {
-  return await api.get('/organizer/stadiums');
-}
+  return await api.get("/organizer/stadiums");
+};
 
 export const checkStadiumExists = async (name) => {
-  return await api.get(`/organizer/stadium/check-name?name=${encodeURIComponent(name)}`);
-}
+  return await api.get(
+    `/organizer/stadium/check-name?name=${encodeURIComponent(name)}`
+  );
+};
+
+export const createEventValidate = async (data) => {
+  const res = await api.post("/organizer/event/create/validate", data);
+  return res.data;
+};
+
+export const createEventFinish = async ({
+  sessionId,
+  bannerImage,
+  thumbnailImage,
+}) => {
+  const res = await api.post("/organizer/event/create/finish", {
+    sessionId,
+    bannerImage,
+    thumbnailImage,
+  });
+  return res.data;
+};
+
+export const getEvents = async (id) => {
+  const res = await api.get(`/organizer/${id}/events`);
+  return res.data;
+};

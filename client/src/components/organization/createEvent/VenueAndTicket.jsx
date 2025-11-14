@@ -3,8 +3,9 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getStadiums } from "../../../services/organization";
 import TicketSetup from "./selectStadium/TicketSetup";
+import { useMemo } from "react";
 
-const VenueAndTicket = ({ register, errors, watch }) => {
+const VenueAndTicket = ({ register, errors, watch, setValue }) => {
   const watchedStadiumId = watch("stadium");
 
   const { data, isLoading } = useQuery({
@@ -15,7 +16,14 @@ const VenueAndTicket = ({ register, errors, watch }) => {
   });
 
   const stadiums = data?.data?.stadiums ?? [];
-  const selectedStadium = stadiums?.find((s) => s._id === watchedStadiumId);
+  const selectedStadium = useMemo(() => {
+    const stadium = stadiums?.find((s) => s._id === watchedStadiumId);
+    if (stadium) {
+      setValue("stadiumName", stadium?.stadiumDetails?.stadiumName);
+      setValue("stadiumAddress", stadium?.stadiumDetails?.address);
+    }
+    return stadium;
+  }, [stadiums, watchedStadiumId]);
 
   return (
     <div className="bg-white border border-gray-100 rounded-md px-4 py-6 sm:px-8 sm:py-8">
@@ -34,7 +42,7 @@ const VenueAndTicket = ({ register, errors, watch }) => {
                focus:ring-violet-400 transition-all duration-200 outline-none"
             {...register("stadium")}
           >
-            <option value="" className="text-gray-400">
+            <option value="" className="text-gray-300">
               Select Stadium/Create Stadium
             </option>
             {stadiums?.map((stadium) => (
@@ -55,7 +63,7 @@ const VenueAndTicket = ({ register, errors, watch }) => {
         </div>
 
         {errors?.stadium && (
-          <span className="text-red-500 text-[.5rem] sm:text-sm">
+          <span className="text-red-500 text-[.6rem] sm:text-sm">
             {errors.stadium.message}
           </span>
         )}
@@ -64,7 +72,7 @@ const VenueAndTicket = ({ register, errors, watch }) => {
           <div className="flex justify-end mt-5">
             <div className="inline-block bg-linear-to-r from-violet-500 to-violet-800 p-0.5 rounded-lg">
               <Link
-                to={"/listmyshow/create-stadium"}
+                to={"/listmyshow/stadium/create"}
                 className="bg-white text-[.5rem] text-violet-700 font-semibold px-2 py-2 sm:px-4 sm:py-2 rounded-md hover:bg-violet-50 transition flex items-center gap-2 text-sm sm:text-base"
               >
                 <Pencil className="w-3 h-3 sm:w-5 sm:h-5" />
@@ -113,6 +121,54 @@ const VenueAndTicket = ({ register, errors, watch }) => {
                     </p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 mt-5">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs sm:text-sm font-medium text-gray-700">
+                  Min Seat Price
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    {...register("minPrice")}
+                    className="w-full border border-gray-300 rounded-md pl-7 pr-3 py-2
+                   sm:py-3 text-xs sm:text-base focus:ring-2 focus:ring-violet-500 outline-none placeholder:text-gray-400"
+                    placeholder="0"
+                  />
+                </div>
+                {errors?.minPrice && (
+                  <span className="text-red-500 text-[0.6rem] sm:text-sm">
+                    {errors.minPrice.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs sm:text-sm font-medium text-gray-700">
+                  Max Seat Price
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    {...register("maxPrice")}
+                    className="w-full border border-gray-300 rounded-md pl-7 pr-3 py-2 
+                   sm:py-3 text-xs sm:text-base focus:ring-2 focus:ring-violet-500 outline-none placeholder:text-gray-400"
+                    placeholder="250"
+                  />
+                </div>
+                {errors?.maxPrice && (
+                  <span className="text-red-500 text-[0.6rem] sm:text-sm">
+                    {errors.maxPrice.message}
+                  </span>
+                )}
               </div>
             </div>
 

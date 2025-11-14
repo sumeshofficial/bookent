@@ -1,6 +1,5 @@
-import adminApi from "./api/adminInterceptor";
-import api from "./api/interceptor";
 import axios from "axios";
+import { adminApi, api } from "./api/apiSetup";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -55,8 +54,8 @@ export const sendOTP = async ({ data, purpose }) => {
 };
 
 export const loginUserWithEmail = async (data) => {
-  console.log(email, password)
   try {
+    const { email, password } = data;
     const response = await axios.post(
       `${API_URL}/auth/email/signin`,
       {
@@ -117,15 +116,11 @@ export const onResend = async ({ email, purpose }) => {
 
 export const verifyToken = async (token) => {
   try {
-    return await api.get(
-      `/auth/getUser`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    return await api.get(`/auth/getUser`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-      { withCredentials: true }
-    );
+    });
   } catch (error) {
     const message =
       error.response?.data?.message ||
@@ -159,13 +154,7 @@ export const verifyTokenAdmin = async (token) => {
 
 export const logout = async () => {
   try {
-    await axios.post(
-      `${API_URL}/auth/logout`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
+    await axios.post(`${API_URL}/auth/logout`, {}, { withCredentials: true });
     localStorage.removeItem("accessToken");
   } catch (error) {
     const message =
@@ -235,11 +224,14 @@ export const adminLogin = async ({ email, password }) => {
   try {
     if (!email || !password) return;
 
-    const response = await axios.post(`${API_URL}/admin/login`, {
-      email,
-      password,
-    },
-  { withCredentials: true });
+    const response = await axios.post(
+      `${API_URL}/admin/login`,
+      {
+        email,
+        password,
+      },
+      { withCredentials: true }
+    );
 
     return response.data;
   } catch (error) {

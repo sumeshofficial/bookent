@@ -53,27 +53,27 @@ const BasicInfo = ({ register, errors, setValue, watch }) => {
       </span>
 
       <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-        <label className="text-[.7rem] sm:text-sm">Event Title *</label>
+        <label className="text-xs sm:text-sm">Event Title *</label>
         <input
           type="text"
           {...register("eventTitle")}
-          className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
+          className="border text-xs sm:text-base border-gray-200 rounded-md py-2 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
           placeholder="e.g., India vs Pakistan T20 Match"
         />
         {errors?.eventTitle && (
-          <span className="text-red-500 text-[.5rem] sm:text-sm">
+          <span className="text-red-500 text-[.6rem] sm:text-sm">
             {errors.eventTitle.message}
           </span>
         )}
       </div>
 
       <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-        <label className="text-[.7rem] sm:text-sm">Sport Type *</label>
+        <label className="text-xs sm:text-sm">Sport Type *</label>
 
         <div className="relative">
           <select
             className="border border-gray-200 rounded-md py-2 px-2 sm:py-3 sm:px-3 
-                 text-[.7rem] sm:text-base focus:outline-none focus:ring-2 
+                 text-xs sm:text-base focus:outline-none focus:ring-2 
                  focus:ring-violet-500 appearance-none w-full pr-8"
             {...register("sportType")}
           >
@@ -92,35 +92,35 @@ const BasicInfo = ({ register, errors, setValue, watch }) => {
         </div>
 
         {errors?.sportType && (
-          <span className="text-red-500 text-[.5rem] sm:text-sm">
+          <span className="text-red-500 text-[.6rem] sm:text-sm">
             {errors.sportType.message}
           </span>
         )}
       </div>
 
       <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-        <label className="text-[.7rem] sm:text-sm">Description </label>
+        <label className="text-xs sm:text-sm">Description </label>
         <textarea
           {...register("eventDescription")}
-          className="border text-[.7rem] sm:text-base border-gray-200 h-20 sm:h-30 rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+          className="border text-xs sm:text-base border-gray-200 h-20 sm:h-30 rounded-md py-2 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
           placeholder="Enter event description, highlights, etc"
         />
         {errors?.eventDescription && (
-          <span className="text-red-500 text-[.5rem] sm:text-sm">
+          <span className="text-red-500 text-[.6rem] sm:text-sm">
             {errors.eventDescription.message}
           </span>
         )}
       </div>
 
       <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-        <label className="text-[.7rem] sm:text-sm">Tags </label>
+        <label className="text-xs sm:text-sm">Tags </label>
         <input
           type="text"
           value={tag}
           onKeyDown={handleTags}
           onChange={handleOnChnage}
           disabled={currentTags.length >= 5}
-          className={`border border-gray-200 text-[.7rem] sm:text-base rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500 ${
+          className={`border border-gray-200 text-xs sm:text-base rounded-md py-2 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500 ${
             currentTags.length >= 5 ? "opacity-60 cursor-not-allowed" : ""
           }`}
           placeholder={
@@ -130,7 +130,7 @@ const BasicInfo = ({ register, errors, setValue, watch }) => {
           }
         />
         {(errors?.tags || tagError) && (
-          <span className="text-red-500 text-[.5rem] sm:text-sm">
+          <span className="text-red-500 text-[.6rem] sm:text-sm">
             {errors?.tags?.message || tagError}
           </span>
         )}
@@ -157,21 +157,21 @@ const BasicInfo = ({ register, errors, setValue, watch }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-            <label className="text-[.7rem] sm:text-sm">Organization Name</label>
+            <label className="text-xs sm:text-sm">Organization Name</label>
             <input
               type="text"
               value={organizationName}
               disabled
-              className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="border text-xs sm:text-base border-gray-200 rounded-md py-2 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
           </div>
           <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-            <label className="text-[.7rem] sm:text-sm">Organizer Name</label>
+            <label className="text-xs sm:text-sm">Organizer Name</label>
             <input
               type="text"
               value={organizerName}
               disabled
-              className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="border text-xs sm:text-base border-gray-200 rounded-md py-2 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
           </div>
         </div>

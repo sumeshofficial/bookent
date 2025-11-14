@@ -3,43 +3,43 @@ const TicketSetup = ({ title, register, errors, index }) => {
     <>
       <div className="border-2 border-gray-200 p-3 sm:p-5 rounded-md sm:mt-3">
         <div className="flex flex-col sm:mt-5 gap-2 mb-2 sm:mb-5">
-          <label className="text-[0.5rem] sm:text-base">
+          <label className="text-xs sm:text-base">
             Section {index + 1}
           </label>
           <input
             type="text"
             disabled
             value={title}
-            className="text-[0.4rem] sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md text-gray-500"
+            className="text-xs sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md text-gray-500 focus:ring-2 focus:ring-violet-500 outline-none"
           />
         </div>
         <div className="grid grid-cols-2 gap-2 mb-2 sm:mb-5">
           <div className="flex flex-col gap-1 sm:gap-2">
-            <label className="text-[0.5rem] sm:text-base">Total Seats</label>
+            <label className="text-xs sm:text-base">Total Seats</label>
             <input
               type="text"
               placeholder="E.g. 250"
               {...register(`ticketSetup.${index}.totalSeats`, { valueAsNumber: true })}
-              className="text-[0.4rem] placeholder:text-gray-400 sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md"
+              className="text-xs placeholder:text-gray-400 sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md focus:ring-2 focus:ring-violet-500 outline-none"
             />
 
             {errors?.totalSeats && (
-              <span className="text-red-500 text-[.4rem] sm:text-[.8rem]">
+              <span className="text-red-500 text-[.6rem] sm:text-[.8rem]">
                 {errors.totalSeats.message}
               </span>
             )}
           </div>
           <div className="flex flex-col gap-1 sm:gap-2">
-            <label className="text-[0.5rem] sm:text-base">Seat Price</label>
+            <label className="text-xs sm:text-base">Seat Price</label>
             <input
               type="text"
               placeholder="E.g. 150"
               {...register(`ticketSetup.${index}.seatPrice`, { valueAsNumber: true })}
-              className="text-[0.4rem] placeholder:text-gray-400 sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md"
+              className="text-xs placeholder:text-gray-400 sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md focus:ring-2 focus:ring-violet-500 outline-none"
             />
 
             {errors?.seatPrice && (
-              <span className="text-red-500 text-[.4rem] sm:text-[.8rem]">
+              <span className="text-red-500 text-[.6rem] sm:text-[.8rem]">
                 {errors.seatPrice.message}
               </span>
             )}
@@ -47,18 +47,18 @@ const TicketSetup = ({ title, register, errors, index }) => {
         </div>
         <div className="grid grid-cols-2 gap-2 mb-2 sm:mb-5">
           <div className="flex flex-col gap-1 sm:gap-2">
-            <label className="text-[0.5rem] sm:text-base">
-              Total Seats Per User
+            <label className="text-xs sm:text-base">
+              Seats Per User
             </label>
             <input
               type="text"
               placeholder="E.g. 5"
               {...register(`ticketSetup.${index}.perUserLimit`, { valueAsNumber: true })}
-              className="text-[0.4rem] placeholder:text-gray-400 sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md"
+              className="text-xs placeholder:text-gray-400 sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md focus:ring-2 focus:ring-violet-500 outline-none"
             />
 
             {errors?.perUserLimit && (
-              <span className="text-red-500 text-[.4rem] sm:text-[.8rem]">
+              <span className="text-red-500 text-[.6rem] sm:text-[.8rem]">
                 {errors.perUserLimit.message}
               </span>
             )}

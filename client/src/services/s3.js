@@ -1,4 +1,4 @@
-import { api } from "./api/axiosSetup";
+import { api } from "./api/apiSetup";
 import axios from 'axios'
 
 export const generateUploadUrl = async ({

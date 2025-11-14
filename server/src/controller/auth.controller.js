@@ -4,17 +4,18 @@ import {
   createUser,
   finduser,
   findUserByEmail,
+  handleLogout,
   isUserExists,
   updatePassword,
 } from "../services/auth.service.js";
-import { sendTokens, sendTokensForAdmin } from "../utility/sendTokens.js";
+import { sendTokens } from "../utility/sendTokens.js";
 import {
-  generateAccessToken,
-  generateRefreshToken,
   revokeRefreshToken,
   verifyRefreshToken,
 } from "../services/token.service.js";
 import { reverseGeocoding } from "../services/user.service.js";
+import { statusCode } from "../utility/constants.js";
+import logger from "../config/logger.js";
 dotenv.config();
 
 // Google Authentication controller
@@ -22,9 +23,29 @@ export const googleAuth = async (req, res) => {
   const user = req.user;
   const FRONTEND_URL = process.env.FRONTEND_URL;
 
-  // Blocked user check
-  if (user && user.status === "blocked") {
-    return res.send(`
+  logger.http(`${req.method} ${req.originalUrl}`);
+
+  try {
+    if (!user) {
+      logger.warn("Google OAuth callback received with no user in req.user");
+      return res.send(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage(
+              { error: "User not found" },
+              "${FRONTEND_URL}"
+            );
+            window.close();
+          </script>
+        </body>
+      </html>
+    `);
+    }
+
+    if (user.status === "blocked") {
+      logger.warn(`Blocked user attempted Google login: ID=${user._id}`);
+      return res.send(`
       <html>
         <body>
           <script>
@@ -37,16 +58,43 @@ export const googleAuth = async (req, res) => {
         </body>
       </html>
     `);
-  }
+    }
 
-  const accessToken = await sendTokens(res, user);
+    logger.info(`Generating access & refresh tokens for userId=${user._id}`);
+    const accessToken = await sendTokens(res, user);
 
-  return res.send(`
+    if (!accessToken) {
+      logger.error(`Token generation failed for userId=${user._id}`);
+      return res.send(`
+        <html>
+          <body>
+            <script>
+              window.opener.postMessage(
+                { error: "Token generation failed" },
+                "${FRONTEND_URL}"
+              );
+              window.close();
+            </script>
+          </body>
+        </html>
+      `);
+    }
+
+    logger.info(`Google OAuth successful: ID=${user._id}, role=${user.role}`);
+
+    const safeUser = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+
+    return res.send(`
     <html>
       <body>
         <script>
           window.opener.postMessage(
-            { accessToken: "${accessToken}", user: ${JSON.stringify(user)} },
+            { accessToken: "${accessToken}", user: ${JSON.stringify(safeUser)} },
             "${FRONTEND_URL}"
           );
           window.close();
@@ -54,6 +102,22 @@ export const googleAuth = async (req, res) => {
       </body>
     </html>
   `);
+  } catch (error) {
+    logger.error(`Error during Google OAuth: ${error.stack || error.message}`);
+    return res.send(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage(
+              { error: "Authentication failed. Please try again." },
+              "${FRONTEND_URL}"
+            );
+            window.close();
+          </script>
+        </body>
+      </html>
+    `);
+  }
 };
 
 // User signup with email controoler
@@ -61,24 +125,40 @@ export const registerUserWithEmail = async (req, res) => {
   const { fullname, email, password, purpose, role = "user" } = req.body;
 
   try {
+    logger.http(`${req.method} ${req.originalUrl}`);
+
     if (!fullname || !email || !password || !purpose) {
-      return res.status(422).json({ message: "All fields are required" });
+      logger.warn(
+        `Missing required fields: fullname=${fullname}, email=${email}, purpose=${purpose}`
+      );
+      return res
+        .status(statusCode.missingField)
+        .json({ message: "All fields are required" });
     }
 
+    logger.info(`Check email already exists, email=${email}`);
     if (await isUserExists(email)) {
-      return res.status(409).json({ error: "Email already exists" });
+      logger.warn(`User enterd email is already exists, email=${email}`);
+      return res
+        .status(statusCode.conflict)
+        .json({ error: "Email already exists" });
     }
 
     const userData = { fullname, email, password, role, authProvider: "email" };
 
+    logger.info(
+      `Generate OTP for email=${userData.email}, role=${userData.role}`
+    );
     await generateOtp({ email, userData, purpose });
 
-    res.status(201).json({
+    logger.info(`OTP sent succssfully to email=${email}`);
+    res.status(statusCode.created).json({
       success: true,
       message: `OTP sent successfully to ${email}`,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
+    logger.error(`Error Registering User: ${error.stack || error.message}`);
+    res.status(statusCode.serverError).json({ error: "Something went wrong" });
   }
 };
 
@@ -86,25 +166,42 @@ export const registerUserWithEmail = async (req, res) => {
 export const resendOTP = async (req, res) => {
   const { email, purpose } = req.body;
   try {
+    logger.http(`${req.method} ${req.originalUrl}`);
+
     if (!email || !purpose) {
+      logger.info(
+        `Missing required fields: email=${email}, purpose=${purpose}`
+      );
       return res
-        .status(422)
+        .status(statusCode.missingField)
         .json({ message: "email and purpose are required" });
     }
 
+    logger.info(`Check user details for email=${email}, purpose=${purpose}`);
     const userData = await checkOtp(email, purpose);
+
     if (!userData) {
-      return res.status(404).json({ message: "No pending OTP found for user" });
+      logger.warn(
+        `No pending OTP found for user email=${email}, purpose=${purpose}`
+      );
+      return res
+        .status(statusCode.notFound)
+        .json({ message: "No pending OTP found for user" });
     }
 
+    logger.info(`Regenerate OTP for email=${email}, purpose=${purpose}`);
     await generateOtp({ email, userData, purpose });
 
-    res.status(201).json({
+    logger.info(
+      `OTP Resent successfully to email=${email}, purpose=${purpose}`
+    );
+    res.status(statusCode.created).json({
       success: true,
-      message: `OTP resent successfully`,
+      message: "OTP resent successfully",
     });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
+    logger.error(`Error resent OTP: ${error.stack || error.message}`);
+    res.status(statusCode.serverError).json({ error: "Something went wrong" });
   }
 };
 
@@ -113,41 +210,53 @@ export const verifyOtp = async (req, res) => {
   const { email, otp, purpose } = req.body;
 
   try {
-    if (!email || !otp || !purpose)
+    logger.http(`${req.method} ${req.originalUrl}`);
+
+    if (!email || !otp || !purpose) {
+      logger.warn(`Missing required fields email=${email}, purpose=${purpose}`);
       return res
-        .status(422)
+        .status(statusCode.missingField)
         .json({ message: "email, purpose and otp are required" });
+    }
 
+    logger.info(`Check OTP valid for email=${email}, purpose=${purpose}`);
     const userData = await checkOtp(email, purpose);
-    if (!userData)
-      return res.status(404).json({ message: "OTP expired or not found" });
 
-    if (userData.otp !== otp || userData.purpose !== purpose)
-      return res.status(400).json({ message: "Invalid OTP" });
-
-    let user;
-    if (purpose === "signup") {
-      user = await createUser({
-        fullname: userData.fullname,
-        email: userData.email,
-        role: userData.email,
-        password: userData.password,
-        role: userData.role,
-        authProvider: userData.authProvider,
-        isVerified: true,
-      });
+    if (!userData) {
+      logger.warn(`No OTP found for user email=${email}, purpose=${purpose}`);
+      return res
+        .status(statusCode.notFound)
+        .json({ message: "OTP expired or not found" });
     }
 
-    if (purpose === "forgot-password") {
-      user = await findUserByEmail(email);
-      if (!user) return res.status(404).json({ message: "User not found" });
+    if (userData.otp !== otp || userData.purpose !== purpose) {
+      logger.warn(`Invalid OTP entry for email=${email} purpose=${purpose}`);
+      return res.status(statusCode.badRequest).json({ message: "Invalid OTP" });
     }
 
+    logger.info(`Delete OTP for email=${email}, purpose=${purpose}`);
     await delOtp(email, purpose);
 
     if (purpose === "signup") {
+      logger.info(`Create user for email=${email}`);
+      const user = await createUser({
+        fullname: userData.fullname,
+        email: userData.email,
+        role: userData.role,
+        password: userData.password,
+        authProvider: userData.authProvider,
+        isVerified: true,
+      });
+
+      logger.info(
+        `Send Access Token and Refresh Token for userId=${user._id}, email=${user.email}`
+      );
       const accessToken = await sendTokens(res, user);
-      return res.status(200).json({
+
+      logger.info(
+        `User verified succssfull, userId=${user._id}, email=${user.email} purpose=${purpose}`
+      );
+      return res.status(statusCode.success).json({
         success: true,
         message: "User verified successfully",
         user,
@@ -155,146 +264,180 @@ export const verifyOtp = async (req, res) => {
       });
     }
 
-    res.status(200).json({
-      success: true,
-      user,
-      message: "User verified successfully",
-    });
+    if (purpose === "forgot-password") {
+      logger.info(`Find user by email=${email} for forgot password`);
+      const user = await findUserByEmail(email);
+      if (!user) {
+        logger.warn(`User not found for email=${email}`);
+        return res
+          .status(statusCode.notFound)
+          .json({ message: "User not found" });
+      }
+
+      logger.info(
+        `User verified succssfull, userId=${user._id}, email=${user.email}, purpose=${purpose}`
+      );
+      return res.status(statusCode.success).json({
+        success: true,
+        user,
+        message: "User verified successfully",
+      });
+    }
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
+    logger.error(`Error verifing user: ${error.stack || error.message}`);
+    res.status(statusCode.serverError).json({ error: "Something went wrong" });
   }
 };
 
 // Generate RefreshAccessToken
 export const refreshAccessToken = async (req, res) => {
   try {
-    const token = req.cookies.refreshToken;
-    if (!token) throw new Error("No refresh token");
+    logger.http(`${req.method} ${req.originalUrl}`);
 
+    const token = req.cookies.user_refreshToken;
+    if (!token) {
+      logger.warn(`Missing refresh token for user`);
+      return res.status(statusCode.missingField).json({
+        success: false,
+        error: "Missing Refresh Token",
+      });
+    }
+
+    logger.info("Verifing refresh roken");
     const payload = await verifyRefreshToken(token);
 
+    if (!payload) {
+      logger.warn("Invalid or expired refresh token for user");
+      return res.status(statusCode.unAuthorized).json({
+        success: false,
+        error: "Invalid or expired refresh token",
+      });
+    }
+
+    logger.info(
+      `Remove old refresh token from db for userId=${payload.userId} email=${payload.role}`
+    );
     await revokeRefreshToken(payload.tokenId);
 
-    const newAccessToken = generateAccessToken({
-      userId: payload.userId,
+    const user = {
+      _id: payload.userId,
       role: payload.role,
-    });
-    const newRefreshToken = await generateRefreshToken({
-      userId: payload.userId,
-      role: payload.role,
-    });
+    };
 
-    res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
+    logger.info(
+      `Regenerate new refresh and accesstoken for userId=${payload.userId} email=${payload.role}`
+    );
+    const newAccessToken = await sendTokens(res, user);
 
-    res.status(200).json({ accessToken: newAccessToken });
+    logger.info(
+      `Regenerating refresh and access token successfully for userId=${payload.userId} email=${payload.role}`
+    );
+    res.status(statusCode.success).json({ accessToken: newAccessToken });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Invalid or expired refresh token" });
+    logger.error(
+      `Error Regenerating access token and refresh token: ${error.stack || error.message}`
+    );
+    res.status(statusCode.serverError).json({
+      success: false,
+      error: "Something went wrong",
+    });
   }
 };
 
 // Generate RefreshAccessToken for admin
 export const refreshAccessTokenForAdmin = async (req, res) => {
   try {
-    const token = req.cookies.admin_refreshToken;
-    if (!token) throw new Error("No refresh token");
+    logger.http(`${req.method} ${req.originalUrl}`);
 
+    const token = req.cookies.admin_refreshToken;
+    if (!token) {
+      logger.warn(`Missing refresh token for admin`);
+      return res.status(statusCode.missingField).json({
+        success: false,
+        error: "Missing Refresh Token",
+      });
+    }
+
+    logger.info("Verifing refresh roken");
     const payload = await verifyRefreshToken(token);
 
+    if (!payload) {
+      logger.warn("Invalid or expired refresh token for admin");
+      return res.status(statusCode.unAuthorized).json({
+        success: false,
+        error: "Invalid or expired refresh token",
+      });
+    }
+
+    logger.info(
+      `Remove old refresh token from db for userId=${payload.userId} email=${payload.role}`
+    );
     await revokeRefreshToken(payload.tokenId);
 
-    const newAccessToken = generateAccessToken({
-      userId: payload.userId,
+    const user = {
+      _id: payload.userId,
       role: payload.role,
-    });
-    const newRefreshToken = await generateRefreshToken({
-      userId: payload.userId,
-      role: payload.role,
-    });
+    };
 
-    res.cookie("admin_refreshToken", newRefreshToken, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
+    logger.info(
+      `Regenerate new refresh and accesstoken for userId=${payload.userId} email=${payload.role}`
+    );
+    const newAccessToken = await sendTokens(res, user);
 
-    res.status(200).json({ accessToken: newAccessToken });
+    logger.info(
+      `Regenerating refresh and access token successfully for userId=${payload.userId} email=${payload.role}`
+    );
+    res.status(statusCode.success).json({ accessToken: newAccessToken });
   } catch (error) {
-    console.log(error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Invalid or expired refresh token" });
+    logger.error(
+      `Error Regenerating access token and refresh token: ${error.stack || error.message}`
+    );
+    res.status(statusCode.serverError).json({
+      success: false,
+      error: "Invalid or expired refresh token",
+    });
   }
 };
 
 // Logout controller
 export const logoutUser = async (req, res) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    logger.http(`${req.method} ${req.originalUrl}`);
 
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-    });
+    logger.info(`Logout User`);
+    await handleLogout(res, "user_refreshToken");
 
-    if (!refreshToken) {
-      return res
-        .status(200)
-        .json({ success: true, message: "Already logged out" });
-    }
-
-    const payload = await verifyRefreshToken(refreshToken);
-
-    await revokeRefreshToken(payload.tokenId);
-
-    return res.status(200).json({
+    logger.info(`User logged out successfully`);
+    res.status(statusCode.success).json({
       success: true,
       message: "User logged out successfully",
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Something went wrong" });
+    logger.error(`Error logout user: ${error.stack || error.message}`);
+    res
+      .status(statusCode.serverError)
+      .json({ success: false, error: "Something went wrong" });
   }
 };
 
 // Admin logout
 export const logoutAdmin = async (req, res) => {
   try {
-    const refreshToken = req.cookies.admin_refreshToken;
+    logger.http(`${req.method} ${req.originalUrl}`);
 
-    res.clearCookie("admin_refreshToken", {
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-    });
+    logger.info(`Logout Admin`);
+    await handleLogout(res, "admin_refreshToken");
 
-    if (!refreshToken) {
-      return res
-        .status(200)
-        .json({ success: true, message: "Already logged out" });
-    }
-
-    const payload = await verifyRefreshToken(refreshToken);
-
-    await revokeRefreshToken(payload.tokenId);
-
-    return res.status(200).json({
+    logger.info(`Admin logged out successfully`);
+    res.status(statusCode.success).json({
       success: true,
-      message: "User logged out successfully",
+      message: "Admin logged out successfully",
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Something went wrong" });
+    logger.error(`Error logout admin: ${error.stack || error.message}`);
+    res
+      .status(statusCode.serverError)
+      .json({ success: false, error: "Something went wrong" });
   }
 };
 
@@ -303,7 +446,7 @@ export const loginwithEmail = async (req, res) => {
   const { email, password, purpose } = req.body;
   try {
     if (!email || !password || !purpose) {
-      return res.status(422).json({
+      return res.status(statusCode.missingField).json({
         success: false,
         error: "email, purpose and password required",
       });
@@ -312,19 +455,21 @@ export const loginwithEmail = async (req, res) => {
     const user = await finduser(email);
 
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res
+        .status(statusCode.notFound)
+        .json({ success: false, error: "User not found" });
     }
 
     const isPasswordValid = await user.isValidPassword(password);
 
     if (!isPasswordValid) {
       return res
-        .status(401)
+        .status(statusCode.unAuthorized)
         .json({ success: false, error: "Invalid credentials" });
     }
 
     if (user.status === "blocked") {
-      return res.status(401).json({
+      return res.status(statusCode.unAuthorized).json({
         success: false,
         error: "You are blocked by the admin",
       });
@@ -332,7 +477,7 @@ export const loginwithEmail = async (req, res) => {
 
     const accessToken = await sendTokens(res, user);
 
-    res.status(200).json({
+    res.status(statusCode.success).json({
       success: true,
       isVerified: true,
       user,
@@ -341,20 +486,29 @@ export const loginwithEmail = async (req, res) => {
     });
   } catch (error) {
     return res
-      .status(500)
-      .json({ success: false, error: "Somthing went wrong" });
+      .status(statusCode.serverError)
+      .json({ success: false, error: error.message || "Somthing went wrong" });
   }
 };
 
+// Get user
 export const getUser = async (req, res) => {
   const { user } = req;
 
   try {
+    logger.http(`GET /api/auth/getUser`, { userId: user?._id });
+
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      logger.warn("No user found in request context");
+      return res.status(statusCode.notFound).json({ error: "User not found" });
     }
 
+    logger.info(`Validating user role: ${user.role}`);
+
     if (user.role === "user" && user.location) {
+      logger.info(
+        `Performing reverse geocoding for coordinates (${user.location.latitude}, ${user.location.longitude})`
+      );
       const response = await reverseGeocoding({
         lat: user.location.latitude,
         lng: user.location.longitude,
@@ -366,13 +520,19 @@ export const getUser = async (req, res) => {
       };
     }
 
-    return res
-      .status(200)
-      .json({ success: true, message: "User found", user: req.user });
+    logger.info(
+      `User fetched successfully — ID: ${user._id}, Role: ${user.role}, Email: ${user.email}`
+    );
+    return res.status(statusCode.success).json({
+      success: true,
+      message: "User fetch succssfully",
+      user: req.user,
+    });
   } catch (error) {
+    logger.error(`Error fetching user: ${error.stack || error.message}`);
     return res
-      .status(500)
-      .json({ success: false, error: "Somthing went wrong" });
+      .status(statusCode.serverError)
+      .json({ success: false, error: error.message || "Somthing went wrong" });
   }
 };
 
@@ -381,7 +541,7 @@ export const sendOtp = async (req, res) => {
   const { email, purpose } = req.body;
   try {
     if (!email || !purpose) {
-      return res.status(422).json({
+      return res.status(statusCode.missingField).json({
         success: false,
         error: "email and purpose required",
       });
@@ -390,20 +550,22 @@ export const sendOtp = async (req, res) => {
     const user = await finduser(email);
 
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res
+        .status(statusCode.notFound)
+        .json({ success: false, error: "User not found" });
     }
 
     await generateOtp({ email, userData: user, purpose });
 
-    return res.status(200).json({
+    return res.status(statusCode.created).json({
       success: true,
       isVerified: false,
       message: `OTP sent successfully to ${email}`,
     });
   } catch (error) {
     return res
-      .status(500)
-      .json({ success: false, error: "Somthing went wrong" });
+      .status(statusCode.serverError)
+      .json({ success: false, error: error.message || "Somthing went wrong" });
   }
 };
 
@@ -413,13 +575,15 @@ export const forgotPassword = async (req, res) => {
   try {
     if (!password || !email) {
       return res
-        .status(422)
+        .status(statusCode.missingField)
         .json({ success: false, message: "email and pasword required" });
     }
 
     const user = await finduser(email);
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res
+        .status(statusCode.notFound)
+        .json({ success: false, error: "User not found" });
     }
 
     await updatePassword({
@@ -427,14 +591,14 @@ export const forgotPassword = async (req, res) => {
       password,
     });
 
-    res.status(200).json({
+    res.status(statusCode.success).json({
       success: true,
       message: "Password updated successfully",
     });
   } catch (error) {
     return res
-      .status(500)
-      .json({ success: false, error: "Somthing went wrong" });
+      .status(statusCode.serverError)
+      .json({ success: false, error: error.message || "Somthing went wrong" });
   }
 };
 
@@ -445,7 +609,7 @@ export const adminLogin = async (req, res) => {
   try {
     if (!email || !password) {
       return res
-        .status(422)
+        .status(statusCode.missingField)
         .json({ success: false, message: "Missing fields" });
     }
 
@@ -453,26 +617,26 @@ export const adminLogin = async (req, res) => {
 
     if (!user) {
       return res
-        .status(400)
+        .status(statusCode.badRequest)
         .json({ success: false, message: "User not found" });
     }
 
     if (user.role !== "admin") {
       return res
-        .status(403)
+        .status(statusCode.permissionDenied)
         .json({ success: false, message: "Access denied. Not an admin." });
     }
 
     const isPasswordValid = await user.isValidPassword(password);
     if (!isPasswordValid) {
       return res
-        .status(401)
+        .status(statusCode.unAuthorized)
         .json({ success: false, message: "Invalid credentials" });
     }
 
-    const accessToken = await sendTokensForAdmin(res, user);
+    const accessToken = await sendTokens(res, user);
 
-    return res.status(200).json({
+    return res.status(statusCode.success).json({
       success: true,
       message: "Admin login successful",
       admin: {
@@ -483,8 +647,9 @@ export const adminLogin = async (req, res) => {
       accessToken,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Something went wrong" });
+    return res.status(statusCode.serverError).json({
+      success: false,
+      error: error.messsage || "Something went wrong",
+    });
   }
 };

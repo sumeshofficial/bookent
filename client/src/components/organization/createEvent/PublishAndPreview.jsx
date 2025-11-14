@@ -1,7 +1,6 @@
 import { ChevronDown } from "lucide-react";
 
 const PublishAndPreview = ({ register, errors, watch }) => {
-
   return (
     <div className="bg-white border border-gray-100 rounded-md px-4 py-6 sm:px-8 sm:py-8 space-y-3 sm:space-y-5">
       <h2 className="font-semibold text-sm sm:text-2xl">Policies & Publish</h2>
@@ -83,30 +82,80 @@ const PublishAndPreview = ({ register, errors, watch }) => {
           </div>
 
           {errors?.eventStatus && (
-          <span className="text-red-500 text-[.5rem] sm:text-sm">
-            {errors.eventStatus.message}
-          </span>
-        )}
+            <span className="text-red-500 text-[.5rem] sm:text-sm">
+              {errors.eventStatus.message}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* <div className="bg-violet-50 border border-violet-400 rounded-lg p-6 mt-6">
-        <h3 className="font-semibold mb-3">Event Summary</h3>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Event:</span>
-            <span className="font-medium">{eventTitle}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Sport:</span>
-            <span className="font-medium">{sportType}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Match Time:</span>
-            <span className="font-medium">{matchDate}</span>
+      <div className="bg-linear-to-br from-violet-50 to-violet-100 border border-violet-300 rounded-xl p-4 sm:p-6 mt-8 shadow-sm">
+        <h3 className="font-semibold text-gray-800 mb-4 sm:text-lg text-base">
+          Event Summary
+        </h3>
+
+        <div className="space-y-4 sm:space-y-5">
+          {[
+            { label: "Event Title", value: watch("eventTitle") },
+            { label: "Sport Type", value: watch("sportType") },
+            {
+              label: "Match Date & Time",
+              value: watch("matchDate")
+                ? new Date(watch("matchDate")).toLocaleString()
+                : null,
+            },
+            { label: "Stadium Name", value: watch("stadiumName") },
+            { label: "Full Address", value: watch("stadiumAddress") },
+            {
+              label: "Ticket Price Range",
+              value:
+                watch("minPrice") && watch("maxPrice")
+                  ? `₹${watch("minPrice")} - ₹${watch("maxPrice")}`
+                  : null,
+            },
+            { label: "Age Restriction", value: watch("ageRestriction") },
+            {
+              label: "Refund Available",
+              value: watch("refund") ? "Yes" : "No",
+            },
+            {
+              label: "Status",
+              value: watch("eventStatus") || "Draft",
+              color:
+                watch("eventStatus") === "Published"
+                  ? "text-green-600"
+                  : "text-yellow-600",
+            },
+          ].map((item, index) => (
+            <div
+              key={index}
+              className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 shadow-sm"
+            >
+              <p className="text-gray-500 text-xs sm:text-sm mb-1">
+                {item.label}
+              </p>
+              <p
+                className={`text-gray-900 font-medium text-sm sm:text-base break-words ${
+                  item.color || ""
+                }`}
+              >
+                {item.value || "---"}
+              </p>
+            </div>
+          ))}
+
+          <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 shadow-sm">
+            <p className="text-gray-500 text-xs sm:text-sm mb-1">
+              Terms & Conditions
+            </p>
+            <p className="text-gray-700 text-xs sm:text-sm max-h-32 overflow-y-auto break-words leading-relaxed">
+              {watch("termsAndConditions")
+                ? watch("termsAndConditions").slice(0, 200) + "..."
+                : "---"}
+            </p>
           </div>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };

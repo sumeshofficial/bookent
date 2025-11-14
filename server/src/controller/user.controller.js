@@ -1,14 +1,16 @@
 import dotenv from "dotenv";
 import { updateUserService } from "../services/user.service.js";
+import { statusCode } from "../utility/constants.js";
 dotenv.config();
 
+// Update user profile or data
 export const updateUser = async (req, res) => {
   const { id, data } = req.body;
 
   try {
     if (!id || !data) {
       return res
-        .status(422)
+        .status(statusCode.missingField)
         .json({ success: false, message: "Missing fields" });
     }
 
@@ -16,14 +18,16 @@ export const updateUser = async (req, res) => {
 
     if (!user) {
       return res
-        .status(404)
+        .status(statusCode.notFound)
         .json({ success: false, message: "User not found" });
     }
 
     return res
-      .status(200)
+      .status(statusCode.success)
       .json({ success: true, message: "Updated Successfully", user });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return res
+      .status(statusCode.serverError)
+      .json({ success: false, error: error.message });
   }
 };

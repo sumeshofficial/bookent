@@ -100,7 +100,7 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
                       All Events
                     </NavLink>
                     <NavLink
-                      to="/listmyshow/create-event"
+                      to="/listmyshow/event/create"
                       onClick={() => setSidebarOpen(false)}
                       className={({ isActive }) =>
                         `block px-4 py-2 text-sm rounded-lg cursor-pointer ${
@@ -113,7 +113,7 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
                       Create Events
                     </NavLink>
                     <NavLink
-                      to="/listmyshow/create-stadium"
+                      to="/listmyshow/stadium/create"
                       onClick={() => setSidebarOpen(false)}
                       className={({ isActive }) =>
                         `block px-4 py-2 text-sm rounded-lg cursor-pointer ${

@@ -1,8 +1,11 @@
 import Organizer from "../models/organizer.model.js";
 import dotenv from "dotenv";
 import Stadium from "../models/stadium.model.js";
+import Event from "../models/event.model.js";
+import logger from "../config/logger.js";
 dotenv.config();
 
+// Create organizer
 export const createOrganizer = async ({
   userId,
   organizationDetails,
@@ -15,10 +18,13 @@ export const createOrganizer = async ({
   });
 };
 
-export const checkOrganizer = ({ userId }) => {
-  return Organizer.findOne({ userId });
+// Check organizer exists
+export const checkOrganizer = async ({ userId }) => {
+  const organizer = await Organizer.findOne({ userId });
+  return organizer;
 };
 
+// Get all organizers
 export const getAllOrganizers = async ({
   limit,
   skip,
@@ -26,35 +32,38 @@ export const getAllOrganizers = async ({
   sort,
   status,
 }) => {
-  try {
-    const query = {
-      ...(search
-        ? {
-            $or: [
-              { "organizationDetails.name": { $regex: search, $options: "i" } },
-            ],
-          }
-        : {}),
-      ...(status && status !== "all" ? { status } : {}),
-    };
+  const query = {
+    ...(search
+      ? {
+          $or: [
+            { "organizationDetails.name": { $regex: search, $options: "i" } },
+          ],
+        }
+      : {}),
+    ...(status && status !== "all" ? { status } : {}),
+  };
 
-    let sortOption = { createdAt: -1 };
-    if (sort === "oldest") sortOption = { createdAt: 1 };
-    if (sort === "a-z") sortOption = { "organizationDetails.name": 1 };
-    if (sort === "z-a") sortOption = { "organizationDetails.name": -1 };
-
-    const organizers = await Organizer.find(query)
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limit);
-
-    const totalOrganizers = await Organizer.countDocuments({ ...query });
-    return { totalOrganizers, organizers };
-  } catch (error) {
-    throw new Error(error.message);
+  let sortOption = { createdAt: -1 };
+  if (sort === "oldest") {
+    sortOption = { createdAt: 1 };
   }
+  if (sort === "a-z") {
+    sortOption = { "organizationDetails.name": 1 };
+  }
+  if (sort === "z-a") {
+    sortOption = { "organizationDetails.name": -1 };
+  }
+
+  const organizers = await Organizer.find(query)
+    .sort(sortOption)
+    .skip(skip)
+    .limit(limit);
+
+  const totalOrganizers = await Organizer.countDocuments({ ...query });
+  return { totalOrganizers, organizers };
 };
 
+// Update organizer request
 export const updateRequest = async ({ id, status }) => {
   const organizer = await Organizer.findById(id);
 
@@ -65,16 +74,19 @@ export const updateRequest = async ({ id, status }) => {
   await organizer.save();
 };
 
+// Create stadium
 export const createStadiumFn = async (payload) => {
   const stadium = await Stadium.create(payload);
   return stadium;
 };
 
+// Find Stadiums
 export const findStadiums = async (organizerId) => {
   const stadiums = await Stadium.find({ organizerId }).lean();
   return stadiums;
 };
 
+// Check stadium is exists
 export const stadiumExists = async (name, organizerId) => {
   const exists = await Stadium.exists({
     "stadiumDetails.stadiumName": { $regex: new RegExp(`^${name}$`, "i") },
@@ -82,4 +94,15 @@ export const stadiumExists = async (name, organizerId) => {
   });
 
   return exists;
+};
+
+// Create Event
+export const createEvent = async (data) => {
+  return await Event.create(data);
+};
+
+// Fetch events
+export const fetchEventsWithOrganizerId = async (id) => {
+  const events = await Event.find({ organizer: id });
+  return events;
 };
