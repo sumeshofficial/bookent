@@ -10,10 +10,12 @@ import { createStadium } from "../../services/organization";
 import { generateUploadUrl, uploadFile } from "../../services/s3";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 const CreateStadium = () => {
   const [currentPage, setCurrentPage] = useState("form");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isModified, setIsModified] = useState(false);
 
   const { organizer } = useSelector((store) => store.organizer);
 
@@ -23,9 +25,14 @@ const CreateStadium = () => {
   });
 
   const { register, handleSubmit, formState, setValue, watch } = method;
-  const { errors, isSubmitting, isDirty } = formState;
+  const { errors, isSubmitting } = formState;
 
-  useNavigationGuard(isDirty && !isSubmitted);
+  useEffect(() => {
+    const sub = watch(() => setIsModified(true));
+    return () => sub.unsubscribe();
+  }, [watch]);
+
+  useNavigationGuard(isModified && !isSubmitted);
 
   const navigate = useNavigate();
 

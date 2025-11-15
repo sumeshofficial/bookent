@@ -102,7 +102,33 @@ export const createEvent = async (data) => {
 };
 
 // Fetch events
-export const fetchEventsWithOrganizerId = async (id) => {
-  const events = await Event.find({ organizer: id });
-  return events;
+export const fetchEventsWithOrganizerId = async ({
+  query,
+  sortOption,
+  skip,
+  limit,
+}) => {
+  const events = await Event.find(query)
+    .sort(sortOption)
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Event.countDocuments(query);
+  const totalPages = Math.ceil(total / limit);
+  return { events, total, totalPages };
+};
+
+// Fetch Event by id
+export const findEvent = async (organizerId, eventId) => {
+  return await Event.findOne({ _id: eventId, organizer: organizerId });
+};
+
+// Update event
+export const updateEvent = async (eventId, newData) => {
+  const updatedEvent = await Event.findByIdAndUpdate(
+    eventId,
+    { $set: newData },
+    { new: true }
+  );
+  return updatedEvent;
 };

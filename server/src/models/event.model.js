@@ -54,6 +54,14 @@ const eventSchema = new mongoose.Schema(
       ref: "Stadium",
       required: true,
     },
+    stadiumName: {
+      type: String,
+      required: true,
+    },
+    stadiumAddress: {
+      type: String,
+      required: true,
+    },
     minPrice: {
       type: Number,
       required: true,
@@ -99,11 +107,11 @@ const eventSchema = new mongoose.Schema(
       min: 30,
       max: 300,
     },
-    bannerImage: {
+    bannerImageKey: {
       type: String,
       required: true,
     },
-    thumbnailImage: {
+    thumbnailImageKey: {
       type: String,
       required: true,
     },

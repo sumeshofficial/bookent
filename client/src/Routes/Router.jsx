@@ -55,7 +55,7 @@ const router = createBrowserRouter([
             element: (
               <Protected>
                 <OrganizerProtected />
-              </Protected>
+              </Protected> 
             ),
             children: [
               {
@@ -71,6 +71,10 @@ const router = createBrowserRouter([
                   },
                   {
                     path: "event/create",
+                    element: <CreateEventForm />,
+                  },
+                  {
+                    path: "organizer/:organizerId/event/:eventId/edit",
                     element: <CreateEventForm />,
                   },
                   {

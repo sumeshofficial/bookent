@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { getOrganizer } from "../../redux/organizerSlice";
 import OrganizerAccountForm from "../../pages/organizer/OrganizerAccountForm";
 import OrganizerAccRequested from "../../pages/organizer/OrganizerAccRequested";
@@ -9,7 +9,7 @@ import OrganizerAccRejected from "../../pages/organizer/OrganizerAccRejected";
 const OrganizerProtected = () => {
   const dispatch = useDispatch();
 
-  const { organizer } = useSelector((state) => state.organizer);
+  const { organizer, isLoading } = useSelector((state) => state.organizer);
   const { user } = useSelector((state) => state.user);
 
   useEffect(() => {

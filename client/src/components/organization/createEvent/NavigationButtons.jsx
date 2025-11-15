@@ -5,6 +5,7 @@ const NavigationButtons = ({
   handleNextStep,
   handlePreviousStep,
   isSubmitting,
+  dirtyFields,
 }) => {
   return (
     <div className="border border-gray-100 py-4 px-5 sm:py-8 sm:px-6 rounded-sm sm:rounded-md bg-white">
@@ -24,10 +25,16 @@ const NavigationButtons = ({
             Previous
           </button>
           <button
-            type={currentStep === 5 ? "submit" : "button"}
-            disabled={isSubmitting}
-            onClick={handleNextStep}
-            className="flex justify-center items-center text-xs sm:text-base px-2 py-2 sm:px-6 sm:py-3 rounded-sm sm:rounded-md bg-violet-500 text-white disabled:bg-gray-500"
+            type="button"
+            disabled={isSubmitting || (currentStep === 5 && Object.keys(dirtyFields).length === 0)}
+            onClick={() => {
+              if (currentStep === 5) {
+                document.querySelector("form").requestSubmit();
+              } else {
+                handleNextStep();
+              }
+            }}
+            className="flex justify-center disabled:bg-gray-400 items-center px-2 py-2 sm:px-6 sm:py-3 rounded-sm bg-violet-500 text-white"
           >
             {currentStep === 5 ? (
               isSubmitting ? (

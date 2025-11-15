@@ -1,5 +1,5 @@
 import logger from "../config/logger.js";
-import { redisClient } from "../config/redis.conf.js";
+import { findOrganizerById } from "../services/auth.service.js";
 import {
   checkOrganizer,
   createOrganizer,
@@ -8,13 +8,19 @@ import {
   stadiumExists,
   fetchEventsWithOrganizerId,
   createEvent,
+  findEvent,
+  updateEvent,
 } from "../services/organizer.service.js";
 import {
   deleteRedisData,
   getRedisData,
   storeInRedis,
 } from "../services/redis.service.js";
-import { getObjectURL, putObject } from "../services/s3.service.js";
+import {
+  deleteObject,
+  getObjectURL,
+  putObject,
+} from "../services/s3.service.js";
 import { statusCode } from "../utility/constants.js";
 import { eventSchema } from "../utility/validation.js";
 import dotenv from "dotenv";
@@ -253,7 +259,168 @@ export const validateEventCreate = async (req, res) => {
     logger.error(
       `Error Create Event Validate: ${error.stack || error.message}`
     );
-    return res
+    res
+      .status(statusCode.serverError)
+      .json({ success: false, error: "Server error" });
+  }
+};
+
+// Edit Event Validate
+export const editEvent = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const userId = req.user._id;
+    const data = req.body;
+
+    logger.http(`${req.method} ${req.originalUrl}`);
+
+    if (!data || !eventId || !userId) {
+      logger.warn("Required fields are missing");
+      return res.status(statusCode.missingField).json({
+        success: false,
+        error: "Required fields are missing",
+      });
+    }
+
+    logger.info("Check ownership");
+    const organizer = await checkOrganizer({ userId });
+    if (!organizer) {
+      logger.warn(`Organizer not found for ${userId}`);
+      return res.status(statusCode.notFound).json({
+        success: false,
+        error: "Organizer not found",
+      });
+    }
+
+    logger.info(
+      `Check event is exixts for organizerId=${organizer._id}, eventId=${eventId}`
+    );
+    const event = await findEvent(organizer._id, eventId);
+    if (!event) {
+      logger.warn("Event not found or unauthorized");
+      return res.status(statusCode.notFound).json({
+        success: false,
+        error: "Event not found or unauthorized",
+      });
+    }
+
+    if (!data?.bannerImage && !data?.thumbnailImage) {
+      logger.info("Update event without images");
+      const updatedEvent = await updateEvent(eventId, data);
+
+      logger.info("Event updated succssfully");
+      return res.status(statusCode.success).json({
+        success: true,
+        message: "Event updated successfully",
+        event: updatedEvent,
+      });
+    }
+
+    logger.info("Create a sessionId for redis");
+    const sessionId = `event:create:${crypto.randomUUID()}`;
+
+    logger.info("Store Event data in redis with expires time for 10m");
+    await storeInRedis(
+      sessionId,
+      eventCreateValidationExpiresIn,
+      JSON.stringify({
+        ...data,
+        event,
+      })
+    );
+
+    const uploadUrls = {};
+    if (data?.bannerImage) {
+      logger.info("Generate signed url for banner image");
+      const bannerImage = await putObject({
+        fileName: `banner-${Date.now()}.jpg`,
+        contentType: "image/jpeg",
+        folderName: "events/banner_images",
+      });
+
+      uploadUrls.bannerImage = {
+        bannerURL: bannerImage.signedUrl,
+        key: bannerImage.key,
+      };
+    }
+
+    if (data?.thumbnailImage) {
+      logger.info("Generate signed url for thumbnail image");
+      const thumbnailImage = await putObject({
+        fileName: `thumbnail-${Date.now()}.jpg`,
+        contentType: "image/jpeg",
+        folderName: "events/thumbnail_images",
+      });
+
+      uploadUrls.thumbnailImage = {
+        thumbnailURL: thumbnailImage.signedUrl,
+        key: thumbnailImage.key,
+      };
+    }
+
+    logger.info("Event Edit Verify and Create signed Urls successfully");
+    res.status(statusCode.created).json({
+      success: true,
+      sessionId,
+      uploadUrls,
+    });
+  } catch (error) {
+    logger.error(`Error edit event: ${error.stack || error.message}`);
+    res
+      .status(statusCode.serverError)
+      .json({ success: false, error: "Server error" });
+  }
+};
+
+// Finish Event Edit
+export const finishEventEdit = async (req, res) => {
+  try {
+    const { sessionId, images } = req.body;
+
+    logger.http(`${req.method} ${req.originalUrl}`);
+
+    logger.info("Fetch validated data from Redis");
+    const cached = await getRedisData(sessionId);
+
+    if (!cached) {
+      logger.warn("Validation session expired. Please start again.");
+      return res.status(statusCode.badRequest).json({
+        success: false,
+        error: "Validation session expired. Please start again.",
+      });
+    }
+
+    logger.debug("Parse cached data");
+    const data = JSON.parse(cached);
+
+    if (data.bannerImage) {
+      logger.info("Deleting the old banner image");
+      await deleteObject(data.event.bannerImageKey);
+    }
+
+    if (data.thumbnailImage) {
+      logger.info("Deleting the old thumbnail image");
+      await deleteObject(data.event.thumbnailImageKey);
+    }
+
+    logger.info("Attach uploaded URLs");
+    const updatedData = { ...data, ...images };
+
+    logger.info("Update event");
+    const updatedEvent = await updateEvent(data.event._id, updatedData);
+
+    logger.info("Delete event session form redis");
+    await deleteRedisData(sessionId);
+
+    logger.info("Event updated succssfully");
+    res.status(statusCode.success).json({
+      success: true,
+      message: "Event updated successfully",
+      event: updatedEvent,
+    });
+  } catch (error) {
+    logger.error(`Error edit event: ${error.stack || error.message}`);
+    res
       .status(statusCode.serverError)
       .json({ success: false, error: "Server error" });
   }
@@ -262,7 +429,7 @@ export const validateEventCreate = async (req, res) => {
 // Finish Event Create
 export const finishEventCreate = async (req, res) => {
   try {
-    const { sessionId, bannerImage, thumbnailImage } = req.body;
+    const { sessionId, bannerImageKey, thumbnailImageKey } = req.body;
 
     logger.http(`${req.method} ${req.originalUrl}`);
 
@@ -281,8 +448,8 @@ export const finishEventCreate = async (req, res) => {
     const data = JSON.parse(cached);
 
     logger.info("Attach uploaded URLs");
-    data.bannerImage = bannerImage;
-    data.thumbnailImage = thumbnailImage;
+    data.bannerImageKey = bannerImageKey;
+    data.thumbnailImageKey = thumbnailImageKey;
 
     logger.info("Save event to DB");
     const event = await createEvent(data);
@@ -297,14 +464,27 @@ export const finishEventCreate = async (req, res) => {
     });
   } catch (error) {
     logger.error(`Error create event: ${error.stack || error.message}`);
-    res.status(500).json({ success: false, error: "Server error" });
+    res
+      .status(statusCode.serverError)
+      .json({ success: false, error: "Server error" });
   }
 };
 
 // Fetch Events
 export const getEvents = async (req, res) => {
   try {
-    const { id } = req.query;
+    const { id } = req.params;
+    const {
+      page = 1,
+      limit = 5,
+      status = "All",
+      sort = "lastest",
+      search = "",
+      startDate,
+      endDate,
+      category,
+      priceFilter,
+    } = req.query;
 
     logger.http(`${req.method} ${req.originalUrl}`);
 
@@ -316,20 +496,174 @@ export const getEvents = async (req, res) => {
       });
     }
 
-    logger.info(`Fetch event form DB with ID=${id}`);
-    const events = await fetchEventsWithOrganizerId(id);
+    const query = { organizer: id };
 
-    logger.info("Events fetch successfully");
+    if (status && status !== "All") {
+      query.status = status;
+    }
+
+    if (category) {
+      query.sportType = category;
+    }
+
+    if (search.trim()) {
+      const regex = new RegExp(search, "i");
+
+      query.$or = [
+        { eventTitle: regex },
+        { sportType: regex },
+        { tags: { $in: [regex] } },
+        { stadiumName: regex },
+        { city: regex },
+      ];
+    }
+
+    if (startDate || endDate) {
+      query.matchDate = {};
+      if (startDate) {
+        query.matchDate.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        query.matchDate.$lte = new Date(endDate);
+      }
+    }
+
+    if (priceFilter) {
+      if (priceFilter === "low") {
+        query.minPrice = { $lte: 500 };
+      } else if (priceFilter === "medium") {
+        query.minPrice = { $gte: 500, $lte: 1500 };
+      } else if (priceFilter === "high") {
+        query.minPrice = { $gte: 1500 };
+      }
+    }
+
+    const sortOption = {};
+    switch (sort) {
+      case "price-high":
+        sortOption.minPrice = -1;
+        break;
+
+      case "price-low":
+        sortOption.minPrice = 1;
+        break;
+
+      case "latest":
+        sortOption.createdAt = -1;
+        break;
+
+      case "oldest":
+        sortOption.createdAt = 1;
+        break;
+
+      default:
+        sortOption.createdAt = -1;
+    }
+
+    const skip = (page - 1) * limit;
+
+    logger.info(`Fetching events from DB for organizer=${id}`);
+    const { events, total, totalPages } = await fetchEventsWithOrganizerId({
+      query,
+      sortOption,
+      skip,
+      limit: Number(limit),
+    });
+
+    if (!events || events.length === 0) {
+      logger.info("Events fetch successfully. No Events found");
+      return res.status(statusCode.success).json({
+        success: true,
+        message: "No events found",
+        events,
+        pagination: { total, page, totalPages },
+      });
+    }
+
+    logger.info("Fetch images from S3 bucket");
+    const updatedEvents = await Promise.all(
+      events.map(async (event) => {
+        event = event.toObject();
+        const bannerKey = event.bannerImageKey;
+        const thumbnailKey = event.thumbnailImageKey;
+
+        const bannerImage = await getObjectURL(bannerKey);
+        const thumbnailImage = await getObjectURL(thumbnailKey);
+
+        const updatedEvent = {
+          ...event,
+          bannerImage,
+          thumbnailImage,
+        };
+
+        return updatedEvent;
+      })
+    );
+
+    logger.info("Events fetched from DB successfully");
     res.status(statusCode.success).json({
       success: true,
       message: "Events fetched succussfully",
-      events,
+      events: updatedEvents,
+      pagination: { total, page, totalPages },
     });
   } catch (error) {
-    logger.error(`Error fetch events: ${error.stack || error.message}`);
+    logger.error(`Error fetching events: ${error.stack || error.message}`);
     res.status(statusCode.error).json({
       success: false,
       error: "Something went wrong",
+    });
+  }
+};
+
+// Find Event
+export const getEvent = async (req, res) => {
+  try {
+    const { organizerId, eventId } = req.params;
+    console.log(organizerId, eventId);
+    logger.http(`${req.method}, ${req.originalUrl}`);
+
+    if (!organizerId || !eventId) {
+      logger.warn("Required fields are misiing");
+      return res.status(statusCode.missingField).json({
+        success: false,
+        message: "Miisng required fields",
+      });
+    }
+
+    logger.info(
+      `Fetching event with organizerId=${organizerId}, eventId=${eventId}`
+    );
+    const event = await findEvent(organizerId, eventId);
+
+    if (!event) {
+      logger.warn("Event not found or organizerId not match");
+      return res.status(statusCode.notFound).json({
+        success: false,
+        error: "Event not found or organizerId not match",
+      });
+    }
+
+    const thumbnailImage = await getObjectURL(event.thumbnailImageKey);
+    const bannerImage = await getObjectURL(event.bannerImageKey);
+
+    const updatedEvent = {
+      ...event.toObject(),
+      bannerImage,
+      thumbnailImage,
+    };
+
+    logger.info("Event fetch succesfully");
+    res.status(statusCode.success).json({
+      success: true,
+      message: "Event fetch succesfully",
+      event: updatedEvent,
+    });
+  } catch (error) {
+    logger.error(`Error fetching event: ${error.stack || error.mesage}`);
+    res.status(500).json({
+      success: false,
+      error: "Server error",
     });
   }
 };

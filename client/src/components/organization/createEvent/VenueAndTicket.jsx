@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getStadiums } from "../../../services/organization";
 import TicketSetup from "./selectStadium/TicketSetup";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 const VenueAndTicket = ({ register, errors, watch, setValue }) => {
   const watchedStadiumId = watch("stadium");
@@ -17,13 +17,15 @@ const VenueAndTicket = ({ register, errors, watch, setValue }) => {
 
   const stadiums = data?.data?.stadiums ?? [];
   const selectedStadium = useMemo(() => {
-    const stadium = stadiums?.find((s) => s._id === watchedStadiumId);
-    if (stadium) {
-      setValue("stadiumName", stadium?.stadiumDetails?.stadiumName);
-      setValue("stadiumAddress", stadium?.stadiumDetails?.address);
-    }
-    return stadium;
+    return stadiums?.find((stadium) => stadium._id === watchedStadiumId);
   }, [stadiums, watchedStadiumId]);
+
+  useEffect(() => {
+    if (selectedStadium?.stadiumDetails) {
+      setValue("stadiumName", selectedStadium?.stadiumDetails?.stadiumName);
+      setValue("stadiumAddress", selectedStadium?.stadiumDetails?.address);
+    }
+  }, [selectedStadium, setValue]);
 
   return (
     <div className="bg-white border border-gray-100 rounded-md px-4 py-6 sm:px-8 sm:py-8">
@@ -187,6 +189,7 @@ const VenueAndTicket = ({ register, errors, watch, setValue }) => {
                       register={register}
                       errors={errors.ticketSetup?.[index]}
                       index={index}
+                      watch={watch}
                     />
                   ))}
               </div>

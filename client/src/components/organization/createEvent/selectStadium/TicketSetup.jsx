@@ -1,4 +1,4 @@
-const TicketSetup = ({ title, register, errors, index }) => {
+const TicketSetup = ({ title, register, errors, index, watch }) => {
   return (
     <>
       <div className="border-2 border-gray-200 p-3 sm:p-5 rounded-md sm:mt-3">
