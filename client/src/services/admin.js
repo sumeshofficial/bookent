@@ -37,7 +37,7 @@ export const getAllOrganizers = async ({
     const message =
       error.response?.data?.message ||
       error.response?.data?.error ||
-      error.message ||
+      error.message || 
       "Something went wrong";
     throw new Error(message);
   }
