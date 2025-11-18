@@ -1,3 +1,4 @@
+import axios from "axios";
 import { api } from "./api/apiSetup";
 
 // Organizer Registration Form
@@ -127,7 +128,28 @@ export const deleteEvent = async (eventId) => {
   });
 };
 
+// Get all Indian States
+export const getState = async () => {
+  const url = import.meta.env.VITE_STATE_API_URL;
+  const response = await axios.get(url);
+  return response.data;
+};
 
+// Get all City
+export const getCity = async (stateName) => {
+  const url = import.meta.env.VITE_CITY_API_URL;
+  const response = await axios.post(
+    url,
+    {
+      country: "India",
+      state: stateName,
+    },
+    { withCredentials: false }
+  );
+  return response.data;
+};
+
+// Update organizer profile
 export const updateOrganizer = async ({ id, data }) => {
   try {
     return await api.patch(

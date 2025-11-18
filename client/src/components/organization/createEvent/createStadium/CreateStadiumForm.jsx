@@ -3,7 +3,11 @@ import StadiumLayout from "../selectStadium/StadiumLayout";
 import { useState } from "react";
 import { Pencil } from "lucide-react";
 import debounce from "lodash.debounce";
-import { checkStadiumExists } from "../../../../services/organization";
+import {
+  checkStadiumExists,
+  getCity,
+  getState,
+} from "../../../../services/organization";
 import toast from "react-hot-toast";
 
 const CreateStadiumInput = ({
@@ -17,6 +21,10 @@ const CreateStadiumInput = ({
 }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isAvailable, setIsAvailable] = useState(null);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
 
   const stadiumName = watch("stadiumName");
   const address = watch("address");
@@ -48,6 +56,7 @@ const CreateStadiumInput = ({
     return () => debouncedCheck.cancel();
   }, [stadiumName, debouncedCheck]);
 
+
   useEffect(() => {
     if (stadiumLayout?.layoutImage) {
       const url = URL.createObjectURL(stadiumLayout.layoutImage);
@@ -56,6 +65,40 @@ const CreateStadiumInput = ({
       return () => URL.revokeObjectURL(url);
     }
   }, [stadiumLayout]);
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const data = await getState();
+        setStates(data.data[98].states);
+      } catch (error) {
+        console.error("Error fetching states:", error);
+        toast.error("Failed to load states");
+      }
+    };
+    fetchStates();
+  }, []);
+
+  const fetchCities = async (stateName) => {
+    if (!stateName) {
+      setCities([]);
+      return;
+    }
+    try {
+      const data = await getCity(stateName);
+      setCities(data.data);
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+      toast.error("Failed to load cities");
+    }
+  };
+
+  const handleStateChange = (e) => {
+    const value = e.target.value;
+    setSelectedState(value);
+    setSelectedCity("");
+    fetchCities(value);
+  };
 
   const isCreateFormValid =
     stadiumName && address && city && state && pincode && location;
@@ -91,7 +134,7 @@ const CreateStadiumInput = ({
             )}
           </div>
           <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-            <label className="text-[.7rem] sm:text-sm">Total Capcity *</label>
+            <label className="text-[.7rem] sm:text-sm">Total Capacity *</label>
             <input
               type="number"
               {...register("capacity", { valueAsNumber: true })}
@@ -107,7 +150,7 @@ const CreateStadiumInput = ({
         </div>
 
         <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-          <label className="text-[.7rem] sm:text-sm">Address </label>
+          <label className="text-[.7rem] sm:text-sm">Address</label>
           <textarea
             {...register("address")}
             className="border text-[.7rem] sm:text-base border-gray-200 h-20 sm:h-30 rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
@@ -122,33 +165,48 @@ const CreateStadiumInput = ({
 
         <div className="grid grid-cols-3 gap-4">
           <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-            <label className="text-[.7rem] sm:text-sm">City *</label>
-            <input
-              type="text"
-              {...register("city")}
-              className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
-              placeholder="Kochi"
-            />
-            {errors?.city && (
-              <span className="text-red-500 text-[.5rem] sm:text-sm">
-                {errors.city.message}
-              </span>
-            )}
-          </div>
-          <div className="mt-2 sm:mt-5 flex flex-col gap-2">
             <label className="text-[.7rem] sm:text-sm">State *</label>
-            <input
-              type="text"
+            <select
               {...register("state")}
-              className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
-              placeholder="Kerala"
-            />
+              value={selectedState}
+              onChange={handleStateChange}
+              className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 focus:outline-none focus:ring-2 focus:ring-violet-500"
+            >
+              <option value="">Select State</option>
+              {states.map((state) => (
+                <option key={state.name} value={state.name}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
             {errors?.state && (
               <span className="text-red-500 text-[.5rem] sm:text-sm">
                 {errors.state.message}
               </span>
             )}
           </div>
+          <div className="mt-2 sm:mt-5 flex flex-col gap-2">
+            <label className="text-[.7rem] sm:text-sm">City *</label>
+            <select
+              {...register("city")}
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 focus:outline-none focus:ring-2 focus:ring-violet-500"
+            >
+              <option value="">Select City</option>
+              {cities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+            {errors?.city && (
+              <span className="text-red-500 text-[.5rem] sm:text-sm">
+                {errors.city.message}
+              </span>
+            )}
+          </div>
+
           <div className="mt-2 sm:mt-5 flex flex-col gap-2">
             <label className="text-[.7rem] sm:text-sm">Pincode *</label>
             <input
