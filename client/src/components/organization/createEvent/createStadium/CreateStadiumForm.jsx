@@ -5,8 +5,7 @@ import { Pencil } from "lucide-react";
 import debounce from "lodash.debounce";
 import {
   checkStadiumExists,
-  getCity,
-  getState,
+    getState,
 } from "../../../../services/organization";
 import toast from "react-hot-toast";
 
