@@ -1,5 +1,4 @@
 const MatchTime = ({ register, errors, watch }) => {
-  console.log(watch("matchDate"))
   return (
     <div className="bg-white border border-gray-100 rounded-md px-4 py-6 sm:px-8 sm:py-8">
       <span className="font-semibold text-sm sm:text-2xl">Match Time</span>

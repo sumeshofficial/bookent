@@ -21,6 +21,9 @@ import AdminLayout from "../sharedComponents/admin/AdminLayout";
 import CreateEventForm from "../pages/organizer/CreateEventForm";
 import CreateStadium from "../pages/organizer/CreateStadium";
 import OrganizerEventsPage from "../pages/organizer/OrganizerEventsPage";
+import EventPreview from "../pages/organizer/EventPreview";
+import EventsPage from "../pages/user/EventsPage";
+import EventDetailPage from "../pages/user/EventDetailPage";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +51,22 @@ const router = createBrowserRouter([
               </Protected>
             ),
           },
+          {
+            path: "events/:category",
+            element: (
+              <Protected>
+                <EventsPage />
+              </Protected>
+            ),
+          },
+          {
+            path: "event/:eventId",
+            element: (
+              <Protected>
+                <EventDetailPage />
+              </Protected>
+            ),
+          },
 
           // Organizer routes
           {
@@ -55,7 +74,7 @@ const router = createBrowserRouter([
             element: (
               <Protected>
                 <OrganizerProtected />
-              </Protected> 
+              </Protected>
             ),
             children: [
               {
@@ -84,6 +103,10 @@ const router = createBrowserRouter([
                   {
                     path: "events",
                     element: <OrganizerEventsPage />,
+                  },
+                  {
+                    path: "organizer/:organizerId/event/:eventId",
+                    element: <EventPreview />,
                   },
                 ],
               },

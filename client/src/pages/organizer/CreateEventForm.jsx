@@ -21,7 +21,7 @@ import { uploadFile } from "../../services/s3";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 const CreateEventForm = () => {
@@ -29,10 +29,19 @@ const CreateEventForm = () => {
   const { organizer } = useSelector((store) => store.organizer);
   const [isModified, setIsModified] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [updatedEventId, setUpdatedEventId] = useState(null);
+
+  const queryClient = useQueryClient();
 
   const { organizerId, eventId } = useParams();
   const isEditMode = !!eventId;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if ((organizer && organizerId) && organizerId !== organizer._id) {
+      navigate("/error");
+    }
+  }, [organizer, organizerId]);
 
   const { data, error, isError } = useQuery({
     queryKey: ["event", organizerId, eventId],
@@ -43,14 +52,13 @@ const CreateEventForm = () => {
 
   const eventData = data?.event;
 
-  if (isError) {
-    if (
-      error.response?.data?.error === "Event not found or organizerId not match"
-    ) {
+  useEffect(() => {
+    if (error) {
+      toast.dismiss();
+      toast.error("Something went wrong");
       navigate("/error");
     }
-    toast.error("Somethig went wrong");
-  }
+  }, [error, navigate]);
 
   const currentValidationSchema = validationSchema[currentStep - 1];
   const method = useForm({
@@ -120,14 +128,18 @@ const CreateEventForm = () => {
         }
 
         const updatedEvent = await updateEvent(eventId, newData);
-        const uploadUrls = updatedEvent.data?.uploadUrls;
+
+        const uploadUrls = updatedEvent?.uploadUrls;
+
+        if (!uploadUrls) {
+          setIsModified(false);
+          setIsSubmitted(true);
+          return setUpdatedEventId(updatedEvent.event._id);
+        }
 
         if (uploadUrls) {
           const images = {};
           if (uploadUrls?.bannerImage?.bannerURL) {
-            console.log(dirtyPayload.bannerImage);
-            console.log(dirtyPayload.bannerImage.type);
-            console.log(uploadUrls.bannerImage.bannerURL);
             await uploadFile({
               file: dirtyPayload.bannerImage,
               contentType: dirtyPayload.bannerImage.type,
@@ -144,10 +156,25 @@ const CreateEventForm = () => {
             images.thumbnailImageKey = uploadUrls.thumbnailImage.key;
           }
 
-          const res = await editEventFinish({
-            sessionId: updatedEvent.data?.sessionId,
+          const handleEventMutation = useMutation({
+            mutationFn: editEventFinish,
+            onSuccess: () => {
+              toast.dismiss();
+              toast.success("Event updated");
+              queryClient.invalidateQueries(["events"]);
+            },
+            onError: (err) => {
+              toast.dismiss();
+              toast.error("Something went wrong");
+            },
+          });
+
+          const res = await handleEventMutation.mutateAsync({
+            sessionId: updatedEvent?.sessionId,
             images,
           });
+
+          setUpdatedEventId(res.event._id);
         }
 
         toast.success("Event updated successfully");
@@ -167,29 +194,43 @@ const CreateEventForm = () => {
           signedUrl: uploadUrls.thumbnailImage.thumbnailURL,
         });
 
-        const res = await createEventFinish({
+        const handleEventMutation = useMutation({
+          mutationFn: createEventFinish,
+          onSuccess: () => {
+            toast.dismiss();
+            toast.success("Event updated");
+            queryClient.invalidateQueries(["events"]);
+          },
+          onError: (err) => {
+            toast.dismiss();
+            toast.error("Something went wrong");
+          },
+        });
+
+        const res = await handleEventMutation.mutateAsync({
           sessionId,
           bannerImageKey: uploadUrls.bannerImage.key,
           thumbnailImageKey: uploadUrls.thumbnailImage.key,
         });
 
+        setUpdatedEventId(res.event._id);
         toast.success("Event created successfully");
       }
 
-      reset();
       setIsModified(false);
       setIsSubmitted(true);
     } catch (error) {
-      console.log(error);
       toast.error("Something went wrong");
     }
   };
 
   useEffect(() => {
-    if (isSubmitted) {
-      navigate("/listmyshow");
+    if (isSubmitted && updatedEventId) {
+      navigate(
+        `/listmyshow/organizer/${organizer._id}/event/${updatedEventId}`
+      );
     }
-  }, [isSubmitted]);
+  }, [isSubmitted, updatedEventId]);
 
   useNavigationGuard(isModified);
 

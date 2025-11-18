@@ -76,6 +76,10 @@ const PublishAndPreview = ({ register, errors, watch }) => {
             >
               <option value="Draft">Draft</option>
               <option value="Published">Published</option>
+              <option value="Postpone">Postpone</option>
+              <option value="Comming-Soon">Comming Soon</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Completed">Completed</option>
             </select>
 
             <ChevronDown className="absolute right-3 text-gray-400 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
@@ -87,6 +91,60 @@ const PublishAndPreview = ({ register, errors, watch }) => {
             </span>
           )}
         </div>
+      </div>
+
+      <div>
+        {watch("eventStatus") === "Postpone" && (
+          <div>
+            <div className="mt-2 sm:mt-5 flex flex-col gap-2">
+              <label className="text-[.7rem] sm:text-sm">New Match Date</label>
+              <input
+                type="Date"
+                {...register("newMatchDate")}
+                className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.5rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
+                placeholder="E.g. 12/12/2025"
+              />
+              {errors?.newMatchDate && (
+                <span className="text-red-500 text-[.5rem] sm:text-sm">
+                  {errors.newMatchDate.message}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-2 sm:mt-5 flex flex-col gap-2">
+              <label className="text-xs sm:text-sm">Postpone Reasone</label>
+              <input
+                type="text"
+                placeholder="e.g., due to rain"
+                {...register("postponeReasone")}
+                className="border text-xs sm:text-base border-gray-200 rounded-md py-2 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
+              />
+              {errors?.postponeReasone && (
+                <span className="text-red-500 text-[.5rem] sm:text-sm">
+                  {errors.postponeReasone.message}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+        {watch("eventStatus") === "Cancelled" && (
+          <div>
+            <div className="mt-2 sm:mt-5 flex flex-col gap-2">
+              <label className="text-xs sm:text-sm">Cancelled Reasone</label>
+              <input
+                type="text"
+                placeholder="e.g., due to rain"
+                {...register("cancelledReasone")}
+                className="border text-xs sm:text-base border-gray-200 rounded-md py-2 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
+              />
+              {errors?.cancelledReasone && (
+                <span className="text-red-500 text-[.5rem] sm:text-sm">
+                  {errors.cancelledReasone.message}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="bg-linear-to-br from-violet-50 to-violet-100 border border-violet-300 rounded-xl p-4 sm:p-6 mt-8 shadow-sm">
@@ -135,7 +193,7 @@ const PublishAndPreview = ({ register, errors, watch }) => {
                 {item.label}
               </p>
               <p
-                className={`text-gray-900 font-medium text-sm sm:text-base break-words ${
+                className={`text-gray-900 font-medium text-sm sm:text-base wrap-break-word ${
                   item.color || ""
                 }`}
               >
@@ -148,7 +206,7 @@ const PublishAndPreview = ({ register, errors, watch }) => {
             <p className="text-gray-500 text-xs sm:text-sm mb-1">
               Terms & Conditions
             </p>
-            <p className="text-gray-700 text-xs sm:text-sm max-h-32 overflow-y-auto break-words leading-relaxed">
+            <p className="text-gray-700 text-xs sm:text-sm max-h-32 overflow-y-auto wrap-break-word leading-relaxed">
               {watch("termsAndConditions")
                 ? watch("termsAndConditions").slice(0, 200) + "..."
                 : "---"}

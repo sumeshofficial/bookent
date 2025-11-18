@@ -36,6 +36,7 @@
     "recharts": "^3.3.0",
     "redux-persist": "^6.0.0",
     "tailwindcss": "^4.1.15",
+    "use-debounce": "^10.0.6",
     "use-image": "^1.1.4",
     "uuid": "^13.0.0",
     "yup": "^1.7.1"

@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import User from "../models/user.model.js";
 import axios from "axios";
+import Event from "../models/event.model.js";
 dotenv.config();
 
 const GOOGLE_MAP_URI = process.env.GOOGLE_MAP_URI;
@@ -70,4 +71,49 @@ export const reverseGeocoding = async ({ lat, lng }) => {
   } else {
     return null;
   }
+};
+
+// Find Events
+export const findEventsForUser = async (searchQuery = "") => {
+  const regex = new RegExp(searchQuery, "i");
+
+  const search = [
+    { eventTitle: regex },
+    { sportType: regex },
+    { tags: { $in: [regex] } },
+    { stadiumName: regex },
+    { city: regex },
+  ];
+  return await Event.find({
+    $or: search,
+    eventStatus: "Published",
+    isDeleted: false,
+  })
+    .populate("stadium")
+    .sort({ createdAt: -1 })
+    .lean();
+};
+
+export const filterAndSortService = async ({
+  query,
+  sortQuery,
+  skip,
+  limit,
+}) => {
+  const events = await Event.find(query)
+    .populate("stadium")
+    .sort(sortQuery)
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  return events;
+};
+
+// Event details
+export const eventDetails = async (eventId) => {
+  return await Event.findById(eventId)
+    .populate("stadium")
+    .populate("organizer")
+    .lean();
 };

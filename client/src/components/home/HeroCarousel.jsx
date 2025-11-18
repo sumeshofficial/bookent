@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import banner1 from "../assets/FCG_ALN_Article_1180x500-1180x350.png";
-import banner2 from "../assets/AFC_article_1180x500-1180x350.png";
+import banner1 from "../../assets/FCG_ALN_Article_1180x500-1180x350.png";
+import banner2 from "../../assets/AFC_article_1180x500-1180x350.png";
 
 const slidesData = [banner1, banner2];
 
@@ -18,7 +18,6 @@ const HeroCarousel = () => {
 
   return (
     <div className="relative w-full h-[180px] sm:h-[350px] rounded-2xl overflow-hidden shadow-2xl">
-      {/* Slides */}
       {slidesData.map((slide, index) => (
         <img
           key={index}
@@ -30,7 +29,6 @@ const HeroCarousel = () => {
         />
       ))}
 
-      {/* Navigation Dots */}
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
         {slides.map((_, index) => (
           <button
@@ -43,7 +41,6 @@ const HeroCarousel = () => {
         ))}
       </div>
 
-      {/* Arrow Navigation */}
       <button
         onClick={() =>
           setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)

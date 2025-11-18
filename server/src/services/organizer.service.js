@@ -81,16 +81,15 @@ export const createStadiumFn = async (payload) => {
 };
 
 // Find Stadiums
-export const findStadiums = async (organizerId) => {
-  const stadiums = await Stadium.find({ organizerId }).lean();
+export const findStadiums = async () => {
+  const stadiums = await Stadium.find().lean();
   return stadiums;
 };
 
 // Check stadium is exists
-export const stadiumExists = async (name, organizerId) => {
+export const stadiumExists = async (name) => {
   const exists = await Stadium.exists({
     "stadiumDetails.stadiumName": { $regex: new RegExp(`^${name}$`, "i") },
-    organizerId,
   });
 
   return exists;
@@ -120,7 +119,11 @@ export const fetchEventsWithOrganizerId = async ({
 
 // Fetch Event by id
 export const findEvent = async (organizerId, eventId) => {
-  return await Event.findOne({ _id: eventId, organizer: organizerId });
+  return await Event.findOne({
+    _id: eventId,
+    organizer: organizerId,
+    isDeleted: false,
+  });
 };
 
 // Update event
@@ -131,4 +134,22 @@ export const updateEvent = async (eventId, newData) => {
     { new: true }
   );
   return updatedEvent;
+};
+
+export const eventExists = async (eventId) => {
+  return Event.exists({ _id: eventId, isDeleted: false });
+};
+
+// Delete Event
+export const deleteEventService = async (organizerId, eventId) => {
+  console.log(organizerId, eventId);
+  return await Event.updateOne(
+    { organizer: organizerId, _id: eventId },
+    {
+      $set: {
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
+    }
+  );
 };

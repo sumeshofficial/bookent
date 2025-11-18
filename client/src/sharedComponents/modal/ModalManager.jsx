@@ -7,7 +7,8 @@ import EmailVerification from "../EmailVerification";
 import ForgotPasswordInput from "../../components/auth/EmailAuth/ForgotPassword/ForgotPasswordInput";
 import ForgotPasswordEmail from "../../components/auth/EmailAuth/ForgotPassword/ForgotPasswordEmail";
 import EditUserProfile from "../../pages/user/EditUserProfile";
-import CropImageModal from "../../components/CropImageModal";
+import CropImageModal from "../../components/modal/CropImageModal";
+import DeleteConfirmationModal from "../../components/modal/DeleteConfirmationModal";
 
 const ModalManager = () => {
 
@@ -43,6 +44,9 @@ const ModalManager = () => {
             break;
         case "crop-image":
             content = <CropImageModal {...modalData}/>
+            break;
+        case "delete-confirmation":
+            content = <DeleteConfirmationModal {...modalData}/>
             break;
         default:
             return null;

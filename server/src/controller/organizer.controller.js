@@ -1,5 +1,4 @@
 import logger from "../config/logger.js";
-import { findOrganizerById } from "../services/auth.service.js";
 import {
   checkOrganizer,
   createOrganizer,
@@ -10,6 +9,8 @@ import {
   createEvent,
   findEvent,
   updateEvent,
+  eventExists,
+  deleteEventService,
 } from "../services/organizer.service.js";
 import {
   deleteRedisData,
@@ -119,7 +120,7 @@ export const createStadium = async (req, res) => {
       stadium,
     });
   } catch (error) {
-    console.log(error);
+    logger.error(`Error create stadium ${error.stack || error.message}`);
     res.status(statusCode.serverError).json({
       success: false,
       error: error.message || "Something went worng",
@@ -138,7 +139,7 @@ export const getStadiums = async (req, res) => {
       });
     }
 
-    const stadiums = await findStadiums(organizer._id);
+    const stadiums = await findStadiums();
 
     if (!stadiums || stadiums.length === 0) {
       return res.status(statusCode.success).json({
@@ -186,7 +187,7 @@ export const checkStadiumName = async (req, res) => {
         .json({ success: false, error: "Organizer not found" });
     }
 
-    const exists = await stadiumExists(name, organizer._id);
+    const exists = await stadiumExists(name);
 
     res.status(statusCode.success).json({
       success: true,
@@ -562,6 +563,8 @@ export const getEvents = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
+    query.isDeleted = false;
+
     logger.info(`Fetching events from DB for organizer=${id}`);
     const { events, total, totalPages } = await fetchEventsWithOrganizerId({
       query,
@@ -620,7 +623,7 @@ export const getEvents = async (req, res) => {
 export const getEvent = async (req, res) => {
   try {
     const { organizerId, eventId } = req.params;
-    console.log(organizerId, eventId);
+
     logger.http(`${req.method}, ${req.originalUrl}`);
 
     if (!organizerId || !eventId) {
@@ -661,9 +664,63 @@ export const getEvent = async (req, res) => {
     });
   } catch (error) {
     logger.error(`Error fetching event: ${error.stack || error.mesage}`);
-    res.status(500).json({
+    res.status(statusCode.serverError).json({
       success: false,
       error: "Server error",
+    });
+  }
+};
+
+// Event delete
+export const deleteEvent = async (req, res) => {
+  try {
+    const user = req.user;
+    const { eventId } = req.body;
+
+    logger.http(`${req.method} ${req.originalUrl}`);
+
+    if (!eventId) {
+      logger.warn("Missing required field");
+      return res.status(statusCode.missingField).json({
+        success: false,
+        error: "Misising required fields",
+      });
+    }
+
+    logger.info(`Fetching organizer with id=${user._id}`);
+    const organizer = await checkOrganizer({ userId: user._id });
+
+    if (!organizer) {
+      logger.warn("Organizer not found");
+      return res.status(statusCode.notFound).json({
+        success: false,
+        error: "Organizer not found",
+      });
+    }
+
+    logger.info(`Check event is exists eventId=${eventId}`);
+    const event = await eventExists(eventId);
+    if (!event) {
+      logger.warn("Event not found");
+      return res.status(statusCode.notFound).json({
+        success: false,
+        error: "Event not found",
+      });
+    }
+
+    logger.info(`deleting event with eventId=${eventId}`);
+    await deleteEventService(organizer._id, eventId);
+
+    logger.info("Event deleted successfully");
+    res.status(statusCode.success).json({
+      success: true,
+      message: "Event deleted successfully",
+    });
+  } catch (error) {
+    logger.error(`Error delete event ${error.stack || error.message}`);
+    res.status(statusCode.serverError).json({
+      success: false,
+      error: "Something went worng",
     });
   }
 };

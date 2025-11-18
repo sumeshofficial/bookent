@@ -12,6 +12,7 @@ import {
   getEvent,
   editEvent,
   finishEventEdit,
+  deleteEvent,
 } from "../controller/organizer.controller.js";
 const organizerRouter = express.Router();
 
@@ -28,5 +29,6 @@ organizerRouter.post("/event/create/finish", protect, finishEventCreate);
 organizerRouter.post("/event/edit/finish", protect, finishEventEdit);
 
 organizerRouter.patch("/event/:eventId/edit", protect, editEvent);
+organizerRouter.patch("/event/delete", protect, deleteEvent);
 
 export default organizerRouter;

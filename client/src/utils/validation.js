@@ -114,7 +114,7 @@ export const validationSchema = [
   }),
 
   // Step 5
-  yup.object({
+  yup.object().shape({
     ageRestriction: yup
       .string()
       .required("Age restriction is required")
@@ -133,10 +133,48 @@ export const validationSchema = [
       .min(20, "Terms must be at least 20 characters long")
       .max(1000, "Terms cannot exceed 1000 characters"),
 
-    eventStatus: yup
-      .string()
-      .required("Event status is required")
-      .oneOf(["Draft", "Published"], "Invalid event status"),
+    eventStatus: yup.string().required("Event status is required").oneOf(
+      [
+        "Draft",
+        "Published",
+        "Postpone",
+        "Cancelled",
+        "Coming-Soon", // FIXED
+        "Completed",
+      ],
+      "Invalid event status"
+    ),
+
+    newMatchDate: yup.string().when("eventStatus", {
+      is: "Postpone",
+      then: (schema) =>
+        schema.required("New match date is required when postponing the event"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+    postponeReasone: yup.string().when("eventStatus", {
+      is: "Postpone",
+      then: (schema) =>
+        schema
+          .required("Reason for postponing is required")
+          .min(3, "Reason must be at least 3 characters"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+    cancelledReasone: yup.string().when("eventStatus", {
+      is: "Cancelled",
+      then: (schema) =>
+        schema
+          .required("Reason for cancellation is required")
+          .min(3, "Reason must be at least 3 characters"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+    matchDate: yup.string().when("eventStatus", {
+      is: "Coming-Soon",
+      then: (schema) => schema.nullable(),
+      otherwise: (schema) => schema.required("Match date is required"),
+    }),
   }),
 ];
 
@@ -172,9 +210,7 @@ export const createStadiumValidationSchema = yup.object({
     .min(3, "State must be at least 3 characters long")
     .max(20, "State cannot exceed 20 characters"),
 
-  pincode: yup
-    .string()
-    .required("Pincode is required"),
+  pincode: yup.string().required("Pincode is required"),
 
   location: yup
     .string()

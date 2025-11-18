@@ -137,13 +137,39 @@ const eventSchema = new mongoose.Schema(
     },
     eventStatus: {
       type: String,
-      enum: ["Draft", "Published"],
+      enum: [
+        "Draft",
+        "Published",
+        "Postpone",
+        "Cancelled",
+        "Coming-Soon",
+        "Completed",
+      ],
       required: true,
     },
+    postponeDetails: {
+      isPostponed: { type: Boolean, default: false },
+      oldMatchDate: { type: Date },
+      newMatchDate: { type: Date },
+      reason: { type: String, maxlength: 300 },
+    },
+    cancelDetails: {
+      isCancelled: { type: Boolean, default: false },
+      reason: { type: String, maxlength: 300 },
+    },
+    isBookingOpen: {
+      type: Boolean,
+      default: true,
+    },
+
     organizer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Organizer",
       required: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {

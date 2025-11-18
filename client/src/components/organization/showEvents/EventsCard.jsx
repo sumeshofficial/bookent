@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useModal } from "../../../utils/constants";
 
 const EventsCard = ({
   event,
@@ -21,9 +22,10 @@ const EventsCard = ({
 }) => {
   const { organizer } = useSelector((store) => store.organizer);
   const navigate = useNavigate();
+  const { openModal, closeModal } = useModal();
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]">
       <div className="flex flex-col sm:flex-row">
         <div className="w-36 sm:w-36 md:w-38 lg:w-38 aspect-9/16 shrink-0 overflow-hidden rounded-md mx-auto">
           <img
@@ -34,7 +36,6 @@ const EventsCard = ({
         </div>
 
         <div className="flex-1 p-4 sm:p-6">
-          {/* TITLE + MENU */}
           <div className="flex flex-col sm:flex-row justify-between items-start gap-3 mb-3">
             <div className="flex-1 w-full">
               <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -59,7 +60,6 @@ const EventsCard = ({
               </div>
             </div>
 
-            {/* MENU */}
             <div className="relative self-end sm:self-auto">
               <button
                 onClick={() =>
@@ -73,7 +73,11 @@ const EventsCard = ({
               {showMenu === event._id && (
                 <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 z-10">
                   <button
-                    onClick={() => navigate(`/listmyshow/organizer/${organizer._id}/event/${event._id}`)}
+                    onClick={() =>
+                      navigate(
+                        `/listmyshow/organizer/${organizer._id}/event/${event._id}`
+                      )
+                    }
                     className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
                   >
                     <Eye size={16} />
@@ -81,7 +85,9 @@ const EventsCard = ({
                   </button>
                   <button
                     onClick={() =>
-                      navigate(`/listmyshow/organizer/${organizer._id}/event/${event._id}/edit`)
+                      navigate(
+                        `/listmyshow/organizer/${organizer._id}/event/${event._id}/edit`
+                      )
                     }
                     className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
                   >
@@ -89,7 +95,13 @@ const EventsCard = ({
                     Edit Event
                   </button>
                   <button
-                    onClick={() => handleDelete(event._id)}
+                    onClick={() =>
+                      openModal("delete-confirmation", {
+                        handleDelete,
+                        eventId: event._id,
+                        closeModal
+                      })
+                    }
                     className="w-full px-4 py-2 text-left hover:bg-red-50 flex items-center gap-2 text-sm text-red-600"
                   >
                     <Trash2 size={16} />
@@ -100,7 +112,6 @@ const EventsCard = ({
             </div>
           </div>
 
-          {/* INFO ROW */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Calendar size={16} className="text-purple-600" />
@@ -203,14 +214,22 @@ const EventsCard = ({
 
             <div className="flex gap-2 justify-end sm:justify-start">
               <button
-                onClick={() => navigate(`/listmyshow/organizer/${organizer._id}/event/${event._id}`)}
+                onClick={() =>
+                  navigate(
+                    `/listmyshow/organizer/${organizer._id}/event/${event._id}`
+                  )
+                }
                 className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-semibold flex items-center gap-2 text-sm"
               >
                 <Eye size={16} />
                 View
               </button>
               <button
-                onClick={() => navigate(`/listmyshow/organizer/${organizer._id}/event/${event._id}/edit`)}
+                onClick={() =>
+                  navigate(
+                    `/listmyshow/organizer/${organizer._id}/event/${event._id}/edit`
+                  )
+                }
                 className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center gap-2 text-sm"
               >
                 <Edit size={16} />

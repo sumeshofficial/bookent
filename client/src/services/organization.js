@@ -99,7 +99,7 @@ export const getEvents = async ({
   return res.data;
 };
 
-// Get event by Id
+// Get event
 export const getEvent = async (organizerId, eventId) => {
   const res = await api.get(`/organizer/${organizerId}/event/${eventId}`);
   return res.data;
@@ -108,17 +108,21 @@ export const getEvent = async (organizerId, eventId) => {
 // Update event
 export const updateEvent = async (eventId, data) => {
   const res = await api.patch(`/organizer/event/${eventId}/edit`, data);
-  return res;
+  return res.data;
 };
 
 // Edit event finish
-export const editEventFinish = async ({
-  sessionId,
-  images,
-}) => {
+export const editEventFinish = async ({ sessionId, images }) => {
   const res = await api.post("/organizer/event/edit/finish", {
     sessionId,
     images,
   });
   return res.data;
+};
+
+// Delete event
+export const deleteEvent = async (eventId) => {
+  await api.patch("/organizer/event/delete", {
+    eventId,
+  });
 };

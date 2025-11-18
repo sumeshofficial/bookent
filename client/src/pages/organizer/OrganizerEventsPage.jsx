@@ -8,22 +8,24 @@ import {
 } from "lucide-react";
 import EventsCard from "../../components/organization/showEvents/EventsCard";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getEvents } from "../../services/organization";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteEvent, getEvents } from "../../services/organization";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { useDebounce } from "use-debounce";
 
 const OrganizerEventsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showMenu, setShowMenu] = useState(null);
 
-  // filters
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [sort, setSort] = useState("latest");
+  const queryClient = useQueryClient();
 
-  const [category, setCategory] = useState(""); // NEW
-  const [priceFilter, setPriceFilter] = useState(""); // NEW
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sort, setSort] = useState("latest");
+  const [debouncedSearch] = useDebounce(searchQuery, 500);
+
+  const [category, setCategory] = useState("");
+  const [priceFilter, setPriceFilter] = useState("");
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -35,8 +37,7 @@ const OrganizerEventsPage = () => {
     queryKey: [
       "events",
       organizerId,
-      searchQuery,
-      statusFilter,
+      debouncedSearch,
       sort,
       category,
       priceFilter,
@@ -49,9 +50,8 @@ const OrganizerEventsPage = () => {
         id: organizerId,
         page: currentPage,
         limit: 8,
-        search: searchQuery,
+        search: debouncedSearch,
         sort,
-        status: statusFilter,
         category,
         priceFilter,
         startDate,
@@ -62,9 +62,25 @@ const OrganizerEventsPage = () => {
     onError: () => toast.error("Failed to load events"),
   });
 
+  const handleEventDeleteMutation = useMutation({
+    mutationFn: ({ eventId }) => deleteEvent(eventId),
+    onSuccess: () => {
+      toast.dismiss();
+      toast.success("Event deleted");
+      queryClient.invalidateQueries(["events"]);
+    },
+    onError: (err) => {
+      console.log(err);
+      toast.dismiss();
+      toast.error("Something went wrong");
+    },
+  });
+
   const handleDelete = async (id) => {
-    console.log(id)
-  }
+    handleEventDeleteMutation.mutate({
+      eventId: id,
+    });
+  };
 
   const events = data?.events || [];
   const pagination = data?.pagination || {};
