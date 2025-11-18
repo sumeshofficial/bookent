@@ -126,3 +126,24 @@ export const deleteEvent = async (eventId) => {
     eventId,
   });
 };
+
+
+export const updateOrganizer = async ({ id, data }) => {
+  try {
+    return await api.patch(
+      "/organizer/profile",
+      {
+        id,
+        data,
+      },
+      { withCredentials: true }
+    );
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Something went wrong";
+    throw new Error(message);
+  }
+};

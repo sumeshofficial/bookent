@@ -1,4 +1,4 @@
-import { putObject } from "../services/s3.service.js";
+import { getObjectURL, putObject } from "../services/s3.service.js";
 import { statusCode } from "../utility/constants.js";
 
 // AWS S3 upload files
@@ -24,6 +24,32 @@ export const uploadFiles = async (req, res) => {
       message: "Url created successfully",
       signedUrl,
       key,
+    });
+  } catch (error) {
+    res.status(statusCode.serverError).json({
+      success: false,
+      error: error.message || "Something went wrong",
+    });
+  }
+};
+
+export const getFiles = async (req, res) => {
+  try {
+    const { key } = req.query;
+
+    if (!key) {
+      return res.status(statusCode.missingField).json({
+        success: false,
+        message: "Missing field",
+      });
+    }
+
+    const imageUrl = await getObjectURL(key);
+
+    res.status(statusCode.created).json({
+      success: true,
+      message: "Url created successfully",
+      imageUrl,
     });
   } catch (error) {
     res.status(statusCode.serverError).json({

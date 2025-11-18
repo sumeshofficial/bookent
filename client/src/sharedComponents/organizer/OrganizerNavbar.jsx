@@ -1,4 +1,5 @@
 import { List, UserCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const OrganizerNavbar = ({
   setSidebarOpen,
@@ -19,9 +20,9 @@ const OrganizerNavbar = ({
         <button
           className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition"
         >
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100 flex items-center justify-center">
+          <Link to={"/listmyshow/profile"} className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100 flex items-center justify-center">
             <UserCircle className="w-8 h-8 text-gray-600" />
-          </div>
+          </Link>
           <div className="hidden md:flex items-center gap-1">
           </div>
         </button>

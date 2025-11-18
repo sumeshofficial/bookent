@@ -1,5 +1,5 @@
 import { api } from "./api/apiSetup";
-import axios from 'axios'
+import axios from "axios";
 
 export const generateUploadUrl = async ({
   fileName,
@@ -11,6 +11,16 @@ export const generateUploadUrl = async ({
       fileName,
       contentType,
       folderName,
+    },
+  });
+
+  return res.data;
+};
+
+export const generateImageUrl = async (key) => {
+  const res = await api.get("/s3/get-image-signed-url", {
+    params: {
+      key,
     },
   });
 

@@ -7,6 +7,8 @@ import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
 import { isEqual } from "lodash";
 import { updateUserProfile } from "../../redux/userSlice";
+import CropImageProfile from "../../components/user/CropImageProfile";
+import { generateImageUrl, generateUploadUrl, uploadFile } from "../../services/s3";
 
 const ProfilePage = () => {
   const { user } = useSelector((store) => store.user);
@@ -38,7 +40,7 @@ const ProfilePage = () => {
     const city = parts[parts.length - 2]?.trim() || "";
     const state = parts[parts.length - 1]?.trim() || "";
     const formatted = `${city}, ${state}`;
-    
+
     if (fullAddress) {
       setLocation({
         formattedLocation: formatted,
@@ -101,6 +103,28 @@ const ProfilePage = () => {
     toast.success("Preferences updated successfully!");
   };
 
+  const imageUpdate = async (image) => {
+    try {
+      const { signedUrl, key } = await generateUploadUrl({
+        fileName: `profileImg-${user._id}`,
+        contentType: image.type,
+        folderName: "user/profile",
+      });
+
+      await uploadFile({ file: image, contentType: image.type, signedUrl });
+      const { imageUrl } = await generateImageUrl(key);
+
+      const data = {
+        profileImage: imageUrl
+      }
+
+      dispatch(updateUserProfile({ id: user._id, data }));
+
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -110,8 +134,11 @@ const ProfilePage = () => {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
                 <div className="relative inline-block mb-6">
-                  <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center">
-                    <User size={64} className="text-gray-400" />
+                  <div className="w-32 h-32 rounded-full flex items-center justify-center">
+                    <CropImageProfile
+                      imageUpdate={imageUpdate}
+                      label="Change Profile"
+                    />
                   </div>
                 </div>
 

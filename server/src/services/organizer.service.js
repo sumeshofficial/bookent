@@ -153,3 +153,13 @@ export const deleteEventService = async (organizerId, eventId) => {
     }
   );
 };
+
+export const updateOrganizerService = async ({ id, data }) => {
+  const updatedUser = await Organizer.findOneAndUpdate(
+    { _id: id },
+    { $set: data },
+    { new: true, runValidators: true, lean: true }
+  );
+
+  return updatedUser;
+};

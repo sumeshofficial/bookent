@@ -24,6 +24,7 @@ import OrganizerEventsPage from "../pages/organizer/OrganizerEventsPage";
 import EventPreview from "../pages/organizer/EventPreview";
 import EventsPage from "../pages/user/EventsPage";
 import EventDetailPage from "../pages/user/EventDetailPage";
+import OrganizerProfilePage from "../pages/organizer/OrganizerProfilePage";
 
 const router = createBrowserRouter([
   {
@@ -107,6 +108,10 @@ const router = createBrowserRouter([
                   {
                     path: "organizer/:organizerId/event/:eventId",
                     element: <EventPreview />,
+                  },
+                  {
+                    path: "profile",
+                    element: <OrganizerProfilePage />,
                   },
                 ],
               },

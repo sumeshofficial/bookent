@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { checkOrganizer } from "../services/organization";
+import { checkOrganizer, updateOrganizer } from "../services/organization";
 
 export const getOrganizer = createAsyncThunk(
   "auth/getOrganizer",
@@ -16,6 +16,20 @@ export const getOrganizer = createAsyncThunk(
           error.response.data.error ||
           "Something went wrong"
       );
+    }
+  }
+);
+
+export const updateOrganizerProfile = createAsyncThunk(
+  "user/updateOrganizerProfile",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      if (!id || !data) return;
+      const res = await updateOrganizer({ id, data });
+
+      return res.data.organizer;
+    } catch (error) {
+      return rejectWithValue(error.response.data.error);
     }
   }
 );
@@ -48,7 +62,11 @@ const organizerSlice = createSlice({
       .addCase(getOrganizer.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-      });
+      })
+      .addCase(updateOrganizerProfile.fulfilled, (state, action) => {
+        state.organizer = action.payload;
+        state.isLoading = false;
+      })
   },
 });
 
