@@ -726,7 +726,6 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
-
 export const updateOrganizerProfile = async (req, res) => {
   const { id, data } = req.body;
 

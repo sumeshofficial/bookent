@@ -1,6 +1,5 @@
 import logger from "../config/logger.js";
 import { verifyTokenAndGetUser } from "../services/auth.service.js";
-import { getObjectURL } from "../services/s3.service.js";
 import { statusCode } from "../utility/constants.js";
 
 // Token verify

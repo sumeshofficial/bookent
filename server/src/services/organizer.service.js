@@ -2,7 +2,6 @@ import Organizer from "../models/organizer.model.js";
 import dotenv from "dotenv";
 import Stadium from "../models/stadium.model.js";
 import Event from "../models/event.model.js";
-import logger from "../config/logger.js";
 dotenv.config();
 
 // Create organizer

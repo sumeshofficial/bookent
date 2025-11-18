@@ -5,7 +5,7 @@ import {
   getHomeEventSections,
   filterAndSortEvents,
   searchEvent,
-  getSingleEvent
+  getSingleEvent,
 } from "../controller/user.controller.js";
 
 const userRouter = express.Router();

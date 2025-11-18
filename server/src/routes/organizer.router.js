@@ -13,7 +13,7 @@ import {
   editEvent,
   finishEventEdit,
   deleteEvent,
-  updateOrganizerProfile
+  updateOrganizerProfile,
 } from "../controller/organizer.controller.js";
 const organizerRouter = express.Router();
 
