@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { defaultClientConditions } from "vite";
 
 const shapeSchema = new mongoose.Schema(
   {
