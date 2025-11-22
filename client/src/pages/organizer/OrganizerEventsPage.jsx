@@ -62,6 +62,9 @@ const OrganizerEventsPage = () => {
     onError: () => toast.error("Failed to load events"),
   });
 
+  const events = data?.events || [];
+  const pagination = data?.pagination || {};
+
   const handleEventDeleteMutation = useMutation({
     mutationFn: ({ eventId }) => deleteEvent(eventId),
     onSuccess: () => {
@@ -70,7 +73,6 @@ const OrganizerEventsPage = () => {
       queryClient.invalidateQueries(["events"]);
     },
     onError: (err) => {
-      console.log(err);
       toast.dismiss();
       toast.error("Something went wrong");
     },
@@ -81,9 +83,6 @@ const OrganizerEventsPage = () => {
       eventId: id,
     });
   };
-
-  const events = data?.events || [];
-  const pagination = data?.pagination || {};
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);

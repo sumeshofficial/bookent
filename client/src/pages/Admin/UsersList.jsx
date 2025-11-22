@@ -55,9 +55,26 @@ const UsersList = () => {
     onSuccess: () => {
       toast.dismiss();
       toast.success("User status updated");
-      queryClient.invalidateQueries({
-        queryKey: ["users", page, limit, debounceSearch, sort, statusFilter],
-      });
+      queryClient.setQueryData(
+        ["users", page, limit, debounceSearch, sort, statusFilter],
+        (oldData) => {
+          if (!oldData) return oldData;
+
+          const updatedUsers = oldData.data.users.map((u) =>
+            u._id === toggleStatusMutation.variables.userId
+              ? { ...u, status: toggleStatusMutation.variables.newStatus }
+              : u
+          );
+
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              users: updatedUsers,
+            },
+          };
+        }
+      );
     },
     onError: (err) => {
       toast.dismiss();

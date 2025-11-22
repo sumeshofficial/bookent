@@ -20,6 +20,7 @@ export const generateAccessToken = ({ userId, role }) => {
 export const generateRefreshToken = async ({ userId, role }) => {
   const expiresIn =
     role === "user" ? userRefreshTokenExpiresIn : adminRefreshTokenExpiresIn;
+
   const tokenId = uuidv4();
   const token = jwt.sign(
     { userId, role, tokenId },

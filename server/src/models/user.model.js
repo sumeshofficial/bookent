@@ -30,10 +30,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  profileImageKey: {
-    type: String,
-    default: null,
-  },
   location: {
     type: Object,
     default: null,

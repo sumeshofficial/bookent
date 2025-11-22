@@ -3,7 +3,7 @@ import { checkOrganizer, updateOrganizer } from "../services/organization";
 
 export const getOrganizer = createAsyncThunk(
   "auth/getOrganizer",
-  async ({ userId } , { rejectWithValue }) => {
+  async ({ userId }, { rejectWithValue }) => {
     try {
       if (!userId) return;
 
@@ -48,6 +48,26 @@ const organizerSlice = createSlice({
     logoutOrganizer: (state) => {
       state.organizer = null;
     },
+    updateOrganizerProfileData: (state, action) => {
+      const payload = action.payload;
+      if (!payload) return;
+
+      Object.entries(payload).forEach(([key, value]) => {
+        if (
+          typeof value === "object" &&
+          !Array.isArray(value) &&
+          value !== null &&
+          typeof state.organizer[key] === "object"
+        ) {
+          state.organizer[key] = {
+            ...state.organizer[key],
+            ...value,
+          };
+        } else {
+          state.organizer[key] = value;
+        }
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -66,9 +86,10 @@ const organizerSlice = createSlice({
       .addCase(updateOrganizerProfile.fulfilled, (state, action) => {
         state.organizer = action.payload;
         state.isLoading = false;
-      })
+      });
   },
 });
 
-export const { addOrganizer, logoutOrganizer } = organizerSlice.actions;
+export const { addOrganizer, logoutOrganizer, updateOrganizerProfileData } =
+  organizerSlice.actions;
 export default organizerSlice.reducer;

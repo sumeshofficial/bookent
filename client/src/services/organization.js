@@ -35,8 +35,20 @@ export const checkOrganizer = async ({ userId }) => {
 };
 
 // Create Stadium
-export const createStadium = async (payload) => {
-  return await api.post("/organizer/stadium/create", payload);
+export const createStadium = async ({ payload }) => {
+  const res = await api.post("/organizer/stadium/create", payload);
+  return res.data;
+};
+
+// Update Stadium
+export const updateStadium = async ({ stadiumId, payload }) => {
+  const res = await api.patch(`/organizer/stadium/${stadiumId}`, payload);
+  return res.data;
+};
+
+// Delete Stadium
+export const deleteStadium = async (stadiumId) => {
+  return await api.patch(`/organizer/stadium/${stadiumId}/delete`);
 };
 
 // Get all Stadiums
@@ -44,10 +56,41 @@ export const getStadiums = async () => {
   return await api.get("/organizer/stadiums");
 };
 
+// Get all Stadiums
+export const getStadium = async (stadiumId) => {
+  const res = await api.get(`/organizer/stadium/${stadiumId}`);
+  return res.data;
+};
+
+// Get all Stadiums with Organizer id
+export const getStadiumsWithOrganizerId = async ({
+  id,
+  page,
+  limit,
+  search,
+  sort,
+}) => {
+  const res = await api.get(`/organizer/${id}/stadiums`, {
+    params: {
+      page,
+      limit,
+      search,
+      sort,
+    },
+  });
+
+  return res.data;
+};
+
 // Check Stadium name exists or not
-export const checkStadiumExists = async (name) => {
+export const checkStadiumExists = async (name, stadiumId = "") => {
   return await api.get(
-    `/organizer/stadium/check-name?name=${encodeURIComponent(name)}`
+    `/organizer/stadium/check-name?name=${encodeURIComponent(name)}`,
+    {
+      params: {
+        stadiumId,
+      },
+    }
   );
 };
 
@@ -151,21 +194,10 @@ export const getCity = async (stateName) => {
 
 // Update organizer profile
 export const updateOrganizer = async ({ id, data }) => {
-  try {
-    return await api.patch(
-      "/organizer/profile",
-      {
-        id,
-        data,
-      },
-      { withCredentials: true }
-    );
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  const res = await api.patch("/organizer/profile", {
+    id,
+    data,
+  });
+
+  return res;
 };

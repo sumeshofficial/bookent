@@ -1,6 +1,4 @@
 import { Clock, DollarSign, List, Users } from "lucide-react";
-import OrganizerSidebar from "../../sharedComponents/organizer/OrganizerSidebar";
-import OrganizerNavbar from "../../sharedComponents/organizer/OrganizerNavbar";
 
 const OrganizerDashboard = () => {
   const stats = [

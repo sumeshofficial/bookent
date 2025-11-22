@@ -81,17 +81,24 @@ export const createStadiumFn = async (payload) => {
 
 // Find Stadiums
 export const findStadiums = async () => {
-  const stadiums = await Stadium.find().lean();
+  const stadiums = await Stadium.find({ isDeleted: false }).lean();
   return stadiums;
 };
 
 // Check stadium is exists
-export const stadiumExists = async (name) => {
-  const exists = await Stadium.exists({
-    "stadiumDetails.stadiumName": { $regex: new RegExp(`^${name}$`, "i") },
-  });
+export const stadiumExists = async (name, stadiumId) => {
+  const query = {
+    "stadiumDetails.stadiumName": {
+      $regex: new RegExp(`^${name}$`, "i"),
+    },
+    isDeleted: false,
+  };
 
-  return exists;
+  if (stadiumId) {
+    query._id = { $ne: stadiumId };
+  }
+
+  return Stadium.exists(query);
 };
 
 // Create Event
@@ -141,7 +148,6 @@ export const eventExists = async (eventId) => {
 
 // Delete Event
 export const deleteEventService = async (organizerId, eventId) => {
-  console.log(organizerId, eventId);
   return await Event.updateOne(
     { organizer: organizerId, _id: eventId },
     {
@@ -153,12 +159,87 @@ export const deleteEventService = async (organizerId, eventId) => {
   );
 };
 
+// Update organizer profile
 export const updateOrganizerService = async ({ id, data }) => {
-  const updatedUser = await Organizer.findOneAndUpdate(
+  const updateFields = {};
+
+  if (data.fullname) {
+    updateFields.fullname = data.fullname;
+  }
+
+  if (data.email) {
+    updateFields.email = data.email;
+  }
+
+  if (data.profileImage) {
+    updateFields.profileImage = data.profileImage;
+  }
+
+  if (data.organizationDetails) {
+    Object.entries(data.organizationDetails).forEach(([key, value]) => {
+      updateFields[`organizationDetails.${key}`] = value;
+    });
+  }
+
+  if (data.bankAccountDetails) {
+    Object.entries(data.bankAccountDetails).forEach(([key, value]) => {
+      updateFields[`bankAccountDetails.${key}`] = value;
+    });
+  }
+
+  const updatedOrganizer = await Organizer.findOneAndUpdate(
     { _id: id },
-    { $set: data },
+    {
+      $set: updateFields,
+    },
     { new: true, runValidators: true, lean: true }
   );
 
-  return updatedUser;
+  return updatedOrganizer;
+};
+
+// Find all stadiums for organizer
+export const findAllStadiumsWithOrgnaizerId = async ({
+  query,
+  sortOption,
+  skip,
+  limit,
+}) => {
+  const stadiums = await Stadium.find(query)
+    .sort(sortOption)
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  const total = await Stadium.countDocuments(query);
+  const totalPages = Math.ceil(total / limit);
+  return { stadiums, total, totalPages };
+};
+
+// Find stadium
+export const findStadium = async (organizerId, stadiumId) => {
+  const stadium = await Stadium.findOne({
+    organizerId,
+    _id: stadiumId,
+    isDeleted: false,
+  }).lean();
+  return stadium;
+};
+
+// Update stadium
+export const updateStadiumService = async (stadiumId, data) => {
+  return Stadium.findByIdAndUpdate(stadiumId, { $set: data }, { new: true });
+};
+
+// Delete Stadium
+export const softDeleteStadiumService = async (stadiumId, organizerId) => {
+  return Stadium.updateOne(
+    { _id: stadiumId, organizerId },
+    {
+      $set: {
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
+    }
+  );
 };

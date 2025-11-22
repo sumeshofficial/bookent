@@ -1,6 +1,8 @@
+// Controllers.jsx
 import { ACTIONS } from "../../../../../utils/constants";
 import {
   CircleIcon,
+  CornerDownLeft,
   ImagePlus,
   MousePointer,
   RectangleHorizontal,
@@ -43,6 +45,29 @@ const Controllers = ({
         >
           <CircleIcon className="w-5 h-5" />
         </button>
+
+        <button
+          className={`p-2 rounded-full ${
+            action === ACTIONS.ARC ? "bg-violet-300" : "hover:bg-violet-100"
+          }`}
+          onClick={() => setAction(ACTIONS.ARC)}
+          title="Arc (A)"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M4 15a8 8 0 0 1 16 0" />
+          </svg>
+        </button>
+
         <label className="cursor-pointer">
           <ImagePlus className="w-5 h-5" />
           <input
@@ -50,11 +75,14 @@ const Controllers = ({
             accept="image/*"
             className="hidden"
             onChange={(e) => {
-              setImageFile(e.target.files[0]);
-              setImageUrl(URL.createObjectURL(e.target.files[0]));
+              if (e.target.files?.[0]) {
+                setImageFile(e.target.files[0]);
+                setImageUrl(URL.createObjectURL(e.target.files[0]));
+              }
             }}
           />
         </label>
+
         <input
           type="color"
           className="w-6 h-6 cursor-pointer"

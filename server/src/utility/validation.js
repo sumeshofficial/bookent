@@ -16,8 +16,6 @@ export const eventSchema = yup.object({
 
   maxPrice: yup.number().required("Max price is required"),
 
-  ticketSetup: yup.array().required("Ticket setup is required"),
-
   matchDate: yup.date().required("Match date is required"),
 
   matchTime: yup.string().required("Match time is required"),

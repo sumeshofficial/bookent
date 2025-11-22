@@ -118,7 +118,7 @@ const EventPreview = () => {
                 openModal("delete-confirmation", {
                   closeModal,
                   handleDelete,
-                  eventId,
+                  id,
                 })
               }
               className="px-4 py-2 bg-black text-white rounded-md"

@@ -4,19 +4,13 @@ import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 
-const CropImageProfile = ({ imageUpdate, label }) => {
+const CropImageProfile = ({ imageUpdate, label, user }) => {
   const [image, setImage] = useState("");
   const [imageAfterCrop, setImageAfterCrop] = useState("");
-  const { user } = useSelector((store) => store.user);
+  const { organizer } = useSelector((store) => store.organizer);
 
   const inputRef = useRef();
   const { openModal, closeModal } = useModal();
-
-  useEffect(() => {
-    if (user && user.profileImage) {
-      setImageAfterCrop(user.profileImage);
-    }
-  }, [user]);
 
   // Crop done
   const onCropDone = (imageCroppedArea) => {
@@ -41,11 +35,11 @@ const CropImageProfile = ({ imageUpdate, label }) => {
         imageCroppedArea.height
       );
 
+      closeModal();
       canvas.toBlob(
         async (blob) => {
           if (blob) await imageUpdate(blob);
           setImage("");
-          closeModal();
         },
         "image/jpeg",
         0.9
@@ -100,7 +94,10 @@ const CropImageProfile = ({ imageUpdate, label }) => {
 
       <div className="relative w-32 h-32 sm:w-30 sm:h-30 mx-auto group cursor-pointer">
         <img
-          src={imageAfterCrop || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+          src={
+            imageAfterCrop || user?.profileImage || 
+            "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+          }
           alt="Profile"
           className="w-full h-full rounded-full object-cover border shadow"
         />

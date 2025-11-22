@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { defaultClientConditions } from "vite";
 
 const shapeSchema = new mongoose.Schema(
   {
@@ -8,7 +9,7 @@ const shapeSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["rect", "circle", "image"],
+      enum: ["rect", "circle", "image", "arc"],
       required: true,
     },
     x: {
@@ -27,9 +28,33 @@ const shapeSchema = new mongoose.Schema(
       type: Number,
       required: false,
     },
+    innerRadius: {
+      type: Number,
+      required: false,
+    },
+    outerRadius: {
+      type: Number,
+      required: false,
+    },
+    angle: {
+      type: Number,
+      required: false,
+    },
     radius: {
       type: Number,
       required: false,
+    },
+    rotation: {
+      type: Number,
+      default: 0,
+    },
+    offsetX: {
+      type: Number,
+      default: 0,
+    },
+    offsetY: {
+      type: Number,
+      default: 0,
     },
     fillColor: {
       type: String,
@@ -50,10 +75,12 @@ const shapeSchema = new mongoose.Schema(
     imageKey: {
       type: String,
     },
+    capacity: {
+      type: Number,
+    },
   },
   {
     _id: false,
-    versionKey: false,
   }
 );
 
@@ -102,6 +129,14 @@ const stadiumSchema = new mongoose.Schema(
     layoutImageKey: {
       type: String,
       required: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
     },
   },
   {

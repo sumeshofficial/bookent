@@ -82,11 +82,28 @@ export const googleAuth = async (req, res) => {
 
     logger.info(`Google OAuth successful: ID=${user._id}, role=${user.role}`);
 
+    if (user.role === "user" && user.location) {
+      logger.info(
+        `Performing reverse geocoding for coordinates (${user.location.latitude}, ${user.location.longitude})`
+      );
+      const response = await reverseGeocoding({
+        lat: user.location.latitude,
+        lng: user.location.longitude,
+      });
+
+      user.location = {
+        ...user.location,
+        address: response,
+      };
+    }
+
     const safeUser = {
       _id: user._id,
-      name: user.name,
+      fullname: user.fullname,
       email: user.email,
+      profileImage: user.profileImage,
       role: user.role,
+      location: user.location,
     };
 
     return res.send(`
@@ -283,6 +300,14 @@ export const verifyOtp = async (req, res) => {
         message: "User verified successfully",
       });
     }
+
+    logger.info(
+      `Email verified succssfull, email=${email}, purpose=${purpose}`
+    );
+    return res.status(statusCode.success).json({
+      success: true,
+      message: "User verified successfully",
+    });
   } catch (error) {
     logger.error(`Error verifing user: ${error.stack || error.message}`);
     res.status(statusCode.serverError).json({ error: "Something went wrong" });

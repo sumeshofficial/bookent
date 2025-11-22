@@ -1,8 +1,5 @@
 import { useEffect } from "react";
-import {
-  useBeforeUnload,
-  useBlocker,
-} from "react-router-dom";
+import { useBeforeUnload, useBlocker } from "react-router-dom";
 
 const useNavigationGuard = (when) => {
   useBeforeUnload(
@@ -17,9 +14,7 @@ const useNavigationGuard = (when) => {
 
   useEffect(() => {
     if (blocker.state === "blocked") {
-      const proceed = window.confirm(
-        "You have unsaved changes. Leave anyway?"
-      );
+      const proceed = window.confirm("You have unsaved changes. Leave anyway?");
       if (proceed) blocker.proceed();
       else blocker.reset();
     }

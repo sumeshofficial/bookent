@@ -29,13 +29,20 @@ export const updateUser = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    return res
+    if (user.profileImage && user.profileImage.includes("uploads")) {
+      const url = await getObjectURL(user.profileImage);
+      user.profileImage = url;
+    }
+
+    logger.info(`User data updated successfully userId=${id}`);
+    res
       .status(statusCode.success)
-      .json({ success: true, message: "Updated Successfully", user });
+      .json({ message: "Updated Successfully", user });
   } catch (error) {
-    return res
+    logger.info(`Error update user data ${error.stack || error.message}`);
+    res
       .status(statusCode.serverError)
-      .json({ success: false, error: error.message });
+      .json({ message: "Something went wrong" });
   }
 };
 

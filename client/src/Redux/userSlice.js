@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { verifyToken } from "../services/auth";
 import { updateProfile } from "../services/user";
+import toast from "react-hot-toast";
 
 export const getUser = createAsyncThunk(
   "user/getUser",
@@ -44,6 +45,7 @@ const userSlice = createSlice({
     isLoading: false,
     accessToken: null,
     error: null,
+    _backup: null,
   },
   reducers: {
     addUser: (state, action) => {
@@ -57,6 +59,14 @@ const userSlice = createSlice({
     },
     addError: (state, action) => {
       state.error = action.payload;
+    },
+    updateUserProfileData: (state, action) => {
+      if (action.payload) {
+        state.user = {
+          ...state.user,
+          ...action.payload,
+        };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -73,12 +83,14 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(updateUserProfile.pending, (state) => {
-        state.isLoading = true;
+      .addCase(updateUserProfile.pending, (state, action) => {
         state.error = null;
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.user = {
+          ...state.user,
+          ...action.payload,
+        };
         state.isLoading = false;
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
@@ -88,5 +100,11 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearError, logoutUser, addUser, addError } = userSlice.actions;
+export const {
+  clearError,
+  logoutUser,
+  addUser,
+  addError,
+  updateUserProfileData,
+} = userSlice.actions;
 export default userSlice.reducer;

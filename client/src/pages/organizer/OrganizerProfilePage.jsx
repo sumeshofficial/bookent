@@ -1,99 +1,423 @@
+import { useState, useEffect } from "react";
+import { getState } from "../../services/organization";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { updateOrganizerProfile } from "../../redux/organizerSlice";
+import {
+  updateOrganizerProfile,
+  updateOrganizerProfileData,
+} from "../../redux/organizerSlice";
 import toast from "react-hot-toast";
+import CropImageProfile from "../../components/user/CropImageProfile";
+import {
+  generateImageUrl,
+  generateUploadUrl,
+  uploadFile,
+} from "../../services/s3";
 
 const OrganizerProfilePage = () => {
   const { organizer } = useSelector((store) => store.organizer);
   const dispatch = useDispatch();
+  const [stateList, setStateList] = useState([]);
+
+  const [activeTab, setActiveTab] = useState("profile");
+
+  const imageUpdate = async (image) => {
+    const previewUrl = URL.createObjectURL(image);
+
+    dispatch(
+      updateOrganizerProfileData({
+        profileImage: previewUrl,
+      })
+    );
+
+    toast.success("Profile image updated");
+
+    try {
+      const { signedUrl, key } = await generateUploadUrl({
+        fileName: `orgProfile-${organizer._id}`,
+        contentType: image.type,
+        folderName: "organizer/profile",
+      });
+
+      await uploadFile({ file: image, contentType: image.type, signedUrl });
+      await generateImageUrl(key);
+
+      dispatch(
+        updateOrganizerProfile({
+          id: organizer._id,
+          data: { profileImage: key },
+        })
+      );
+    } catch (error) {
+      toast.error("Failed to upload image");
+    }
+  };
 
   const {
     register,
     handleSubmit,
-    watch,
-    formState: { errors },
+    reset,
+    formState: { errors, isDirty, dirtyFields },
   } = useForm({
     defaultValues: {
+      fullname: organizer.fullname,
+      email: organizer.email,
       name: organizer.organizationDetails.name,
       address: organizer.organizationDetails.address,
+      state: organizer.organizationDetails.state,
+      beneficiaryName: organizer.bankAccountDetails.beneficiaryName,
+      accountNumber: organizer.bankAccountDetails.accountNumber,
+      accountType: organizer.bankAccountDetails.accountType,
+      bankName: organizer.bankAccountDetails.bankName,
+      ifsc: organizer.bankAccountDetails.ifsc,
     },
   });
 
-  const watchedValues = watch();
+  useEffect(() => {
+    reset({
+      fullname: organizer.fullname,
+      email: organizer.email,
+      name: organizer.organizationDetails.name,
+      address: organizer.organizationDetails.address,
+      state: organizer.organizationDetails.state,
+      beneficiaryName: organizer.bankAccountDetails.beneficiaryName,
+      accountNumber: organizer.bankAccountDetails.accountNumber,
+      accountType: organizer.bankAccountDetails.accountType,
+      bankName: organizer.bankAccountDetails.bankName,
+      ifsc: organizer.bankAccountDetails.ifsc,
+    });
+  }, [organizer, reset]);
 
-  const isModified =
-    watchedValues.name !== organizer.organizationDetails.name ||
-    watchedValues.address !== organizer.organizationDetails.address;
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const data = await getState();
+        setStateList(data.data[98].states);
+      } catch (error) {
+        console.error("Error fetching states", error);
+      }
+    };
+    fetchStates();
+  }, []);
+
+  const buildUpdatedPayload = (dirtyFields, data) => {
+    const updated = {};
+
+    if (dirtyFields.fullname) updated.fullname = data.fullname;
+    if (dirtyFields.email) updated.email = data.email;
+
+    if (dirtyFields.name || dirtyFields.address || dirtyFields.state) {
+      updated.organizationDetails = {};
+      if (dirtyFields.name) updated.organizationDetails.name = data.name;
+      if (dirtyFields.address)
+        updated.organizationDetails.address = data.address;
+      if (dirtyFields.state) updated.organizationDetails.state = data.state;
+    }
+
+    if (
+      dirtyFields.beneficiaryName ||
+      dirtyFields.accountNumber ||
+      dirtyFields.accountType ||
+      dirtyFields.bankName ||
+      dirtyFields.ifsc
+    ) {
+      updated.bankAccountDetails = {};
+      if (dirtyFields.beneficiaryName)
+        updated.bankAccountDetails.beneficiaryName = data.beneficiaryName;
+      if (dirtyFields.accountNumber)
+        updated.bankAccountDetails.accountNumber = data.accountNumber;
+      if (dirtyFields.accountType)
+        updated.bankAccountDetails.accountType = data.accountType;
+      if (dirtyFields.bankName)
+        updated.bankAccountDetails.bankName = data.bankName;
+      if (dirtyFields.ifsc) updated.bankAccountDetails.ifsc = data.ifsc;
+    }
+
+    return updated;
+  };
 
   const onSubmit = (formdata) => {
-    const data = {
-      organizationDetails: {
-        ...formdata,
-      },
-    };
-    dispatch(updateOrganizerProfile({ id: organizer._id, data }));
-    toast.success("Preferences updated successfully!");
+    const updatedData = buildUpdatedPayload(dirtyFields, formdata);
+    dispatch(
+      updateOrganizerProfileData({
+        ...updatedData,
+      })
+    );
+    toast.success("Profile updated successfully!");
+    dispatch(updateOrganizerProfile({ id: organizer._id, data: updatedData }));
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white rounded-3xl shadow-lg p-10 max-w-3xl w-full text-center">
-        <h2 className="text-gray-700 text-sm font-medium mb-4">
-          WELCOME {organizer.organizationDetails.name}
-        </h2>
-
-        <div className="flex flex-col items-center mb-4">
-          <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-              alt="User"
-              className="w-12 h-12"
-            />
+      <div className="bg-white rounded-3xl shadow-lg p-10 max-w-4xl w-full">
+        <div className="flex items-center gap-4 mb-6">
+          <CropImageProfile
+            imageUpdate={imageUpdate}
+            label="Change Profile"
+            user={organizer}
+          />
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800">
+              {organizer.fullname}
+            </h2>
+            <p className="text-gray-500 break-all line-clamp-1">
+              {organizer.email}
+            </p>
           </div>
+        </div>
 
-          <p className="mt-3 text-gray-800 font-semibold">
-            {organizer.organizationDetails.name}
-          </p>
+        <div className="flex border-b pb-2 mb-6">
+          <button
+            className={`px-4 py-2 font-medium ${
+              activeTab === "profile"
+                ? "border-b-2 border-black text-black"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("profile")}
+          >
+            Organizer Profile
+          </button>
+
+          <button
+            className={`px-4 py-2 font-medium ${
+              activeTab === "organization"
+                ? "border-b-2 border-black text-black"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("organization")}
+          >
+            Organization Details
+          </button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4 mt-6">
-            <div className="text-left">
-              <label className="text-sm text-gray-600">Organization name</label>
-              <input
-                type="text"
-                defaultValue={organizer.organizationDetails.name}
-                {...register("name", {
-                  required: "Name required",
-                })}
-                className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border border-gray-200 text-gray-700 focus:outline-none"
-              />
-            </div>
+          {activeTab === "profile" && (
+            <div className="space-y-5">
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                Organizer Information
+              </h3>
 
-            <div className="text-left">
-              <label className="text-sm text-gray-600">Address</label>
-              <input
-                type="text"
-                defaultValue={organizer.organizationDetails.address}
-                {...register("address", {
-                  required: "address",
-                })}
-                className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border border-gray-200 text-gray-700 focus:outline-none"
-              />
-            </div>
-          </div>
+              <div>
+                <label className="text-sm text-gray-600">Full Name</label>
+                <input
+                  type="text"
+                  {...register("fullname", {
+                    required: "Full name is required",
+                    minLength: {
+                      value: 3,
+                      message: "Minimum 3 characters required",
+                    },
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border border-gray-300 break-all overflow-hidden"
+                />
+                {errors.fullname && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.fullname.message}
+                  </p>
+                )}
+              </div>
 
-          <button
-            disabled={!isModified}
-            className={`mt-8 w-40 mx-auto py-3 font-semibold rounded-lg transition
-    ${
-      isModified
-        ? "bg-black text-white hover:bg-gray-800"
-        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-    }
-  `}
-          >
-            EDIT
-          </button>
+              <div>
+                <label className="text-sm text-gray-600">Email</label>
+                <input
+                  type="text"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Invalid email format",
+                    },
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border border-gray-300 break-all overflow-hidden"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "organization" && (
+            <div className="space-y-5">
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                Organization Details
+              </h3>
+
+              <div>
+                <label className="text-sm text-gray-600">
+                  Organization Name
+                </label>
+                <input
+                  type="text"
+                  {...register("name", {
+                    required: "Organization name is required",
+                    minLength: {
+                      value: 3,
+                      message: "Minimum 3 characters required",
+                    },
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Address</label>
+                <input
+                  type="text"
+                  {...register("address", {
+                    required: "Address is required",
+                    minLength: { value: 5, message: "Address too short" },
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
+                />
+                {errors.address && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.address.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">State</label>
+                <select
+                  {...register("state", {
+                    required: "State is required",
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
+                >
+                  <option value="">Select State</option>
+                  {stateList.map((s) => (
+                    <option key={s.name} value={s.name}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.state && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.state.message}
+                  </p>
+                )}
+              </div>
+
+              <h3 className="text-lg font-semibold text-gray-700 mt-6">
+                Bank Account Details
+              </h3>
+
+              <div>
+                <label className="text-sm text-gray-600">
+                  Beneficiary Name
+                </label>
+                <input
+                  type="text"
+                  {...register("beneficiaryName", {
+                    required: "Beneficiary name is required",
+                    pattern: {
+                      value: /^[A-Za-z ]+$/,
+                      message: "Only letters and spaces allowed",
+                    },
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
+                />
+                {errors.beneficiaryName && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.beneficiaryName.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Account Number</label>
+                <input
+                  type="text"
+                  {...register("accountNumber", {
+                    required: "Account number is required",
+                    pattern: {
+                      value: /^[0-9]{9,18}$/,
+                      message: "Account number must be 9–18 digits",
+                    },
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
+                />
+                {errors.accountNumber && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.accountNumber.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Account Type</label>
+                <input
+                  type="text"
+                  {...register("accountType", {
+                    required: "Account type is required",
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
+                />
+                {errors.accountType && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.accountType.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">Bank Name</label>
+                <input
+                  type="text"
+                  {...register("bankName", {
+                    required: "Bank name is required",
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
+                />
+                {errors.bankName && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.bankName.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-600">IFSC Code</label>
+                <input
+                  type="text"
+                  {...register("ifsc", {
+                    required: "IFSC code is required",
+                    pattern: {
+                      value: /^[A-Z]{4}0[A-Z0-9]{6}$/,
+                      message: "Invalid IFSC format (e.g., SBIN0001234)",
+                    },
+                  })}
+                  className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
+                />
+                {errors.ifsc && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.ifsc.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {(activeTab === "organization" || activeTab === "profile") && (
+            <button
+              disabled={!isDirty}
+              className={`mt-8 w-40 py-3 font-semibold rounded-lg transition ${
+                isDirty
+                  ? "bg-black text-white hover:bg-gray-800"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              SAVE
+            </button>
+          )}
         </form>
       </div>
     </div>

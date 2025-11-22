@@ -5,50 +5,68 @@ import { Pencil } from "lucide-react";
 import debounce from "lodash.debounce";
 import {
   checkStadiumExists,
-    getCity,
-    getState,
+  getCity,
+  getState,
 } from "../../../../services/organization";
 import toast from "react-hot-toast";
+import { useWatch } from "react-hook-form";
 
 const CreateStadiumInput = ({
   register,
   errors,
   setCurrentPage,
-  watch,
   handleSubmit,
   onSubmit,
   isSubmitting,
+  isEditMode,
+  control,
+  setValue,
+  stadiumData,
+  dirtyFields,
 }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isAvailable, setIsAvailable] = useState(null);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
+  const [isValid, setIsValid] = useState(false);
 
-  const stadiumName = watch("stadiumName");
-  const address = watch("address");
-  const city = watch("city");
-  const state = watch("state");
-  const pincode = watch("pincode");
-  const location = watch("location");
-  const stadiumLayout = watch("stadiumLayout");
+  const values = useWatch({
+    control,
+    name: [
+      "stadiumName",
+      "address",
+      "city",
+      "state",
+      "pincode",
+      "location",
+      "stadiumLayout",
+    ],
+  });
+
+  const [stadiumName, address, city, state, pincode, location, stadiumLayout] =
+    values;
+
+  useEffect(() => {
+    if (state) {
+      fetchCities(state);
+    }
+  }, [state]);
 
   const debouncedCheck = useCallback(
     debounce(async (name) => {
-      if (!name.trim()) {
+      if (!name?.trim()) {
         setIsAvailable(null);
         return;
       }
 
       try {
-        const { data } = await checkStadiumExists(name);
+        const { data } = await checkStadiumExists(name, stadiumData?._id);
         setIsAvailable(!data.exists);
       } catch (error) {
         toast.error(error.message);
       }
     }, 500),
-    []
+    [stadiumData]
   );
 
   useEffect(() => {
@@ -56,8 +74,15 @@ const CreateStadiumInput = ({
     return () => debouncedCheck.cancel();
   }, [stadiumName, debouncedCheck]);
 
-
   useEffect(() => {
+    if (
+      stadiumLayout?.layoutImage &&
+      typeof stadiumLayout.layoutImage === "string" &&
+      stadiumLayout.layoutImage.includes("https")
+    ) {
+      const url = stadiumLayout?.layoutImage;
+      return setPreviewUrl(url);
+    }
     if (stadiumLayout?.layoutImage) {
       const url = URL.createObjectURL(stadiumLayout.layoutImage);
       setPreviewUrl(url);
@@ -81,7 +106,7 @@ const CreateStadiumInput = ({
 
   const fetchCities = async (stateName) => {
     if (!stateName) {
-      setCities([]);
+      if (city) setCities([]);
       return;
     }
     try {
@@ -93,15 +118,9 @@ const CreateStadiumInput = ({
     }
   };
 
-  const handleStateChange = (e) => {
-    const value = e.target.value;
-    setSelectedState(value);
-    setSelectedCity("");
-    fetchCities(value);
-  };
-
-  const isCreateFormValid =
-    stadiumName && address && city && state && pincode && location;
+  useEffect(() => {
+    setIsValid(stadiumName && address && city && state && pincode && location);
+  }, [values]);
 
   return (
     <div className="bg-white py-4 px-6 sm:py-6 sm:px-8 rounded-md">
@@ -133,20 +152,6 @@ const CreateStadiumInput = ({
               </span>
             )}
           </div>
-          <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-            <label className="text-[.7rem] sm:text-sm">Total Capacity *</label>
-            <input
-              type="number"
-              {...register("capacity", { valueAsNumber: true })}
-              className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-[.7rem] sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
-              placeholder="e.g., 35000"
-            />
-            {errors?.capacity && (
-              <span className="text-red-500 text-[.5rem] sm:text-sm">
-                {errors.capacity.message}
-              </span>
-            )}
-          </div>
         </div>
 
         <div className="mt-2 sm:mt-5 flex flex-col gap-2">
@@ -168,8 +173,11 @@ const CreateStadiumInput = ({
             <label className="text-[.7rem] sm:text-sm">State *</label>
             <select
               {...register("state")}
-              value={selectedState}
-              onChange={handleStateChange}
+              value={state || ""}
+              onChange={(e) => {
+                setValue("state", e.target.value, { shouldDirty: true });
+                fetchCities(e.target.value);
+              }}
               className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 focus:outline-none focus:ring-2 focus:ring-violet-500"
             >
               <option value="">Select State</option>
@@ -189,8 +197,10 @@ const CreateStadiumInput = ({
             <label className="text-[.7rem] sm:text-sm">City *</label>
             <select
               {...register("city")}
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
+              value={city || ""}
+              onChange={(e) => {
+                setValue("city", e.target.value, { shouldDirty: true });
+              }}
               className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 focus:outline-none focus:ring-2 focus:ring-violet-500"
             >
               <option value="">Select City</option>
@@ -241,11 +251,11 @@ const CreateStadiumInput = ({
         </div>
 
         {!Object.keys(errors).length &&
-          isCreateFormValid &&
+          isValid &&
           !stadiumLayout &&
           isAvailable && <StadiumLayout setCurrentPage={setCurrentPage} />}
 
-        {!isCreateFormValid && (
+        {!isValid && (
           <p className="text-[0.5rem] sm:text-xs text-yellow-500 italic mt-2">
             Fill all the required details to create your stadium layout.
           </p>
@@ -281,13 +291,16 @@ const CreateStadiumInput = ({
             <div className="flex justify-end mt-5">
               <div>
                 <button
-                  disabled={!isAvailable || isSubmitting}
+                  disabled={
+                    isSubmitting ||
+                    !isAvailable ||
+                    (!isEditMode && !isValid) ||
+                    (isEditMode && Object.keys(dirtyFields).length === 0)
+                  }
                   type="submit"
-                  className={`py-1 px-2 text-[.7rem] sm:text-base sm:py-2 sm:px-5 rounded-md text-white ${
-                    !isAvailable
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-violet-600 hover:bg-violet-400"
-                  }`}
+                  className="py-1 px-2 text-[.7rem] sm:text-base sm:py-2 sm:px-5 rounded-md text-white 
+                      disabled:bg-gray-400 disabled:cursor-not-allowed
+                      bg-violet-600 hover:bg-violet-400"
                 >
                   {isSubmitting ? "Saving..." : "Save"}
                 </button>

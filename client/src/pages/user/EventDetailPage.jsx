@@ -3,6 +3,7 @@ import EventDetails from "../../components/user/EventDetails";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { eventById, getEventsForUser } from "../../services/user";
+import { useEffect } from "react";
 
 const EventDetailPage = () => {
   const { eventId } = useParams();
@@ -17,6 +18,10 @@ const EventDetailPage = () => {
     queryKey: ["events"],
     queryFn: getEventsForUser,
     onError: () => toast.error("Failed to load events"),
+  });
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
   const recommendedEvents = eventsData?.sections?.recommendedEvents || [];

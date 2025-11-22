@@ -6,9 +6,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
 import { isEqual } from "lodash";
-import { updateUserProfile } from "../../redux/userSlice";
+import {
+  updateUserProfile,
+  updateUserProfileData,
+} from "../../redux/userSlice";
 import CropImageProfile from "../../components/user/CropImageProfile";
-import { generateImageUrl, generateUploadUrl, uploadFile } from "../../services/s3";
+import {
+  generateImageUrl,
+  generateUploadUrl,
+  uploadFile,
+} from "../../services/s3";
 
 const ProfilePage = () => {
   const { user } = useSelector((store) => store.user);
@@ -99,11 +106,26 @@ const ProfilePage = () => {
         ...formData,
       },
     };
-    dispatch(updateUserProfile({ id: user._id, data }));
+    dispatch(
+      updateUserProfileData({
+        ...data,
+      })
+    );
     toast.success("Preferences updated successfully!");
+    dispatch(updateUserProfile({ id: user._id, data }));
   };
 
   const imageUpdate = async (image) => {
+    const previewUrl = URL.createObjectURL(image);
+
+    dispatch(
+      updateUserProfileData({
+        data: { profileImage: previewUrl },
+      })
+    );
+
+    toast.success("Profile image updated");
+
     try {
       const { signedUrl, key } = await generateUploadUrl({
         fileName: `profileImg-${user._id}`,
@@ -112,16 +134,16 @@ const ProfilePage = () => {
       });
 
       await uploadFile({ file: image, contentType: image.type, signedUrl });
-      const { imageUrl } = await generateImageUrl(key);
+      await generateImageUrl(key);
 
-      const data = {
-        profileImage: imageUrl
-      }
-
-      dispatch(updateUserProfile({ id: user._id, data }));
-
+      dispatch(
+        updateUserProfile({
+          id: user._id,
+          data: { profileImage: key },
+        })
+      );
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error("Failed to upload image");
     }
   };
 
@@ -138,6 +160,7 @@ const ProfilePage = () => {
                     <CropImageProfile
                       imageUpdate={imageUpdate}
                       label="Change Profile"
+                      user={user}
                     />
                   </div>
                 </div>

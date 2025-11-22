@@ -21,7 +21,7 @@ import { uploadFile } from "../../services/s3";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 const CreateEventForm = () => {
@@ -38,12 +38,12 @@ const CreateEventForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if ((organizer && organizerId) && organizerId !== organizer._id) {
+    if (organizer && organizerId && organizerId !== organizer._id) {
       navigate("/error");
     }
   }, [organizer, organizerId]);
 
-  const { data, error, isError } = useQuery({
+  const { data, error } = useQuery({
     queryKey: ["event", organizerId, eventId],
     queryFn: () => getEvent(organizerId, eventId),
     enabled: isEditMode,
@@ -85,12 +85,38 @@ const CreateEventForm = () => {
     }
   }, [eventData, reset]);
 
+  const handleEventCreateMutation = useMutation({
+    mutationFn: createEventFinish,
+    onSuccess: () => {
+      toast.dismiss();
+      toast.success("Event Created");
+      queryClient.invalidateQueries(["event"]);
+    },
+    onError: (err) => {
+      toast.dismiss();
+      toast.error("Something went wrong");
+    },
+  });
+
+  const handleEventEditMutation = useMutation({
+    mutationFn: editEventFinish,
+    onSuccess: () => {
+      toast.dismiss();
+      toast.success("Event updated");
+      queryClient.invalidateQueries(["event"]);
+    },
+    onError: (err) => {
+      toast.dismiss();
+      toast.error("Something went wrong");
+    },
+  });
+
   const onSubmit = async (data) => {
     try {
       const { bannerImage, thumbnailImage, ...dataWithoutImage } = data;
 
       const totalTickets = dataWithoutImage.ticketSetup.reduce(
-        (sum, tier) => sum + tier.totalSeats,
+        (sum, tier) => sum + tier.totalTickets,
         0
       );
 
@@ -114,7 +140,6 @@ const CreateEventForm = () => {
 
         const dirtyPayload = extractChangedFields(data, dirtyFields);
 
-        dirtyPayload.ticketSetup = data.ticketSetup;
         dirtyPayload.tags = data.tags;
 
         const { bannerImage, thumbnailImage, ...newData } = dirtyPayload;
@@ -156,28 +181,13 @@ const CreateEventForm = () => {
             images.thumbnailImageKey = uploadUrls.thumbnailImage.key;
           }
 
-          const handleEventMutation = useMutation({
-            mutationFn: editEventFinish,
-            onSuccess: () => {
-              toast.dismiss();
-              toast.success("Event updated");
-              queryClient.invalidateQueries(["events"]);
-            },
-            onError: (err) => {
-              toast.dismiss();
-              toast.error("Something went wrong");
-            },
-          });
-
-          const res = await handleEventMutation.mutateAsync({
+          const res = await handleEventEditMutation.mutateAsync({
             sessionId: updatedEvent?.sessionId,
             images,
           });
 
           setUpdatedEventId(res.event._id);
         }
-
-        toast.success("Event updated successfully");
       } else {
         const resData = await createEventValidate(dataWithoutImage);
 
@@ -194,27 +204,13 @@ const CreateEventForm = () => {
           signedUrl: uploadUrls.thumbnailImage.thumbnailURL,
         });
 
-        const handleEventMutation = useMutation({
-          mutationFn: createEventFinish,
-          onSuccess: () => {
-            toast.dismiss();
-            toast.success("Event updated");
-            queryClient.invalidateQueries(["events"]);
-          },
-          onError: (err) => {
-            toast.dismiss();
-            toast.error("Something went wrong");
-          },
-        });
-
-        const res = await handleEventMutation.mutateAsync({
+        const res = await handleEventCreateMutation.mutateAsync({
           sessionId,
           bannerImageKey: uploadUrls.bannerImage.key,
           thumbnailImageKey: uploadUrls.thumbnailImage.key,
         });
 
         setUpdatedEventId(res.event._id);
-        toast.success("Event created successfully");
       }
 
       setIsModified(false);

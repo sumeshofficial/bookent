@@ -45,7 +45,7 @@ const CreateStadiumForm = ({ setValue, setCurrentPage, watch }) => {
         layoutImage: blob,
       };
 
-      setValue("stadiumLayout", layoutData);
+      setValue("stadiumLayout", layoutData, { shouldDirty: true });
       toast.success("Layout saved successfully");
       setCurrentPage("form");
     } catch (error) {
@@ -58,7 +58,7 @@ const CreateStadiumForm = ({ setValue, setCurrentPage, watch }) => {
       <div className="flex-1">
         <div className="flex justify-between mb-4">
           <button
-          type="button"
+            type="button"
             onClick={() => {
               if (shapes.length > 0) {
                 const confirmLeave = window.confirm(
@@ -74,7 +74,7 @@ const CreateStadiumForm = ({ setValue, setCurrentPage, watch }) => {
           </button>
 
           <button
-          type="button"
+            type="button"
             onClick={handleSaveLayout}
             disabled={!shapes.length}
             className={`py-2 px-3 rounded-md text-white font-medium ${
