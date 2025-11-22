@@ -27,7 +27,7 @@ const CropImageModal = ({ image, onCropDone, onCropCancel, aspectRation = 4 / 3 
 
       <div className="self-end space-x-4">
         <button type='button' className="bg-red-600 text-white sm:text-base text-[.7rem] px-2 py-1 rounded-sm" onClick={onCropCancel}>Cancel</button>
-        <button type='button' className="bg-violet-600 text-white sm:text-base text-[.7rem] px-2 py-1 rounded-sm" onClick={() => onCropDone(croppedArea)}>Done</button>
+        <button type='button' className="bg-violet-600 text-white sm:text-base text-[.7rem] px-2 py-1 rounded-sm" onClick={() =>{ onCropDone(croppedArea)}}>Done</button>
       </div>
     </div>
   );

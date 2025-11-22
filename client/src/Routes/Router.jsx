@@ -25,6 +25,8 @@ import EventPreview from "../pages/organizer/EventPreview";
 import EventsPage from "../pages/user/EventsPage";
 import EventDetailPage from "../pages/user/EventDetailPage";
 import OrganizerProfilePage from "../pages/organizer/OrganizerProfilePage";
+import Stadiums from "../pages/organizer/Stadiums";
+import StadiumDetails from "../pages/organizer/StadiumDetails";
 
 const router = createBrowserRouter([
   {
@@ -112,6 +114,18 @@ const router = createBrowserRouter([
                   {
                     path: "profile",
                     element: <OrganizerProfilePage />,
+                  },
+                  {
+                    path: "stadiums",
+                    element: <Stadiums />,
+                  },
+                  {
+                    path: "stadium/:stadiumId",
+                    element: <StadiumDetails />,
+                  },
+                  {
+                    path: "stadium/:stadiumId/edit",
+                    element: <CreateStadium />,
                   },
                 ],
               },

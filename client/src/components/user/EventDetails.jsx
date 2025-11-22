@@ -53,8 +53,6 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
     ? "Restricted entry"
     : "All age groups";
 
-  const languages = ["English", "Spanish"];
-
   const isFillingFast = soldTickets / totalTickets >= 0.6;
 
   const isEventOver = new Date(matchDate) < new Date();
@@ -88,76 +86,74 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
           </div>
         </div>
 
-        <div className="bg-white shadow-sm rounded-xl border p-6 flex flex-col gap-3 justify-center">
-          <div className="flex items-start gap-3">
-            <Calendar className="w-5 h-5 text-gray-700" />
-            <span className="text-gray-800 font-medium">
-              {formattedStartDate} - {formattedEndDate}
-            </span>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <Clock className="w-5 h-5 text-gray-700" />
-            <span className="text-gray-800">{matchTime}</span>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <Hourglass className="w-5 h-5 text-gray-700" />
-            <span className="text-gray-800">{matchDuration / 60} Hours</span>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <Users className="w-5 h-5 text-gray-700" />
-            <span className="text-gray-800">{ageGroup}</span>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <Languages className="w-5 h-5 text-gray-700" />
-            <span className="text-gray-800">{languages.join(", ")}</span>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <MapPin className="w-5 h-5 text-gray-700" />
-            <Link
-              to={stadium.stadiumDetails.location}
-              className="text-gray-800"
-            >
-              {stadiumName}
-            </Link>
-          </div>
-
-          <hr className="my-4" />
-
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="font-bold text-lg">₹{minPrice} onwards</p>
-              {isFillingFast && (
-                <p className="text-orange-500 text-sm font-medium">
-                  Filling Fast
-                </p>
-              )}
+        <div className="bg-white shadow-sm rounded-xl border py-8 sm:py-12 px-6 flex flex-col gap-3 justify-between">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start gap-3">
+              <Calendar className="w-5 h-5 text-gray-700" />
+              <span className="text-gray-800 font-medium">
+                {formattedStartDate} - {formattedEndDate}
+              </span>
             </div>
 
-            <button
-              disabled={disableBooking}
-              className={`px-5 py-2 rounded-lg text-base font-semibold ${
-                disableBooking
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-red-500 text-white hover:bg-red-600"
-              }`}
-            >
-              {isComingSoon
-                ? "Coming Soon"
-                : isSoldOut
-                ? "Sold Out"
-                : isEventOver
-                ? "Event Passed"
-                : isCancelled
-                ? "Cancelled"
-                : isPostponed
-                ? "Postponed"
-                : "Book Now"}
-            </button>
+            <div className="flex items-start gap-3">
+              <Clock className="w-5 h-5 text-gray-700" />
+              <span className="text-gray-800">{matchTime}</span>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Hourglass className="w-5 h-5 text-gray-700" />
+              <span className="text-gray-800">{matchDuration / 60} Hours</span>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Users className="w-5 h-5 text-gray-700" />
+              <span className="text-gray-800">{ageGroup}</span>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <MapPin className="w-5 h-5 text-gray-700" />
+              <Link
+                to={stadium.stadiumDetails.location}
+                className="text-gray-800"
+              >
+                {stadiumName}
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            <hr className="my-4" />
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="font-bold text-lg">₹{minPrice} onwards</p>
+                {isFillingFast && (
+                  <p className="text-orange-500 text-sm font-medium">
+                    Filling Fast
+                  </p>
+                )}
+              </div>
+
+              <button
+                disabled={disableBooking}
+                className={`px-5 py-2 rounded-lg text-base font-semibold ${
+                  disableBooking
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-red-500 text-white hover:bg-red-600"
+                }`}
+              >
+                {isComingSoon
+                  ? "Coming Soon"
+                  : isSoldOut
+                  ? "Sold Out"
+                  : isEventOver
+                  ? "Event Passed"
+                  : isCancelled
+                  ? "Cancelled"
+                  : isPostponed
+                  ? "Postponed"
+                  : "Book Now"}
+              </button>
+            </div>
           </div>
         </div>
       </div>

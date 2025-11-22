@@ -28,6 +28,9 @@ const organizerSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    fullname: String,
+    email: String,
+    profileImage: String,
     organizationDetails: organizationDetailsSchema,
     bankAccountDetails: bankAccountDetailsSchema,
     isVerified: {

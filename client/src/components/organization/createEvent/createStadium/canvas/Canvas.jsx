@@ -4,7 +4,6 @@ import { ACTIONS } from "../../../../../utils/constants";
 import useResizer from "../../../../../hooks/useResizer";
 import { v4 as uuidv4 } from "uuid";
 import { useEffect, useRef, useState } from "react";
-import useImage from "use-image";
 import Controllers from "./Controllers";
 import { forwardRef } from "react";
 import { useImperativeHandle } from "react";
@@ -21,7 +20,8 @@ const Canvas = forwardRef(
     const stageRef = useRef();
     const containerRef = useRef();
 
-    const [imageSrc] = useImage(imageUrl);
+    const arcCenterRef = useRef({ x: 0, y: 0 });
+    const arcStartAngleRef = useRef(0);
 
     const size = useResizer(containerRef);
     const isDraggable = action === ACTIONS.SELECT;
@@ -39,6 +39,9 @@ const Canvas = forwardRef(
             break;
           case "c":
             setAction(ACTIONS.CIRCLE);
+            break;
+          case "a":
+            setAction(ACTIONS.ARC);
             break;
           case "s":
           case "escape":
@@ -60,7 +63,8 @@ const Canvas = forwardRef(
     }, [selectedId]);
 
     useEffect(() => {
-      if (imageFile && imageSrc && imageUrl) {
+      if (imageFile && imageUrl) {
+        const localUrl = URL.createObjectURL(imageFile);
         const id = uuidv4();
         const newImage = {
           id,
@@ -71,7 +75,7 @@ const Canvas = forwardRef(
           height: 200,
           visible: true,
           zIndex: shapes.length,
-          imageurl: imageSrc,
+          imageUrl: localUrl,
           image: imageFile,
           title: imageFile.name,
         };
@@ -79,7 +83,7 @@ const Canvas = forwardRef(
         setSelectedId(id);
         setAction(ACTIONS.SELECT);
       }
-    }, [imageSrc]);
+    }, [imageUrl]);
 
     const handleCanvasPointerDown = (e) => {
       if (action === ACTIONS.SELECT) return;
@@ -89,6 +93,35 @@ const Canvas = forwardRef(
       const id = uuidv4();
       currentShapeId.current = id;
       isPainting.current = true;
+
+      if (action === ACTIONS.ARC) {
+        arcCenterRef.current = { x: pos.x, y: pos.y };
+        const startAngle =
+          (Math.atan2(pos.y - pos.y, pos.x - pos.x) * 180) / Math.PI || 0;
+        arcStartAngleRef.current = 0;
+        const newArc = {
+          id,
+          type: "arc",
+          x: pos.x,
+          y: pos.y,
+          innerRadius: 40,
+          outerRadius: 70,
+          innerRadiusX: 40,
+          innerRadiusY: 40,
+          outerRadiusX: 70,
+          outerRadiusY: 70,
+          angle: 60,
+          rotation: -30,
+          fillColor,
+          fillOpacity: 0.6,
+          capacity: 200,
+          visible: true,
+          zIndex: shapes.length,
+          title: `Pavilion ${shapes.length + 1}`,
+        };
+        setShapes((prev) => [...prev, newArc]);
+        return;
+      }
 
       let newShape = {
         id,
@@ -100,11 +133,18 @@ const Canvas = forwardRef(
         radius: 20,
         fillColor,
         fillOpacity: 0.5,
+        capacity: 50,
         visible: true,
         zIndex: shapes.length,
         title: `Section ${shapes.length + 1}`,
       };
       setShapes((prev) => [...prev, newShape]);
+    };
+
+    const handleResize = (id, newAttrs) => {
+      setShapes((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, ...newAttrs } : s))
+      );
     };
 
     const onShapeClick = (e, id) => {
@@ -164,12 +204,40 @@ const Canvas = forwardRef(
           if (shape.id !== currentShapeId.current) return shape;
           if (shape.type === "rect") {
             return { ...shape, width: x - shape.x, height: y - shape.y };
-          } else {
+          } else if (shape.type === "circle") {
             return {
               ...shape,
               radius: Math.sqrt((x - shape.x) ** 2 + (y - shape.y) ** 2),
             };
-          }
+          } else if (shape.type === "arc") {
+            const cx = shape.x;
+            const cy = shape.y;
+            const dx = x - cx;
+            const dy = y - cy;
+
+            // use separate x/y distances so dragging creates an ellipse
+            const absDx = Math.max(10, Math.round(Math.abs(dx)));
+            const absDy = Math.max(10, Math.round(Math.abs(dy)));
+
+            const pointerAngle = (Math.atan2(dy, dx) * 180) / Math.PI;
+
+            // angle is determined by how far around the center the pointer moves
+            // keep sensible limits
+            let angle = Math.min(Math.max(Math.abs(pointerAngle), 10), 360);
+            const rotation = pointerAngle - angle / 2;
+
+            return {
+              ...shape,
+              outerRadiusX: absDx,
+              outerRadiusY: absDy,
+              outerRadius: Math.max(20, Math.round(Math.max(absDx, absDy))),
+              innerRadiusX: Math.max(5, Math.round(absDx * 0.5)),
+              innerRadiusY: Math.max(5, Math.round(absDy * 0.5)),
+              innerRadius: Math.max(10, Math.round(Math.min(absDx, absDy) * 0.5)),
+              angle: Math.round(angle),
+              rotation: Math.round(rotation),
+            };
+          } else return shape;
         })
       );
     };
@@ -227,6 +295,7 @@ const Canvas = forwardRef(
                       onSelect={(e) => onShapeClick(e, shape.id)}
                       onDragEnd={handleDragEnd}
                       isDraggable={isDraggable}
+                      onResize={handleResize}
                     />
                   ) : null
                 )}

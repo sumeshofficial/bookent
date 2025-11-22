@@ -2,12 +2,6 @@ import mongoose from "mongoose";
 
 const ticketSchema = new mongoose.Schema(
   {
-    totalSeats: {
-      type: Number,
-      required: true,
-      min: 1,
-      max: 99999,
-    },
     seatPrice: {
       type: Number,
       required: true,
@@ -67,7 +61,6 @@ const eventSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
-
     maxPrice: {
       type: Number,
       required: true,
@@ -170,6 +163,10 @@ const eventSchema = new mongoose.Schema(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
     },
   },
   {

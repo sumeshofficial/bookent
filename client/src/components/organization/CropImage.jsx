@@ -34,6 +34,12 @@ const CropImage = ({
     }
   }, [name, watch]);
 
+  useEffect(() => {
+    return () => {
+      setImage("");
+    };
+  }, []);
+
   const onCropDone = (imageCroppedArea) => {
     const canvas = document.createElement("canvas");
     canvas.width = imageCroppedArea.width;
@@ -73,6 +79,11 @@ const CropImage = ({
 
   const onCropCancel = () => {
     setImage("");
+    setImageAfterCrop("");
+    setValue(name, null);
+    if (inputRef.current) {
+      inputRef.current.value = null;
+    }
     closeModal();
   };
 
@@ -85,6 +96,10 @@ const CropImage = ({
         aspectRation: aspect,
       });
     }
+
+    return () => {
+      setImage("");
+    };
   }, [image]);
 
   const handleOnChange = (event) => {

@@ -21,10 +21,7 @@ const ModalManager = () => {
         case "auth":
             content = <AuthModal />
             break;
-        case "signup":
-            content = <EmailInputFormModal {...modalData} />
-            break;
-        case "email":
+        case "signup" || "email":
             content = <EmailInputFormModal {...modalData} />
             break;
         case "otp":

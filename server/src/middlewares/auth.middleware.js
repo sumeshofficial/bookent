@@ -1,5 +1,6 @@
 import logger from "../config/logger.js";
 import { verifyTokenAndGetUser } from "../services/auth.service.js";
+import { getObjectURL } from "../services/s3.service.js";
 import { statusCode } from "../utility/constants.js";
 
 // Token verify
@@ -35,6 +36,11 @@ export const protect = async (req, res, next) => {
       return res
         .status(statusCode.unAuthorized)
         .json({ message: "You are bloked by admin" });
+    }
+
+    if (user.profileImage && user.profileImage.includes("uploads")) {
+      const url = await getObjectURL(user.profileImage);
+      user.profileImage = url;
     }
 
     req.user = user;

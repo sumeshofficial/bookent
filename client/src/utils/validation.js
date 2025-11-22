@@ -63,12 +63,6 @@ export const validationSchema = [
       .array()
       .of(
         yup.object().shape({
-          totalSeats: yup
-            .number()
-            .typeError("Total seats must be a valid number")
-            .required("Total seats are required")
-            .min(1, "There must be at least 1 seat")
-            .max(99999, "Too many seats"),
           seatPrice: yup
             .number()
             .typeError("Seat price must be a valid number")
@@ -183,20 +177,13 @@ export const createStadiumValidationSchema = yup.object({
     .string()
     .required("Stadium name is required")
     .min(10, "Stadium name must be at least 10 characters long")
-    .max(30, "Stadium name cannot exceed 30 characters"),
-
-  capacity: yup
-    .number()
-    .typeError("Please enter a valid number")
-    .required("Stadium Capacity is required")
-    .min(100, "Must be at least 3 digits")
-    .max(99999999, "Cannot exceed 8 digits"),
+    .max(100, "Stadium name cannot exceed 100 characters"),
 
   address: yup
     .string()
     .required("Address is required")
     .min(10, "Address must be at least 10 characters long")
-    .max(50, "Address cannot exceed 50 characters"),
+    .max(250, "Address cannot exceed 250 characters"),
 
   city: yup
     .string()

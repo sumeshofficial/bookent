@@ -2,14 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { onResend, verifyOtp } from "../../../services/auth";
 import { Loader } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { addUser, updateUserProfile } from "../../../redux/userSlice";
+import {
+  addUser,
+  updateUserProfile,
+  updateUserProfileData,
+} from "../../../redux/userSlice";
 import { useModal } from "../../../utils/constants";
 import toast from "react-hot-toast";
 
 const OTP_DIGITS_COUNT = 6;
 const RESEND_TIMEOUT = 60;
 
-const OTPInputForm = ({ title, email, purpose, data }) => {
+const OTPInputForm = ({ title, email, purpose, updatedData }) => {
   const { openModal, closeModal } = useModal();
   const [inputArr, setInputArr] = useState(
     new Array(OTP_DIGITS_COUNT).fill("")
@@ -107,15 +111,25 @@ const OTPInputForm = ({ title, email, purpose, data }) => {
         return closeModal();
       }
 
-      if (purpose === 'email-edit'){
-        const updateData = {
-          user: response.user,
-          data,
-        }
-        dispatch(updateUserProfile({ data: updateData }));
+      if (purpose === "edit-email") {
+        closeModal();
+        dispatch(
+          updateUserProfileData({
+            ...updatedData?.updatedFields,
+          })
+        );
+        toast.success("Profile updated successfully!");
+        await dispatch(
+          updateUserProfile({
+            id: updatedData?.user._id,
+            data: updatedData?.updatedFields,
+          })
+        ).unwarp();
+        return;
       }
       openModal(purpose, { response });
     } catch (error) {
+      toast.error("Something went wrong");
       setStat({ ...stat, isLoading: false, error: error.message });
       setIsButtonDisabled(true);
     }

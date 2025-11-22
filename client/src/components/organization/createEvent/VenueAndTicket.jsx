@@ -189,7 +189,8 @@ const VenueAndTicket = ({ register, errors, watch, setValue }) => {
                       register={register}
                       errors={errors.ticketSetup?.[index]}
                       index={index}
-                      watch={watch}
+                      capacity={shape.capacity}
+                      setValue={setValue}
                     />
                   ))}
               </div>

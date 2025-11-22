@@ -125,6 +125,19 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
                     >
                       Create Stadium
                     </NavLink>
+                    <NavLink
+                      to="/listmyshow/stadiums"
+                      onClick={() => setSidebarOpen(false)}
+                      className={({ isActive }) =>
+                        `block px-4 py-2 text-sm rounded-lg cursor-pointer ${
+                          isActive
+                            ? "text-blue-600 bg-blue-50"
+                            : "text-gray-600 hover:bg-gray-50"
+                        }`
+                      }
+                    >
+                      All Stadiums
+                    </NavLink>
                   </div>
                 )}
               </div>

@@ -6,7 +6,7 @@ const DeleteConfirmationModal = ({
   message = "Are you sure you want to delete this event?",
   handleDelete,
   closeModal,
-  eventId,
+  id,
 }) => {
   useEffect(() => {
     const handleEsc = (e) => {
@@ -17,7 +17,7 @@ const DeleteConfirmationModal = ({
   }, [closeModal]);
 
   const handleOnClick = () => {
-    handleDelete(eventId);
+    handleDelete(id);
     closeModal();
   };
 

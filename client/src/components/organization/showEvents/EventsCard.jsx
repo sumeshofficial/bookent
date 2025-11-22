@@ -98,7 +98,7 @@ const EventsCard = ({
                     onClick={() =>
                       openModal("delete-confirmation", {
                         handleDelete,
-                        eventId: event._id,
+                        id: event._id,
                         closeModal
                       })
                     }
