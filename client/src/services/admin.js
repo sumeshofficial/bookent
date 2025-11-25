@@ -1,24 +1,9 @@
 import { adminApi } from "./api/apiSetup";
 
-export const getAllUsers = async ({
-  page,
-  limit,
-  search,
-  sort,
-  status,
-}) => {
-  try {
-    return await adminApi.get(
-      `/admin/users?page=${page}&limit=${limit}&search=${search}&sort=${sort}&status=${status}`
-    );
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+export const getAllUsers = async ({ page, limit, search, sort, status }) => {
+  return await adminApi.get(
+    `/admin/users?page=${page}&limit=${limit}&search=${search}&sort=${sort}&status=${status}`
+  );
 };
 
 export const getAllOrganizers = async ({
@@ -28,74 +13,35 @@ export const getAllOrganizers = async ({
   sort,
   status,
 }) => {
-  try {
-    return await adminApi.get(
-      `/admin/organizers?&page=${page}&limit=${limit}&search=${search}&sort=${sort}&status=${status}`
-    );
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message || 
-      "Something went wrong";
-    throw new Error(message);
-  }
+  return await adminApi.get(
+    `/admin/organizers?&page=${page}&limit=${limit}&search=${search}&sort=${sort}&status=${status}`
+  );
 };
 
 export const toggleUserStatusAPI = async ({ userId, newStatus }) => {
-  try {
-    const res = await adminApi.patch(`/admin/users/${userId}/${newStatus}`);
+  const res = await adminApi.patch(`/admin/users/${userId}/${newStatus}`);
 
-    return res.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  return res.data;
 };
 
-export const handleOrganizerRequest = async ({id, status}) => {
-  try {
-    const res = await adminApi.patch(`/admin/organizers/${id}/${status}`);
+export const handleOrganizerRequest = async ({ id, status, reason }) => {
+  const body = { status };
 
-    return res.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
+  if (status === "rejected") {
+    body.reason = reason;
   }
+
+  const res = await adminApi.patch(`/admin/organizers/${id}`, body);
+
+  return res.data;
 };
 
 export const getUserDeatils = async (userId) => {
-  try {
-    const user = await adminApi.get(`/admin/users/${userId}`);
-    return user;
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  const user = await adminApi.get(`/admin/users/${userId}`);
+  return user;
 };
 
 export const getOrganizerDetails = async (id) => {
-  try {
-    const organizer = await adminApi.get(`/admin/organizers/${id}`);
-    return organizer;
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  const res = await adminApi.get(`/admin/organizers/${id}`);
+  return res.data;
 };

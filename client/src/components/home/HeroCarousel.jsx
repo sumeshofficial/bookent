@@ -45,13 +45,13 @@ const HeroCarousel = () => {
         onClick={() =>
           setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
         }
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10"
+        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10"
       >
         <ChevronLeft className="w-6 h-6 text-white" />
       </button>
       <button
         onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10"
+        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10"
       >
         <ChevronRight className="w-6 h-6 text-white" />
       </button>

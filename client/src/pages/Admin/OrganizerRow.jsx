@@ -1,8 +1,8 @@
 import React from "react";
-import { Check, X, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const OrganizerRow = React.memo(({ org, handleRequest }) => {
+const OrganizerRow = React.memo(({ org }) => {
   return (
     <tr key={org._id} className="fade-in hover:bg-gray-50 transition-all duration-300">
       <td className="px-6 py-4 font-medium text-gray-900">
@@ -35,26 +35,6 @@ const OrganizerRow = React.memo(({ org, handleRequest }) => {
         >
           {org.isVerified ? "Yes" : "No"}
         </span>
-      </td>
-      <td className="px-6 py-4">
-        {org.status === "pending" ? (
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleRequest({ id:org._id, status: 'approved'})}
-              className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-600"
-            >
-              <Check size={14} /> Approve
-            </button>
-            <button
-              onClick={() => handleRequest({ id:org._id, status: 'rejected'})}
-              className="flex items-center gap-1 bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600"
-            >
-              <X size={14} /> Reject
-            </button>
-          </div>
-        ) : (
-          <span className="text-gray-400 italic text-sm">No action</span>
-        )}
       </td>
       <td className="px-6 py-4">
         <Link

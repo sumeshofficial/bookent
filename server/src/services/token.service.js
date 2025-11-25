@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import RefreshToken from "../models/refreshToken.model.js";
 import { v4 as uuidv4 } from "uuid";
+import { getRedisData, storeInRedis } from "./redis.service.js";
 dotenv.config();
 
 const userRefreshTokenExpiresIn = process.env.JWT_USER_REFRESH_TOKEN_EXPIRES_IN;
@@ -39,9 +40,11 @@ export const generateRefreshToken = async ({ userId, role }) => {
 // Verify refresh Token
 export const verifyRefreshToken = async (token) => {
   const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  console.log(payload);
   const dbToken = await RefreshToken.findOne({
     tokenId: payload.tokenId,
   });
+  console.log(dbToken);
   if (!dbToken) {
     throw new Error("Invalid refresh token");
   }
@@ -51,4 +54,16 @@ export const verifyRefreshToken = async (token) => {
 // Revoke Refresh Token
 export const revokeRefreshToken = async (tokenId) => {
   await RefreshToken.deleteOne({ tokenId });
+};
+
+// Add token to blacklist
+export const blacklistToken = async (token, expiresInSeconds) => {
+  const key = `blacklist:${token}`;
+  await storeInRedis(key, expiresInSeconds, "blacklisted");
+};
+
+// Check if token is blacklisted
+export const isTokenBlacklisted = async (token) => {
+  const key = `blacklist:${token}`;
+  return await getRedisData(key);
 };

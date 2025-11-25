@@ -156,7 +156,7 @@ const CropImage = ({
               if (inputRef.current) inputRef.current.value = null;
               setImage("");
             }}
-            className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm text-red-600 p-1 rounded-full shadow hover:bg-white"
+            className="absolute top-2 right-2 bg-white/80 text-red-600 p-1 rounded-full shadow hover:bg-white"
           >
             <X className="w-4 h-4" />
           </button>

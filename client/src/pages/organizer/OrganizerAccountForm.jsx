@@ -1,27 +1,103 @@
 import { useEffect, useState } from "react";
 import logo from "../../assets/bookent-logo-white.png";
 import { useForm } from "react-hook-form";
-import { registerOrganizationAccount } from "../../services/organization";
+import {
+  getState,
+  registerOrganizationAccount,
+} from "../../services/organization";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader } from "lucide-react";
+import { Loader, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import { addOrganizer } from "../../redux/organizerSlice";
+import {
+  addOrganizer,
+  updateOrganizerProfile,
+  updateOrganizerProfileData,
+} from "../../redux/organizerSlice";
 import { Link } from "react-router-dom";
 
-const OrganizarAccountForm = () => {
+const OrganizarAccountForm = ({ isRejected = false }) => {
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     mode: "onBlur",
   });
 
   const dispatch = useDispatch();
+  const [stateList, setStateList] = useState([]);
 
   const [isError, setError] = useState();
+
+  const { organizer } = useSelector((store) => store.organizer);
+  const [isUnchanged, setIsUnchanged] = useState(true);
+
+  useEffect(() => {
+    if (isRejected && organizer && stateList.length > 0) {
+      const organizationDetails = {
+        orgName: organizer.organizationDetails.name,
+        orgAddress: organizer.organizationDetails.address,
+        state: organizer.organizationDetails.state,
+      };
+      const bankAccountDetails = {
+        beneficiaryName: organizer.bankAccountDetails.beneficiaryName,
+        accountNumber: organizer.bankAccountDetails.accountNumber,
+        accountType: organizer.bankAccountDetails.accountType,
+        bankName: organizer.bankAccountDetails.bankName,
+        bankIFSC: organizer.bankAccountDetails.ifsc,
+      };
+      reset({
+        ...organizer,
+        ...organizationDetails,
+        ...bankAccountDetails,
+      });
+    }
+  }, [isRejected, organizer, stateList]);
+
+  useEffect(() => {
+    if (isRejected && organizer) {
+      const current = {
+        orgName: watch("orgName"),
+        orgAddress: watch("orgAddress"),
+        state: watch("state"),
+        beneficiaryName: watch("beneficiaryName"),
+        accountNumber: watch("accountNumber"),
+        accountType: watch("accountType"),
+        bankName: watch("bankName"),
+        bankIFSC: watch("bankIFSC"),
+      };
+
+      const original = {
+        orgName: organizer.organizationDetails.name,
+        orgAddress: organizer.organizationDetails.address,
+        state: organizer.organizationDetails.state,
+        beneficiaryName: organizer.bankAccountDetails.beneficiaryName,
+        accountNumber: organizer.bankAccountDetails.accountNumber,
+        accountType: organizer.bankAccountDetails.accountType,
+        bankName: organizer.bankAccountDetails.bankName,
+        bankIFSC: organizer.bankAccountDetails.ifsc,
+      };
+
+      const unchanged = JSON.stringify(current) === JSON.stringify(original);
+      setIsUnchanged(unchanged);
+    }
+  }, [watch(), isRejected, organizer]);
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const data = await getState();
+        setStateList(data);
+      } catch (error) {
+        console.error("Error fetching states:", error);
+        toast.error("Failed to load states");
+      }
+    };
+    fetchStates();
+  }, []);
 
   useEffect(() => {
     if (isSubmitting) {
@@ -38,31 +114,79 @@ const OrganizarAccountForm = () => {
   const { user } = useSelector((store) => store.user);
 
   const onSubmit = async (data) => {
-    const organizationDetails = {
-      name: data.orgName,
-      address: data.orgAddress,
-      state: data.state,
-    };
-    const bankAccountDetails = {
-      beneficiaryName: data.beneficiaryName,
-      accountNumber: data.accountNumber,
-      accountType: data.accountType,
-      bankName: data.bankName,
-      ifsc: data.bankIFSC,
-    };
+    const originalOrg = organizer?.organizationDetails;
+    const originalBank = organizer?.bankAccountDetails;
 
-    const userId = user._id;
+    const updatedOrganizationDetails = {};
+    const updatedBankDetails = {};
+
+    if (!isRejected || data.orgName !== originalOrg?.name) {
+      updatedOrganizationDetails.name = data.orgName;
+    }
+    if (!isRejected || data.orgAddress !== originalOrg?.address) {
+      updatedOrganizationDetails.address = data.orgAddress;
+    }
+    if (!isRejected || data.state !== originalOrg?.state) {
+      updatedOrganizationDetails.state = data.state;
+    }
+
+    if (!isRejected || data.beneficiaryName !== originalBank?.beneficiaryName) {
+      updatedBankDetails.beneficiaryName = data.beneficiaryName;
+    }
+    if (!isRejected || data.accountNumber !== originalBank?.accountNumber) {
+      updatedBankDetails.accountNumber = data.accountNumber;
+    }
+    if (!isRejected || data.accountType !== originalBank?.accountType) {
+      updatedBankDetails.accountType = data.accountType;
+    }
+    if (!isRejected || data.bankName !== originalBank?.bankName) {
+      updatedBankDetails.bankName = data.bankName;
+    }
+    if (!isRejected || data.bankIFSC !== originalBank?.ifsc) {
+      updatedBankDetails.ifsc = data.bankIFSC;
+    }
+
+    const payload = {
+      userId: user._id,
+      ...(Object.keys(updatedOrganizationDetails).length > 0 && {
+        organizationDetails: {
+          ...originalOrg,
+          ...updatedOrganizationDetails,
+        },
+      }),
+
+      ...(Object.keys(updatedBankDetails).length > 0 && {
+        bankAccountDetails: {
+          ...originalBank,
+          ...updatedBankDetails,
+        },
+      }),
+    };
 
     try {
-      const res = await registerOrganizationAccount({
-        organizationDetails,
-        bankAccountDetails,
-        userId,
-      });
+      let res;
 
-      dispatch(addOrganizer(res.data));
-      toast.dismiss();
-      toast.success("Registration Successfully");
+      if (isRejected) {
+        console.log({ ...payload, status: "pending" });
+        dispatch(
+          updateOrganizerProfileData({
+            ...payload,
+            status: "pending",
+          })
+        );
+        toast.success("Profile updated successfully!");
+        dispatch(
+          updateOrganizerProfile({
+            id: organizer._id,
+            data: { ...payload, status: "pending" },
+          })
+        );
+      } else {
+        res = await registerOrganizationAccount(payload);
+        dispatch(addOrganizer(res.data));
+        toast.dismiss();
+        toast.success("Registration Successfully");
+      }
     } catch (error) {
       setError(error?.message || "Something went wrong");
       toast.dismiss();
@@ -110,6 +234,15 @@ const OrganizarAccountForm = () => {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100">
+            {isRejected && organizer?.rejectReason && (
+              <div className="mb-10 bg-red-50 border border-red-300 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-red-700 mb-2 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                  Rejection Reason
+                </h3>
+                <p className="text-red-600 text-sm">{organizer.rejectReason}</p>
+              </div>
+            )}
             <div className="mb-10">
               <h3 className="text-xl font-semibold text-gray-800 mb-6">
                 Organisation Details
@@ -160,9 +293,7 @@ const OrganizarAccountForm = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    State
-                  </label>
+                  <label className="text-sm text-gray-600">State</label>
                   <select
                     {...register("state", {
                       required: "State is required",
@@ -170,11 +301,11 @@ const OrganizarAccountForm = () => {
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-4 focus:ring-blue-300 focus:border-blue-500 outline-none transition-all bg-white"
                   >
                     <option value="">Select State</option>
-                    <option value="Kerala">Kerala</option>
-                    <option value="Tamil Nadu">Tamil Nadu</option>
-                    <option value="Karnataka">Karnataka</option>
-                    <option value="Maharashtra">Maharashtra</option>
-                    <option value="Delhi">Delhi</option>
+                    {stateList.map((s) => (
+                      <option key={s.name} value={s.name}>
+                        {s.name}
+                      </option>
+                    ))}
                   </select>
                   {errors.state && (
                     <p className="text-red-500 text-sm mt-1">
@@ -308,11 +439,10 @@ const OrganizarAccountForm = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <div className="flex justify-end">
               <button
                 type="submit"
-                disabled={isSubmitting || isError}
+                disabled={isSubmitting || isError || isUnchanged}
                 className="bg-black text-white px-8 py-3 rounded-md font-semibold hover:bg-gray-800 transition-all duration-200 focus:ring-4 focus:ring-offset-2 focus:ring-black disabled:opacity-70"
               >
                 {isSubmitting ? "Submitting..." : "Proceed"}

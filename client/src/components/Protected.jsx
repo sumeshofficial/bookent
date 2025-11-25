@@ -9,7 +9,7 @@ const Protected = ({ children }) => {
 
   useEffect(() => {
     dispatch(getUser());
-  }, []);
+  }, [dispatch]);
 
   if (!user){
     return <WelcomePage />

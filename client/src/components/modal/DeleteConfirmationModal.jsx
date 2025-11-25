@@ -22,7 +22,7 @@ const DeleteConfirmationModal = ({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 animate-fadeIn">
       <div className="bg-white w-[90%] max-w-md rounded-xl shadow-lg p-6 animate-scaleIn relative">
         <button
           onClick={closeModal}

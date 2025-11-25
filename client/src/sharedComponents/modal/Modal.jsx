@@ -22,14 +22,14 @@ const Modal = ({ onClose, isOpen, children }) => {
 
   return createPortal(
     <div
-      className="fixed inset-0 flex items-center bg-gray-600/75 justify-center z-50 "
+      className="fixed inset-0 flex items-center justify-center z-50 bg-gray-600/20"
       onClick={() => {
         onClose();
         dispatch(clearError());
       }}
     >
       <div
-        className="bg-white rounded-2xl shadow-lg p-6 w-11/12 max-w-md relative"
+        className="bg-white rounded-2xl p-6 w-11/12 max-w-md relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button

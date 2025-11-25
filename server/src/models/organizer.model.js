@@ -37,6 +37,10 @@ const organizerSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    rejectReason: {
+      type: String,
+      default: null,
+    },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

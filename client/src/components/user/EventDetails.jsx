@@ -1,6 +1,6 @@
 import { Calendar, Clock, MapPin } from "lucide-react";
 import { Hourglass, Users, Languages } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EventRow from "../home/EventRow";
 
 const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
@@ -31,6 +31,8 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
     month: "long",
     year: "numeric",
   });
+
+  const navigate = useNavigate();
 
   const start = new Date(matchDate);
   const end = new Date(start.getTime() + matchDuration * 60 * 1000);
@@ -135,6 +137,7 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
 
               <button
                 disabled={disableBooking}
+                onClick={() => navigate("seat-layout")}
                 className={`px-5 py-2 rounded-lg text-base font-semibold ${
                   disableBooking
                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"

@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middlewares/auth.middleware.js";
+import { protect } from "../middlewares/common/auth.middleware.js";
 import { getFiles, uploadFiles } from "../controller/s3.controller.js";
 
 const s3Router = express.Router();

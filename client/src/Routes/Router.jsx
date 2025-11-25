@@ -27,6 +27,7 @@ import EventDetailPage from "../pages/user/EventDetailPage";
 import OrganizerProfilePage from "../pages/organizer/OrganizerProfilePage";
 import Stadiums from "../pages/organizer/Stadiums";
 import StadiumDetails from "../pages/organizer/StadiumDetails";
+import SeatSelectPage from "../pages/user/SeatSelectPage";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +68,14 @@ const router = createBrowserRouter([
             element: (
               <Protected>
                 <EventDetailPage />
+              </Protected>
+            ),
+          },
+          {
+            path: "event/:eventId/seat-layout",
+            element: (
+              <Protected>
+                <SeatSelectPage />
               </Protected>
             ),
           },

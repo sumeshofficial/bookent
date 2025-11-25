@@ -49,16 +49,6 @@ export const getAllUsers = async ({ limit, skip, search, sort, status }) => {
   return { totalUsers, users };
 };
 
-// Update user status
-export const updateUserStatus = async ({ userId, newStatus }) => {
-  await User.updateOne(
-    { _id: userId },
-    {
-      status: newStatus,
-    }
-  );
-};
-
 // Reverse Geocoding
 export const reverseGeocoding = async ({ lat, lng }) => {
   const LOCATION_API_KEY = process.env.LOCATION_API_KEY;

@@ -9,7 +9,7 @@ const GoogleButton = ({ role = "user" }) => {
   const handleGoogleLogin = () => {
     dispatch(clearError());
     const popup = window.open(
-      `${import.meta.env.VITE_API_URL}/auth/google?state=` +
+      `${import.meta.env.VITE_API_URL}/user/auth/google?state=` +
         encodeURIComponent(JSON.stringify({ role })),
       "googleLogin",
       "width=500,height=600"

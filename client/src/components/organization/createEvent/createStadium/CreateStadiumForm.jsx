@@ -9,7 +9,7 @@ import {
   getState,
 } from "../../../../services/organization";
 import toast from "react-hot-toast";
-import { useWatch } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 
 const CreateStadiumInput = ({
   register,
@@ -37,20 +37,27 @@ const CreateStadiumInput = ({
       "address",
       "city",
       "state",
+      "stateCode",
       "pincode",
       "location",
       "stadiumLayout",
     ],
   });
 
-  const [stadiumName, address, city, state, pincode, location, stadiumLayout] =
-    values;
+  const [
+    stadiumName,
+    address,
+    city,
+    state,
+    stateCode,
+    pincode,
+    location,
+    stadiumLayout,
+  ] = values;
 
   useEffect(() => {
-    if (state) {
-      fetchCities(state);
-    }
-  }, [state]);
+    if (stateCode) fetchCities(stateCode);
+  }, [stateCode]);
 
   const debouncedCheck = useCallback(
     debounce(async (name) => {
@@ -95,7 +102,7 @@ const CreateStadiumInput = ({
     const fetchStates = async () => {
       try {
         const data = await getState();
-        setStates(data.data[98].states);
+        setStates(data);
       } catch (error) {
         console.error("Error fetching states:", error);
         toast.error("Failed to load states");
@@ -104,14 +111,14 @@ const CreateStadiumInput = ({
     fetchStates();
   }, []);
 
-  const fetchCities = async (stateName) => {
-    if (!stateName) {
+  const fetchCities = async (stateCode) => {
+    if (!stateCode) {
       if (city) setCities([]);
       return;
     }
     try {
-      const data = await getCity(stateName);
-      setCities(data.data);
+      const data = await getCity(stateCode);
+      setCities(data);
     } catch (error) {
       console.error("Error fetching cities:", error);
       toast.error("Failed to load cities");
@@ -171,22 +178,41 @@ const CreateStadiumInput = ({
         <div className="grid grid-cols-3 gap-4">
           <div className="mt-2 sm:mt-5 flex flex-col gap-2">
             <label className="text-[.7rem] sm:text-sm">State *</label>
-            <select
-              {...register("state")}
-              value={state || ""}
-              onChange={(e) => {
-                setValue("state", e.target.value, { shouldDirty: true });
-                fetchCities(e.target.value);
-              }}
-              className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3 focus:outline-none focus:ring-2 focus:ring-violet-500"
-            >
-              <option value="">Select State</option>
-              {states.map((state) => (
-                <option key={state.name} value={state.name}>
-                  {state.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="state"
+              render={({ field }) => (
+                <select
+                  value={
+                    state && stateCode
+                      ? JSON.stringify({ name: state, code: stateCode })
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const selected = JSON.parse(e.target.value);
+
+                    setValue("state", selected.name, { shouldDirty: true });
+                    setValue("stateCode", selected.code, { shouldDirty: true });
+
+                    fetchCities(selected.code);
+                  }}
+                  className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3"
+                >
+                  <option value="">Select State</option>
+                  {states.map((s) => (
+                    <option
+                      key={s.isoCode}
+                      value={JSON.stringify({
+                        name: s.name,
+                        code: s.isoCode,
+                      })}
+                    >
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            />
             {errors?.state && (
               <span className="text-red-500 text-[.5rem] sm:text-sm">
                 {errors.state.message}
@@ -205,8 +231,8 @@ const CreateStadiumInput = ({
             >
               <option value="">Select City</option>
               {cities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
+                <option key={city.name} value={city.name}>
+                  {city.name}
                 </option>
               ))}
             </select>

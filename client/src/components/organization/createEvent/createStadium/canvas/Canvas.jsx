@@ -215,14 +215,11 @@ const Canvas = forwardRef(
             const dx = x - cx;
             const dy = y - cy;
 
-            // use separate x/y distances so dragging creates an ellipse
             const absDx = Math.max(10, Math.round(Math.abs(dx)));
             const absDy = Math.max(10, Math.round(Math.abs(dy)));
 
             const pointerAngle = (Math.atan2(dy, dx) * 180) / Math.PI;
 
-            // angle is determined by how far around the center the pointer moves
-            // keep sensible limits
             let angle = Math.min(Math.max(Math.abs(pointerAngle), 10), 360);
             const rotation = pointerAngle - angle / 2;
 

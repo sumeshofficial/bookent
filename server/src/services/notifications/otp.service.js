@@ -1,5 +1,8 @@
-import { sendMail } from "../utility/mailer.js";
-import { redisClient } from "../config/redis.conf.js";
+import { otpTemplate, sendEmail } from "./email.service.js";
+import { redisClient } from "../../config/redis.conf.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const redisExpiresIn = process.env.REDIS_OTP_EXPIRES_IN;
 
@@ -18,7 +21,11 @@ export const generateOtp = async ({ email, userData, purpose }) => {
 
   await redisClient.setEx(redisKey, redisExpiresIn, JSON.stringify(redisData));
 
-  await sendMail(email, otpCode, userData.fullname);
+  await sendEmail({
+    to: email,
+    subject: "Email otp verification",
+    html: otpTemplate(otpCode, userData.fullname),
+  });
 };
 
 // Check OTP is expired or not

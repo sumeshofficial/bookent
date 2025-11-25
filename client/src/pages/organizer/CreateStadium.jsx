@@ -167,6 +167,7 @@ const CreateStadium = () => {
         address: values.address,
         city: values.city,
         state: values.state,
+        stateCode: values.stateCode,
         pincode: values.pincode,
         location: values.location,
         capacity,
@@ -218,6 +219,7 @@ const CreateStadium = () => {
         dirty.address ||
         dirty.city ||
         dirty.state ||
+        dirty.stateCode ||
         dirty.pincode ||
         dirty.location
       ) {
@@ -227,6 +229,7 @@ const CreateStadium = () => {
           address: dirty.address ?? oldDetails.address,
           city: dirty.city ?? oldDetails.city,
           state: dirty.state ?? oldDetails.state,
+          stateCode: dirty.stateCode ?? oldDetails.stateCode,
           pincode: dirty.pincode ?? oldDetails.pincode,
           location: dirty.location ?? oldDetails.location,
           capacity: stadiumData.stadiumDetails.capacity,

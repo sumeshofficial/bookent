@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   MapPin,
   Calendar,
@@ -124,7 +124,8 @@ const StadiumDetails = () => {
                   <button
                     onClick={() =>
                       openModal("delete-confirmation", {
-                        message: "Are you sure you want to delete this stadium?",
+                        message:
+                          "Are you sure you want to delete this stadium?",
                         handleDelete,
                         id: stadium._id,
                         closeModal,

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { clearError, loginAdmin } from "../../redux/adminSlice";
 
@@ -8,16 +8,16 @@ const AdminLoginInput = () => {
   const { error } = useSelector((store) => store.admin);
 
   const {
+    control,
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
     mode: "onBlur",
   });
 
-  const email = watch("email");
-  const password = watch("password");
+  const email = useWatch({ control, name: "email" });
+  const password = useWatch({ control, name: "password" });
 
   useEffect(() => {
     if (error && (email || password)) {

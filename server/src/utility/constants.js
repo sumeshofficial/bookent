@@ -10,3 +10,14 @@ export const statusCode = {
   notFound: 404,
   permissionDenied: 403,
 };
+export const STATUS_CODE = {
+  SERVER_ERROR: 500,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  MISSING_FIELD: 422,
+  SUCCESS: 200,
+  CREATED: 201,
+  CONFLICT: 409,
+  NOTFOUND: 404,
+  PERMISSION_DENIED: 403,
+};

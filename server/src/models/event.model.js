@@ -14,6 +14,18 @@ const ticketSchema = new mongoose.Schema(
       min: 1,
       max: 10,
     },
+    totalTickets: {
+      type: Number,
+      required: true,
+    },
+    availableTickets: {
+      type: Number,
+      required: true,
+    },
+    soldTickets: {
+      type: Number,
+      default: 0,
+    },
   },
   { _id: false }
 );

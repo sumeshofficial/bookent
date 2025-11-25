@@ -68,8 +68,8 @@ export const createApiInstance = (type = "user") => {
       try {
         const refreshUrl =
           type === "admin"
-            ? `${API_URL}/admin/refresh-token`
-            : `${API_URL}/auth/refresh-token`;
+            ? `${API_URL}/admin/auth/refresh-token`
+            : `${API_URL}/user/auth/refresh-token`;
 
         const response = await axios.post(
           refreshUrl,

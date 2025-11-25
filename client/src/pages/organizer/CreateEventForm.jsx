@@ -44,8 +44,8 @@ const CreateEventForm = () => {
   }, [organizer, organizerId]);
 
   const { data, error } = useQuery({
-    queryKey: ["event", organizerId, eventId],
-    queryFn: () => getEvent(organizerId, eventId),
+    queryKey: ["event", eventId],
+    queryFn: () => getEvent(eventId),
     enabled: isEditMode,
     retry: 1,
   });
@@ -120,6 +120,10 @@ const CreateEventForm = () => {
         0
       );
 
+      dataWithoutImage.ticketSetup = dataWithoutImage.ticketSetup.map(
+        (tier) => ({ ...tier, availableTickets: tier.totalTickets })
+      );
+
       dataWithoutImage.totalTickets = totalTickets;
       dataWithoutImage.availableTickets = totalTickets;
       dataWithoutImage.soldTickets = 0;
@@ -141,6 +145,7 @@ const CreateEventForm = () => {
         const dirtyPayload = extractChangedFields(data, dirtyFields);
 
         dirtyPayload.tags = data.tags;
+        dirtyPayload.ticketSetup = dataWithoutImage.ticketSetup;
 
         const { bannerImage, thumbnailImage, ...newData } = dirtyPayload;
 

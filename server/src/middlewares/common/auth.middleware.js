@@ -1,14 +1,15 @@
-import logger from "../config/logger.js";
-import { verifyTokenAndGetUser } from "../services/auth.service.js";
-import { getObjectURL } from "../services/s3.service.js";
-import { statusCode } from "../utility/constants.js";
+import logger from "../../config/logger.js";
+import { verifyTokenAndGetUser } from "../../services/auth.service.js";
+import { getObjectURL } from "../../services/s3.service.js";
+import { isTokenBlacklisted } from "../../services/token.service.js";
+import { STATUS_CODE, statusCode } from "../../utility/constants.js";
+import { sanitizeUser } from "../../utility/user/sanitizeUser.js";
 
 // Token verify
 export const protect = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    logger.http(`${req.method} ${req.originalUrl} - Auth check started`);
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       logger.warn("Missing or invalid Authorization header");
       return res
@@ -17,22 +18,22 @@ export const protect = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-    logger.debug("Extracted token from header");
     const user = await verifyTokenAndGetUser(token);
 
-    if (user) {
-      logger.info(
-        `Authenticated user: ID=${user._id}, Role=${user.role}, Status=${user.status}`
-      );
-    } else {
-      logger.warn("Token verified but user not found");
+    if (!user) {
       return res
         .status(statusCode.unAuthorized)
         .json({ message: "User not found" });
     }
 
+    const blacklisted = await isTokenBlacklisted(token);
+    if (blacklisted) {
+      return res
+        .status(STATUS_CODE.UNAUTHORIZED)
+        .json({ message: "Token expired or logged out" });
+    }
+
     if (user.status === "blocked") {
-      logger.warn(`Blocked user attempted access: ID=${user._id}`);
       return res
         .status(statusCode.unAuthorized)
         .json({ message: "You are bloked by admin" });
@@ -43,7 +44,9 @@ export const protect = async (req, res, next) => {
       user.profileImage = url;
     }
 
-    req.user = user;
+    const updatedUser = sanitizeUser(user);
+
+    req.user = updatedUser;
     logger.http(
       `${req.method} ${req.originalUrl} - Auth passed for user ${user._id}`
     );
@@ -52,7 +55,6 @@ export const protect = async (req, res, next) => {
     logger.error(
       `Authentication failed: ${error.stack || error.message || "Unknown error"}`
     );
-
     res
       .status(statusCode.unAuthorized)
       .json({ message: error.message || "Invalid token" });

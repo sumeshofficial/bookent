@@ -4,7 +4,7 @@ import { logout } from "../services/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/userSlice";
 import logo from "../assets/bookent-logo-black.png";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ChevronLeft, Search, Ticket, UserCircle2, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { logoutOrganizer } from "../redux/organizerSlice";
@@ -21,8 +21,6 @@ const Navbar = () => {
   const [debouncedSearch] = useDebounce(searchQuery, 500);
   const location = useLocation();
   const inputRef = useRef(null);
-
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {

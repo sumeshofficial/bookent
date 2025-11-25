@@ -9,6 +9,7 @@ import ForgotPasswordEmail from "../../components/auth/EmailAuth/ForgotPassword/
 import EditUserProfile from "../../pages/user/EditUserProfile";
 import CropImageModal from "../../components/modal/CropImageModal";
 import DeleteConfirmationModal from "../../components/modal/DeleteConfirmationModal";
+import ConfirmationModal from "../../components/modal/ConfirmationModal";
 
 const ModalManager = () => {
 
@@ -44,6 +45,9 @@ const ModalManager = () => {
             break;
         case "delete-confirmation":
             content = <DeleteConfirmationModal {...modalData}/>
+            break;
+        case "confirmation":
+            content = <ConfirmationModal {...modalData}/>
             break;
         default:
             return null;

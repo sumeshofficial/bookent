@@ -112,6 +112,10 @@ const stadiumSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
+      stateCode: {
+        type: String,
+        required: true,
+      },
       pincode: {
         type: String,
         required: true,

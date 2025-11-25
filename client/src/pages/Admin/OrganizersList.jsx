@@ -3,8 +3,6 @@ import {
   Search,
   ChevronDown,
   Eye,
-  Check,
-  X,
   Loader,
   ChevronLeft,
   ChevronRight,
@@ -13,11 +11,10 @@ import {
 import toast from "react-hot-toast";
 import {
   getAllOrganizers,
-  handleOrganizerRequest,
 } from "../../services/admin.js";
 import { Link } from "react-router-dom";
 import OrganizerRow from "./OrganizerRow.jsx";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const OrganizersList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,8 +23,6 @@ const OrganizersList = () => {
   const [debounceSearch, setDebouncedSearch] = useState("");
   const limit = 5;
   const [page, setPage] = useState(1);
-
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -64,26 +59,6 @@ const OrganizersList = () => {
     setPage(num);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-
-  const handleRequestMutation = useMutation({
-    mutationFn: handleOrganizerRequest,
-    onSuccess: () => {
-      toast.dismiss();
-      toast.success("Organizer request updated");
-      queryClient.invalidateQueries(["organizers"]);
-    },
-    onError: (err) => {
-      toast.dismiss();
-      toast.error(err.message || "Something went wrong");
-    },
-  });
-
-  const handleRequest = useCallback(
-    ({ id, status }) => {
-      handleRequestMutation.mutate({ id, status });
-    },
-    [handleRequestMutation]
-  );
 
   return (
     <main className="flex-1 p-4 md:p-8">
@@ -168,7 +143,6 @@ const OrganizersList = () => {
                 "Bank",
                 "Status",
                 "Verified",
-                "Action",
                 "View",
               ].map((head) => (
                 <th
@@ -193,7 +167,6 @@ const OrganizersList = () => {
                 <OrganizerRow
                   key={org._id}
                   org={org}
-                  handleRequest={handleRequest}
                 />
               ))
             ) : (
@@ -256,31 +229,6 @@ const OrganizersList = () => {
               </div>
 
               <div className="mt-4 flex items-center justify-between">
-                {org.status === "pending" ? (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() =>
-                        handleRequest({ id: org._id, status: "approved" })
-                      }
-                      className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-600"
-                    >
-                      <Check size={14} /> Approve
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleRequest({ id: org._id, status: "rejected" })
-                      }
-                      className="flex items-center gap-1 bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600"
-                    >
-                      <X size={14} /> Reject
-                    </button>
-                  </div>
-                ) : (
-                  <span className="text-gray-400 italic text-sm">
-                    No action
-                  </span>
-                )}
-
                 <Link
                   to={`/admin/organizers/${org._id}`}
                   className="p-2 hover:bg-gray-100 rounded-lg transition"

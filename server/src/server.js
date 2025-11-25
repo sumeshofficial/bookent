@@ -3,14 +3,16 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.conf.js";
-import authRouter from "./routes/auth.router.js";
-import userRouter from "./routes/user.router.js";
-import passport from "./middlewares/passport.js";
-import organizerRouter from "./routes/organizer.router.js";
-import adminRouter from "./routes/admin.router.js";
+import userRoutes from "./routes/user/user.routes.js";
+import passport from "./middlewares/user/passport.js";
+import organizerRoutes from "./routes/organizer/organizer.routes.js";
+import adminRoutes from "./routes/admin/admin.routes.js";
 import { connectRedis } from "./config/redis.conf.js";
 import s3Router from "./routes/s3.router.js";
 import logger from "./config/logger.js";
+import { errorHandler } from "./middlewares/common/error.handler.js";
+import { initSocket } from "./config/socket.conf.js";
+import http from "http";
 dotenv.config();
 
 const app = express();
@@ -42,13 +44,17 @@ app.use(
 app.use(passport.initialize());
 
 // Routes
-app.use("/api/auth", authRouter);
-app.use("/api/me", userRouter);
-app.use("/api/organizer", organizerRouter);
-app.use("/api/admin", adminRouter);
-app.use("/api/s3", s3Router);
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/organizer", organizerRoutes);
+app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/s3", s3Router);
 
+app.use(errorHandler);
+
+const server = http.createServer(app);
+
+initSocket(server);
 // Server listening
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   logger.info(`server running at http://localhost:${PORT}`);
 });

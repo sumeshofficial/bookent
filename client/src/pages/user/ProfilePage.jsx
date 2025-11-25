@@ -143,7 +143,7 @@ const ProfilePage = () => {
         })
       );
     } catch (error) {
-      toast.error("Failed to upload image");
+      toast.error(error.message || "Failed to upload image");
     }
   };
 

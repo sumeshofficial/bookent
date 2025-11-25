@@ -127,17 +127,20 @@ export const validationSchema = [
       .min(20, "Terms must be at least 20 characters long")
       .max(1000, "Terms cannot exceed 1000 characters"),
 
-    eventStatus: yup.string().required("Event status is required").oneOf(
-      [
-        "Draft",
-        "Published",
-        "Postpone",
-        "Cancelled",
-        "Coming-Soon", // FIXED
-        "Completed",
-      ],
-      "Invalid event status"
-    ),
+    eventStatus: yup
+      .string()
+      .required("Event status is required")
+      .oneOf(
+        [
+          "Draft",
+          "Published",
+          "Postpone",
+          "Cancelled",
+          "Coming-Soon",
+          "Completed",
+        ],
+        "Invalid event status"
+      ),
 
     newMatchDate: yup.string().when("eventStatus", {
       is: "Postpone",
@@ -185,17 +188,9 @@ export const createStadiumValidationSchema = yup.object({
     .min(10, "Address must be at least 10 characters long")
     .max(250, "Address cannot exceed 250 characters"),
 
-  city: yup
-    .string()
-    .required("City is required")
-    .min(3, "City must be at least 3 characters long")
-    .max(20, "City cannot exceed 20 characters"),
+  city: yup.string().required("City is required"),
 
-  state: yup
-    .string()
-    .required("State is required")
-    .min(3, "State must be at least 3 characters long")
-    .max(20, "State cannot exceed 20 characters"),
+  state: yup.string().required("State is required"),
 
   pincode: yup.string().required("Pincode is required"),
 

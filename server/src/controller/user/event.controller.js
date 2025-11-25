@@ -1,53 +1,14 @@
-import dotenv from "dotenv";
+import logger from "../../config/logger.js";
+import { getObjectURL } from "../../services/s3.service.js";
 import {
   eventDetails,
   filterAndSortService,
   findEventsForUser,
-  updateUserService,
-} from "../services/user.service.js";
-import { statusCode } from "../utility/constants.js";
-import logger from "../config/logger.js";
-import { getObjectURL } from "../services/s3.service.js";
-dotenv.config();
+} from "../../services/user.service.js";
+import { statusCode } from "../../utility/constants.js";
 
-// Update user profile or data
-export const updateUser = async (req, res) => {
-  const { id, data } = req.body;
-
-  try {
-    if (!id || !data) {
-      return res
-        .status(statusCode.missingField)
-        .json({ success: false, message: "Missing fields" });
-    }
-
-    const user = await updateUserService({ id, data });
-
-    if (!user) {
-      return res
-        .status(statusCode.notFound)
-        .json({ success: false, message: "User not found" });
-    }
-
-    if (user.profileImage && user.profileImage.includes("uploads")) {
-      const url = await getObjectURL(user.profileImage);
-      user.profileImage = url;
-    }
-
-    logger.info(`User data updated successfully userId=${id}`);
-    res
-      .status(statusCode.success)
-      .json({ message: "Updated Successfully", user });
-  } catch (error) {
-    logger.info(`Error update user data ${error.stack || error.message}`);
-    res
-      .status(statusCode.serverError)
-      .json({ message: "Something went wrong" });
-  }
-};
-
-// Home Page Events List
-export const getHomeEventSections = async (req, res) => {
+// Home Page Events List controller
+export const getHomeEventSectionsController = async (req, res) => {
   try {
     const user = req.user;
     logger.http(`${req.method} ${req.originalUrl}`);
@@ -125,7 +86,7 @@ export const getHomeEventSections = async (req, res) => {
   }
 };
 
-export const filterAndSortEvents = async (req, res) => {
+export const filterAndSortEventsController = async (req, res) => {
   try {
     const { date, category, price, sort, page = 1, homeCategory } = req.query;
     const user = req.user;
@@ -253,7 +214,7 @@ export const filterAndSortEvents = async (req, res) => {
   }
 };
 
-export const getSingleEvent = async (req, res) => {
+export const getSingleEventController = async (req, res) => {
   const { eventId } = req.params;
 
   logger.http(`${req.method} ${req.originalUrl}`);
@@ -288,6 +249,24 @@ export const getSingleEvent = async (req, res) => {
         .json({ error: "Event not found" });
     }
 
+    if (updatedEvent.stadium) {
+      const updatedStadium = {
+        ...updatedEvent.stadium,
+        layoutImage: await getObjectURL(updatedEvent.stadium.layoutImageKey),
+      };
+
+      updatedStadium.shapes = await Promise.all(
+        updatedEvent.stadium.shapes.map(async (shape) => {
+          if (shape.type === "image") {
+            const imageUrl = await getObjectURL(shape.imageKey);
+            return { ...shape, imageUrl };
+          }
+          return shape;
+        })
+      );
+      updatedEvent.stadium = updatedStadium;
+    }
+
     logger.info("Event fetched successfully");
     res.json({ success: true, message: "Event fetched", event: updatedEvent });
   } catch (error) {
@@ -296,7 +275,7 @@ export const getSingleEvent = async (req, res) => {
   }
 };
 
-export const searchEvent = async (req, res) => {
+export const searchEventController = async (req, res) => {
   try {
     const { searchQuery } = req.query;
 

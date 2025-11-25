@@ -63,14 +63,20 @@ export const getAllOrganizers = async ({
 };
 
 // Update organizer request
-export const updateRequest = async ({ id, status }) => {
+export const updateRequest = async ({ id, status, reason }) => {
   const organizer = await Organizer.findById(id);
 
   organizer.status = status;
+  if (status === "rejected") {
+    organizer.rejectReason = reason;
+  }
   if (status === "approved") {
     organizer.isVerified = true;
+    organizer.rejectReason = null;
   }
   await organizer.save();
+
+  return organizer;
 };
 
 // Create stadium
@@ -169,6 +175,10 @@ export const updateOrganizerService = async ({ id, data }) => {
 
   if (data.email) {
     updateFields.email = data.email;
+  }
+
+  if (data.status) {
+    updateFields.status = data.status;
   }
 
   if (data.profileImage) {

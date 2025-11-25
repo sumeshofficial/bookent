@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { verifyToken } from "../services/auth";
 import { updateProfile } from "../services/user";
-import toast from "react-hot-toast";
 
 export const getUser = createAsyncThunk(
   "user/getUser",

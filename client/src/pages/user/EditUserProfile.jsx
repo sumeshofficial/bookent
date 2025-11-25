@@ -62,7 +62,7 @@ const EditUserProfile = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-2xl p-4 mt-10">
+    <div className="max-w-2xl mx-auto bg-white rounded-2xl p-4 mt-10 border-2">
       <h2 className="text-2xl font-semibold text-gray-700 mb-6">
         Edit User Profile
       </h2>

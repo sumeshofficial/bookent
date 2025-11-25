@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 
 const EventPreview = () => {
   const [selectedTab, setSelectedTab] = useState("about");
+  const [menuOpen, setMenuOpen] = useState(false);
   const { organizerId, eventId } = useParams();
   const { openModal, closeModal } = useModal();
   const { organizer } = useSelector((store) => store.organizer);
@@ -31,8 +32,8 @@ const EventPreview = () => {
   }
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["event", organizerId, eventId],
-    queryFn: () => getEvent(organizerId, eventId),
+    queryKey: ["event", eventId],
+    queryFn: () => getEvent(eventId),
   });
 
   useEffect(() => {
@@ -95,7 +96,7 @@ const EventPreview = () => {
 
   return (
     <div className="min-h-screen bg-white px-5 rounded-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-end">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-end overflow-visible relative z-[99999]">
         {isLoading ? (
           <div className="flex items-center gap-3">
             <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
@@ -103,33 +104,62 @@ const EventPreview = () => {
           </div>
         ) : (
           <div className="flex items-center gap-3 transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]">
-            <button
-              onClick={() =>
-                navigate(
-                  `/listmyshow/organizer/${eventData.organizer}/event/${eventData._id}/edit`
-                )
-              }
-              className="px-4 py-2 bg-red-600 text-white rounded-md"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() =>
-                openModal("delete-confirmation", {
-                  closeModal,
-                  handleDelete,
-                  id,
-                })
-              }
-              className="px-4 py-2 bg-black text-white rounded-md"
-            >
-              Delete
-            </button>
+            <div className="relative z-9999">
+              <button
+                className="p-2 rounded-full hover:bg-gray-200 transition"
+                onClick={() => setMenuOpen((prev) => !prev)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-gray-700"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6.75a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM12 13.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM12 20.25a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"
+                  />
+                </svg>
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-md z-99999">
+                  <button
+                    onClick={() => {
+                      navigate(
+                        `/listmyshow/organizer/${eventData.organizer}/event/${eventData._id}/edit`
+                      );
+                      setMenuOpen((prev) => !prev);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      openModal("delete-confirmation", {
+                        closeModal,
+                        handleDelete,
+                        id: eventData._id,
+                      });
+                      setMenuOpen((prev) => !prev);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 mb-10 transition-opacity duration-700">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 mb-10 transition-opacity duration-700 relative z-[1]">
         <div className="relative w-full aspect-video rounded-md overflow-hidden">
           {isLoading ? (
             <>
@@ -234,7 +264,7 @@ const EventPreview = () => {
 
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
-                      className="bg-green-500 h-3 rounded-full"
+                      className="bg-violet-500 h-3 rounded-full"
                       style={{ width: `${getAvailabilityPercentage()}%` }}
                     />
                   </div>

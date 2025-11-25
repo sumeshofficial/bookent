@@ -2,8 +2,8 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import dotenv from "dotenv";
-import { findUserById, handleGoogleAuth } from "../services/auth.service.js";
-import { getObjectURL } from "../services/s3.service.js";
+import { findUserById, handleGoogleAuth } from "../../services/auth.service.js";
+import { getObjectURL } from "../../services/s3.service.js";
 dotenv.config();
 
 const googleCallbackUrl = process.env.GOOGLE_CALLBACK_URL;

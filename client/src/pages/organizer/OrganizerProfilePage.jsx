@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getState } from "../../services/organization";
+import { getState, sendOtpEmailVerification } from "../../services/organization";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,6 +13,10 @@ import {
   generateUploadUrl,
   uploadFile,
 } from "../../services/s3";
+import {
+  onResend,
+  verifyOtp,
+} from "../../services/auth";
 
 const OrganizerProfilePage = () => {
   const { organizer } = useSelector((store) => store.organizer);
@@ -20,6 +24,10 @@ const OrganizerProfilePage = () => {
   const [stateList, setStateList] = useState([]);
 
   const [activeTab, setActiveTab] = useState("profile");
+  const [emailOtpSent, setEmailOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isEmailVerified, setIsEmailVerified] = useState(true);
+  const [resendTimer, setResendTimer] = useState(0);
 
   const imageUpdate = async (image) => {
     const previewUrl = URL.createObjectURL(image);
@@ -57,7 +65,12 @@ const OrganizerProfilePage = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isDirty, dirtyFields },
+    watch,
+    formState: {
+      errors,
+      isDirty,
+      dirtyFields,
+    },
   } = useForm({
     defaultValues: {
       fullname: organizer.fullname,
@@ -72,6 +85,25 @@ const OrganizerProfilePage = () => {
       ifsc: organizer.bankAccountDetails.ifsc,
     },
   });
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      if (value && value.email && value.email !== organizer.email) {
+        setIsEmailVerified(false);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, organizer.email]);
+
+  useEffect(() => {
+    let interval = null;
+    if (emailOtpSent && resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [emailOtpSent, resendTimer]);
 
   useEffect(() => {
     reset({
@@ -92,9 +124,10 @@ const OrganizerProfilePage = () => {
     const fetchStates = async () => {
       try {
         const data = await getState();
-        setStateList(data.data[98].states);
+        setStateList(data);
       } catch (error) {
-        console.error("Error fetching states", error);
+        console.error("Error fetching states:", error);
+        toast.error("Failed to load states");
       }
     };
     fetchStates();
@@ -136,6 +169,50 @@ const OrganizerProfilePage = () => {
     return updated;
   };
 
+  const handleSendOtp = async (email, purpose = "email-verify") => {
+    try {
+      toast.dismiss();
+      toast.success("OTP sent");
+      setEmailOtpSent(true);
+      setResendTimer(30);
+      await sendOtpEmailVerification(email, purpose);
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  };
+
+  const handleResendOtp = async (email, purpose = "email-verify") => {
+    try {
+      toast.dismiss();
+      toast.success("OTP resent");
+      setResendTimer(30);
+      await onResend({ email, purpose });
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  };
+
+  const handleOtpVerification = async (
+    email,
+    otp,
+    purpose = "email-verify"
+  ) => {
+    try {
+      const data = {
+        email,
+        otp,
+        purpose,
+      };
+      await verifyOtp(data);
+      setIsEmailVerified(true);
+      setEmailOtpSent(false);
+      toast.dismiss();
+      toast.success("Email verified successfully");
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
+    }
+  };
+
   const onSubmit = (formdata) => {
     const updatedData = buildUpdatedPayload(dirtyFields, formdata);
     dispatch(
@@ -143,12 +220,13 @@ const OrganizerProfilePage = () => {
         ...updatedData,
       })
     );
+    toast.dismiss();
     toast.success("Profile updated successfully!");
     dispatch(updateOrganizerProfile({ id: organizer._id, data: updatedData }));
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center ">
       <div className="bg-white rounded-3xl shadow-lg p-10 max-w-4xl w-full">
         <div className="flex items-center gap-4 mb-6">
           <CropImageProfile
@@ -230,6 +308,53 @@ const OrganizerProfilePage = () => {
                   })}
                   className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border border-gray-300 break-all overflow-hidden"
                 />
+                {!emailOtpSent && !isEmailVerified && (
+                  <div className="mt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleSendOtp(watch("email"))}
+                      className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+                    >
+                      Send OTP
+                    </button>
+                  </div>
+                )}
+
+                {emailOtpSent && !isEmailVerified && (
+                  <div className="mt-3 space-y-2">
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="Enter OTP"
+                      className="w-full px-4 py-3 bg-gray-100 rounded-lg border border-gray-300"
+                    />
+                    <div className="flex justify-end items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleOtpVerification(watch("email"), otp)}
+                        className="px-4 py-2 bg-green-600 text-white font-medium rounded-lg shadow hover:bg-green-700 transition"
+                      >
+                        Verify
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={resendTimer > 0}
+                        onClick={() => handleResendOtp(watch("email"))}
+                        className={`px-4 py-2 font-medium rounded-lg shadow transition ${
+                          resendTimer > 0
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
+                      >
+                        {resendTimer > 0
+                          ? `Resend in ${resendTimer}s`
+                          : "Resend OTP"}
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.email.message}
@@ -354,13 +479,15 @@ const OrganizerProfilePage = () => {
 
               <div>
                 <label className="text-sm text-gray-600">Account Type</label>
-                <input
-                  type="text"
+                <select
                   {...register("accountType", {
                     required: "Account type is required",
                   })}
                   className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
-                />
+                >
+                  <option value="Savings">Savings</option>
+                  <option value="Current">Current</option>
+                </select>
                 {errors.accountType && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.accountType.message}
@@ -408,9 +535,9 @@ const OrganizerProfilePage = () => {
 
           {(activeTab === "organization" || activeTab === "profile") && (
             <button
-              disabled={!isDirty}
+              disabled={!isDirty || !isEmailVerified}
               className={`mt-8 w-40 py-3 font-semibold rounded-lg transition ${
-                isDirty
+                isDirty && isEmailVerified
                   ? "bg-black text-white hover:bg-gray-800"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}

@@ -3,7 +3,11 @@ import dotenv from "dotenv";
 dotenv.config();
 import jwt from "jsonwebtoken";
 import Organizer from "../models/organizer.model.js";
-import { revokeRefreshToken, verifyRefreshToken } from "./token.service.js";
+import {
+  blacklistToken,
+  revokeRefreshToken,
+  verifyRefreshToken,
+} from "./token.service.js";
 
 // Check user is already exists
 export const isUserExists = async (email) => {
@@ -84,7 +88,7 @@ export const findOrganizerById = async (id) => {
 export const verifyTokenAndGetUser = async (token) => {
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  const user = await User.findById(decoded.id).select("-password");
+  const user = await User.findById(decoded.id).select("-password").lean();
   if (!user) {
     throw new Error("User not found");
   }
@@ -98,8 +102,14 @@ export const findAdmin = async ({ email }) => {
 };
 
 // logout.service.js
-export const handleLogout = async (res, tokenName) => {
+export const handleLogout = async (res, tokenName, token) => {
   const refreshToken = res.req.cookies[tokenName];
+
+  // Decode expiry for blacklist
+  const decoded = jwt.decode(token);
+  const expiresIn = decoded.exp - Math.floor(Date.now() / 1000);
+
+  await blacklistToken(token, expiresIn);
 
   res.clearCookie(tokenName, {
     httpOnly: true,

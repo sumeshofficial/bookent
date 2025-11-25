@@ -3,10 +3,13 @@ import {
   Banknote,
   User,
   Calendar,
-  CheckCircle,
-  XCircle,
   Loader,
   ArrowLeft,
+  ChevronDown,
+  Save,
+  Circle,
+  Check,
+  X,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -15,10 +18,16 @@ import {
 } from "../../services/admin";
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useModal } from "../../utils/constants";
 
 const OrganizerDetailsPage = () => {
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const { openModal, closeModal } = useModal();
+
   const navigate = useNavigate();
 
   const getStatusColor = (status) => {
@@ -34,20 +43,38 @@ const OrganizerDetailsPage = () => {
     }
   };
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["organizer", id],
     queryFn: () => getOrganizerDetails(id),
-    onError: (error) => toast.error(error.message),
   });
 
-  const organizer = data?.data?.organizer;
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
+  const organizer = data?.organizer;
+
+  useEffect(() => {
+    if (organizer) setSelectedStatus(organizer.status);
+  }, [organizer]);
 
   const handleRequestMutation = useMutation({
     mutationFn: handleOrganizerRequest,
     onSuccess: () => {
       toast.dismiss();
       toast.success("Organizer request updated successfully");
-      queryClient.invalidateQueries(["organizer", id]);
+      queryClient.setQueryData(["organizer", id], (oldData) => {
+        if (!oldData?.organizer) return oldData;
+        return {
+          ...oldData,
+          organizer: {
+            ...oldData.organizer,
+            status: handleRequestMutation.variables.status,
+          },
+        };
+      });
     },
     onError: (err) => {
       toast.dismiss();
@@ -55,13 +82,12 @@ const OrganizerDetailsPage = () => {
     },
   });
 
-  const handleRequest = (status) => {
-    handleRequestMutation.mutate({ id, status });
+  const handleRequest = (id, status, reason) => {
+    handleRequestMutation.mutate({ id, status, reason });
   };
 
   return (
     <main className="flex-1 p-6 lg:p-8">
-      
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 mb-6 text-gray-600 hover:text-gray-800 transition"
@@ -97,28 +123,73 @@ const OrganizerDetailsPage = () => {
               </p>
             </div>
 
-            {organizer.status === "pending" && (
-              <div className="flex gap-3 mt-4 sm:mt-0">
+            <div className="relative">
+              <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-2 bg-white">
                 <button
-                  onClick={() => handleRequest("approved")}
-                  disabled={handleRequestMutation.isPending}
-                  className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+                  onClick={() => setDropdownOpen((prev) => !prev)}
+                  className="flex items-center gap-2 text-sm hover:bg-gray-100 px-2 py-1 rounded transition"
                 >
-                  <CheckCircle className="w-5 h-5" />
-                  {handleRequestMutation.isPending
-                    ? "Processing..."
-                    : "Approve"}
+                  <span className="capitalize">{selectedStatus}</span>
+                  <ChevronDown className="w-4 h-4 text-gray-600" />
                 </button>
-                <button
-                  onClick={() => handleRequest("rejected")}
-                  disabled={handleRequestMutation.isPending}
-                  className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
-                >
-                  <XCircle className="w-5 h-5" />
-                  Reject
-                </button>
+
+                {selectedStatus !== organizer.status && (
+                  <button
+                    onClick={() =>
+                      openModal("confirmation", {
+                        closeModal,
+                        handleAction: handleRequest,
+                        status: selectedStatus,
+                        id,
+                      })
+                    }
+                    className="flex items-center p-1 hover:bg-gray-100 rounded"
+                    title="Save changes"
+                  >
+                    <Save className="w-5 h-5 text-violet-600" />
+                  </button>
+                )}
+
+                {dropdownOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-20">
+                    <ul className="py-1">
+                      <li
+                        className="flex items-center gap-2 px-4 py-2 hover:bg-yellow-50 cursor-pointer"
+                        onClick={() => {
+                          setSelectedStatus("pending");
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        <Circle className="w-4 h-4 text-yellow-600" />
+                        Pending
+                      </li>
+
+                      <li
+                        className="flex items-center gap-2 px-4 py-2 hover:bg-green-50 cursor-pointer"
+                        onClick={() => {
+                          setSelectedStatus("approved");
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        <Check className="w-4 h-4 text-green-600" />
+                        Approved
+                      </li>
+
+                      <li
+                        className="flex items-center gap-2 px-4 py-2 hover:bg-red-50 cursor-pointer"
+                        onClick={() => {
+                          setSelectedStatus("rejected");
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        <X className="w-4 h-4 text-red-600" />
+                        Rejected
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

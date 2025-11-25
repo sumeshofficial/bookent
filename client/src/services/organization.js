@@ -7,26 +7,17 @@ export const registerOrganizationAccount = async ({
   organizationDetails,
   userId,
 }) => {
-  try {
-    const res = await api.post(
-      "/organizer/account/register",
-      {
-        bankAccountDetails,
-        organizationDetails,
-        userId,
-      },
-      { withCredentials: true }
-    );
+  const res = await api.post(
+    "/organizer/auth/register",
+    {
+      bankAccountDetails,
+      organizationDetails,
+      userId,
+    },
+    { withCredentials: true }
+  );
 
-    return res.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  return res.data;
 };
 
 // Check Organizer
@@ -36,19 +27,19 @@ export const checkOrganizer = async ({ userId }) => {
 
 // Create Stadium
 export const createStadium = async ({ payload }) => {
-  const res = await api.post("/organizer/stadium/create", payload);
+  const res = await api.post("/organizer/stadiums/create", payload);
   return res.data;
 };
 
 // Update Stadium
 export const updateStadium = async ({ stadiumId, payload }) => {
-  const res = await api.patch(`/organizer/stadium/${stadiumId}`, payload);
+  const res = await api.patch(`/organizer/stadiums/${stadiumId}`, payload);
   return res.data;
 };
 
 // Delete Stadium
 export const deleteStadium = async (stadiumId) => {
-  return await api.patch(`/organizer/stadium/${stadiumId}/delete`);
+  return await api.patch(`/organizer/stadiums/${stadiumId}/delete`);
 };
 
 // Get all Stadiums
@@ -58,7 +49,7 @@ export const getStadiums = async () => {
 
 // Get all Stadiums
 export const getStadium = async (stadiumId) => {
-  const res = await api.get(`/organizer/stadium/${stadiumId}`);
+  const res = await api.get(`/organizer/stadiums/${stadiumId}`);
   return res.data;
 };
 
@@ -70,7 +61,7 @@ export const getStadiumsWithOrganizerId = async ({
   search,
   sort,
 }) => {
-  const res = await api.get(`/organizer/${id}/stadiums`, {
+  const res = await api.get(`/organizer/stadiums/or/${id}`, {
     params: {
       page,
       limit,
@@ -85,7 +76,7 @@ export const getStadiumsWithOrganizerId = async ({
 // Check Stadium name exists or not
 export const checkStadiumExists = async (name, stadiumId = "") => {
   return await api.get(
-    `/organizer/stadium/check-name?name=${encodeURIComponent(name)}`,
+    `/organizer/stadiums/check-name?name=${encodeURIComponent(name)}`,
     {
       params: {
         stadiumId,
@@ -96,7 +87,7 @@ export const checkStadiumExists = async (name, stadiumId = "") => {
 
 // Creare Event validate
 export const createEventValidate = async (data) => {
-  const res = await api.post("/organizer/event/create/validate", data);
+  const res = await api.post("/organizer/events/create/validate", data);
   return res.data;
 };
 
@@ -106,7 +97,7 @@ export const createEventFinish = async ({
   bannerImageKey,
   thumbnailImageKey,
 }) => {
-  const res = await api.post("/organizer/event/create/finish", {
+  const res = await api.post("/organizer/events/create/finish", {
     sessionId,
     bannerImageKey,
     thumbnailImageKey,
@@ -127,7 +118,7 @@ export const getEvents = async ({
   category,
   priceFilter,
 }) => {
-  const res = await api.get(`/organizer/${id}/events`, {
+  const res = await api.get(`/organizer/events`, {
     params: {
       page,
       limit,
@@ -144,20 +135,20 @@ export const getEvents = async ({
 };
 
 // Get event
-export const getEvent = async (organizerId, eventId) => {
-  const res = await api.get(`/organizer/${organizerId}/event/${eventId}`);
+export const getEvent = async (eventId) => {
+  const res = await api.get(`/organizer/events/${eventId}`);
   return res.data;
 };
 
 // Update event
 export const updateEvent = async (eventId, data) => {
-  const res = await api.patch(`/organizer/event/${eventId}/edit`, data);
+  const res = await api.patch(`/organizer/events/${eventId}/edit`, data);
   return res.data;
 };
 
 // Edit event finish
 export const editEventFinish = async ({ sessionId, images }) => {
-  const res = await api.post("/organizer/event/edit/finish", {
+  const res = await api.post("/organizer/events/edit/finish", {
     sessionId,
     images,
   });
@@ -166,7 +157,7 @@ export const editEventFinish = async ({ sessionId, images }) => {
 
 // Delete event
 export const deleteEvent = async (eventId) => {
-  await api.patch("/organizer/event/delete", {
+  await api.patch("/organizer/events/delete", {
     eventId,
   });
 };
@@ -174,30 +165,43 @@ export const deleteEvent = async (eventId) => {
 // Get all Indian States
 export const getState = async () => {
   const url = import.meta.env.VITE_STATE_API_URL;
-  const response = await axios.get(url);
+  const response = await axios.get(url, {
+    headers: {
+      "X-RapidAPI-Key": import.meta.env.VITE_RAPIDAPI_KEY,
+      "X-RapidAPI-Host": "country-state-city-search-rest-api.p.rapidapi.com",
+    },
+  });
   return response.data;
 };
 
 // Get all City
-export const getCity = async (stateName) => {
-  const url = import.meta.env.VITE_CITY_API_URL;
-  const response = await axios.post(
-    url,
-    {
-      country: "India",
-      state: stateName,
+export const getCity = async (stateCode) => {
+  const url = `${import.meta.env.VITE_CITY_API_URL}${stateCode}`;
+  const response = await axios.get(url, {
+    headers: {
+      "X-RapidAPI-Key": import.meta.env.VITE_RAPIDAPI_KEY,
+      "X-RapidAPI-Host": "country-state-city-search-rest-api.p.rapidapi.com",
     },
-    { withCredentials: false }
-  );
+  });
   return response.data;
 };
 
 // Update organizer profile
 export const updateOrganizer = async ({ id, data }) => {
-  const res = await api.patch("/organizer/profile", {
+  const res = await api.patch("/organizer/account/update-profile", {
     id,
     data,
   });
 
   return res;
+};
+
+// Send otp for email verification
+export const sendOtpEmailVerification = async (email, purpose) => {
+  const res = await api.post("/organizer/auth/sendOtp", {
+    email,
+    purpose,
+  });
+
+  return res.data;
 };
