@@ -40,11 +40,9 @@ export const generateRefreshToken = async ({ userId, role }) => {
 // Verify refresh Token
 export const verifyRefreshToken = async (token) => {
   const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-  console.log(payload);
   const dbToken = await RefreshToken.findOne({
     tokenId: payload.tokenId,
   });
-  console.log(dbToken);
   if (!dbToken) {
     throw new Error("Invalid refresh token");
   }

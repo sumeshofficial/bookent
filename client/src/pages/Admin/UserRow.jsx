@@ -1,8 +1,10 @@
 import { Eye } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
+import { useModal } from "../../utils/constants";
 
 const UserRow = React.memo(({ user, handleToggleStatus }) => {
+  const { openModal, closeModal } = useModal();
   return (
     <tr className="fade-in hover:bg-gray-50 transition-all duration-300">
       <td className="px-4 py-3">
@@ -31,7 +33,13 @@ const UserRow = React.memo(({ user, handleToggleStatus }) => {
       </td>
       <td className="px-4 py-3">
         <button
-          onClick={() => handleToggleStatus(user._id, user.status)}
+          onClick={() =>
+            openModal("user-status-confirmation", {
+              onClose: closeModal,
+              user,
+              onConfirm: () => handleToggleStatus(user._id, user.status),
+            })
+          }
           className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
             user.status === "blocked"
               ? "bg-red-500 focus:ring-red-500"

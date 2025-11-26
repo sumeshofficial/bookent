@@ -18,8 +18,8 @@ export const sendTokens = async (res, user) => {
 
   res.cookie(`${user.role}_refreshToken`, refreshToken, {
     httpOnly: true,
-    sameSite: "strict",
-    secure: false,
+    sameSite: "lax", // Production "none"
+    secure: false, // Production true
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 

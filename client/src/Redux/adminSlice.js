@@ -13,8 +13,7 @@ export const loginAdmin = createAsyncThunk(
 
       return response.admin;
     } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.message || "Something went wrong");
+      return rejectWithValue(error.response.data.message || "Something went wrong");
     }
   }
 );

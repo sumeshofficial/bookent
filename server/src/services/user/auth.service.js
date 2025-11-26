@@ -213,6 +213,7 @@ export const refreshAccessToken = async (token) => {
   }
 
   const payload = await verifyRefreshToken(token);
+  console.log(payload);
 
   if (!payload) {
     throw new AppError(

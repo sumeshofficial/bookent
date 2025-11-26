@@ -121,10 +121,10 @@ export const verifyOtpController = asyncHandler(async (req, res) => {
 
 // Generate RefreshAccessToken
 export const refreshAccessTokenController = asyncHandler(async (req, res) => {
-  console.log(req.cookies);
-  const token = await refreshAccessToken(req.cookies.user_refreshToken);
+  const token = req.cookies.user_refreshToken;
+  const user = await refreshAccessToken(token);
 
-  const newAccessToken = await sendTokens(res, token);
+  const newAccessToken = await sendTokens(res, user);
 
   sendResponse(res, { accessToken: newAccessToken }, STATUS_CODE.SUCCESS);
 });

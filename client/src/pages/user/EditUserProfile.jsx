@@ -62,7 +62,7 @@ const EditUserProfile = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-2xl p-4 mt-10 border-2">
+    <div>
       <h2 className="text-2xl font-semibold text-gray-700 mb-6">
         Edit User Profile
       </h2>
@@ -78,7 +78,10 @@ const EditUserProfile = () => {
               name="fullname"
               {...register("fullname", {
                 required: "Full name is required",
-                minLength: { value: 3, message: "Full name must be at least 3 characters" }
+                minLength: {
+                  value: 3,
+                  message: "Full name must be at least 3 characters",
+                },
               })}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
             />
@@ -102,8 +105,8 @@ const EditUserProfile = () => {
                 required: "Email is required",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Enter a valid email address"
-                }
+                  message: "Enter a valid email address",
+                },
               })}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
             />

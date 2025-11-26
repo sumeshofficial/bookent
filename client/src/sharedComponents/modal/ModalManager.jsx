@@ -10,6 +10,7 @@ import EditUserProfile from "../../pages/user/EditUserProfile";
 import CropImageModal from "../../components/modal/CropImageModal";
 import DeleteConfirmationModal from "../../components/modal/DeleteConfirmationModal";
 import ConfirmationModal from "../../components/modal/ConfirmationModal";
+import UserBlockModal from "../../components/modal/UserBlockModal";
 
 const ModalManager = () => {
 
@@ -48,6 +49,9 @@ const ModalManager = () => {
             break;
         case "confirmation":
             content = <ConfirmationModal {...modalData}/>
+            break;
+        case "user-status-confirmation":
+            content = <UserBlockModal {...modalData}/>
             break;
         default:
             return null;

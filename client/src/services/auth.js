@@ -98,7 +98,7 @@ export const logout = async () => {
 };
 
 export const adminLogout = async () => {
-  await api.post("/admin/auth/logout");
+  await adminApi.post("/admin/auth/logout");
   localStorage.removeItem("adminAccessToken");
 };
 
