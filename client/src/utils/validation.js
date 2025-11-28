@@ -115,12 +115,6 @@ export const validationSchema = [
       .min(3, "Age restriction must be at least 3 characters long")
       .max(100, "Age restriction cannot exceed 100 characters"),
 
-    refundPolicy: yup
-      .string()
-      .required("Refund policy is required")
-      .min(10, "Refund policy must be at least 10 characters long")
-      .max(300, "Refund policy cannot exceed 300 characters"),
-
     termsAndConditions: yup
       .string()
       .required("Terms and conditions are required")

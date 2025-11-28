@@ -1,5 +1,5 @@
 import { Loader } from "lucide-react";
-import InputBox from "../../../../sharedComponents/InputBox";
+import InputBox from "../../../../sharedComponents/user/InputBox";
 import { useContextForm, useModal } from "../../../../utils/constants";
 import { forgotPassword } from "../../../../services/auth";
 import { useState } from "react";

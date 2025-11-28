@@ -1,5 +1,3 @@
-import React from "react";
-
 const UserBlockModal = ({ onClose, user, onConfirm }) => {
   const isBlocked = user?.status === "blocked";
 

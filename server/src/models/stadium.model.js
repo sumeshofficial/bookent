@@ -35,6 +35,22 @@ const shapeSchema = new mongoose.Schema(
       type: Number,
       required: false,
     },
+    innerRadiusX: {
+      type: Number,
+      required: false,
+    },
+    innerRadiusY: {
+      type: Number,
+      required: false,
+    },
+    outerRadiusX: {
+      type: Number,
+      required: false,
+    },
+    outerRadiusY: {
+      type: Number,
+      required: false,
+    },
     angle: {
       type: Number,
       required: false,

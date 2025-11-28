@@ -213,7 +213,6 @@ export const refreshAccessToken = async (token) => {
   }
 
   const payload = await verifyRefreshToken(token);
-  console.log(payload);
 
   if (!payload) {
     throw new AppError(
@@ -259,7 +258,7 @@ export const handleLogout = async (res, tokenName, token) => {
 
 // Send otp service
 export const sendOtp = async (data) => {
-  const { email, purpose } = data;
+  const { email, purpose, oldEmail } = data;
   if (!email || !purpose) {
     throw new AppError(
       STATUS_CODE.MISSING_FIELD,
@@ -268,14 +267,18 @@ export const sendOtp = async (data) => {
     );
   }
 
-  const user = await finduser(email);
+  let user = await finduser(email);
 
-  if (!user) {
+  if (!user && !purpose === "edit-email") {
     throw new AppError(
       STATUS_CODE.NOTFOUND,
       "USER_NOT_FOUND",
       "User not found"
     );
+  }
+
+  if (purpose === "edit-email") {
+    user = await finduser(oldEmail);
   }
 
   await generateOtp({ email, userData: user, purpose });

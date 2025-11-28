@@ -6,10 +6,7 @@ export const getUser = createAsyncThunk(
   "user/getUser",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("accessToken");
-
-      if (!token) return;
-      const res = await verifyToken(token);
+      const res = await verifyToken();
 
       return res.data.user;
     } catch (error) {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { sendOTP } from "../../../../services/auth";
-import EmailVerification from "../../../../sharedComponents/EmailVerification";
+import EmailVerification from "../../../../sharedComponents/user/EmailVerification";
 import toast from "react-hot-toast";
 import { useContextForm, useModal } from "../../../../utils/constants";
 

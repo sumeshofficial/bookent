@@ -107,7 +107,6 @@ export const createEventFinish = async ({
 
 // Get events
 export const getEvents = async ({
-  id,
   page,
   limit,
   search,

@@ -4,5 +4,7 @@ export const sanitizeUser = (user) => ({
   email: user.email,
   profileImage: user.profileImage,
   role: user.role,
+  authProvider: user.authProvider,
   location: user.location,
+  preferences: user.preferences,
 });

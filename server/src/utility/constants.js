@@ -21,3 +21,4 @@ export const STATUS_CODE = {
   NOTFOUND: 404,
   PERMISSION_DENIED: 403,
 };
+
