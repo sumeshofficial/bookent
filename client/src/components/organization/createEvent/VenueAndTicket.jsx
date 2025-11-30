@@ -1,9 +1,10 @@
 import { ChevronDown, Pencil } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getStadiums } from "../../../services/organization";
 import TicketSetup from "./selectStadium/TicketSetup";
 import { useEffect, useMemo } from "react";
+import toast from "react-hot-toast";
 
 const VenueAndTicket = ({ register, errors, watch, setValue }) => {
   const watchedStadiumId = watch("stadium");
@@ -185,6 +186,7 @@ const VenueAndTicket = ({ register, errors, watch, setValue }) => {
                   .map((shape, index) => (
                     <TicketSetup
                       key={shape.id}
+                      id={shape.id}
                       title={shape.title}
                       register={register}
                       errors={errors.ticketSetup?.[index]}

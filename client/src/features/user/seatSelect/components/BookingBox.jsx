@@ -1,8 +1,17 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Info } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSectionLock } from "../hooks/useSeatLock";
+import { useSelector } from "react-redux";
 
-const BookingBox = ({ selectedShape, ticketSetup = [], shapes = [], eventId }) => {
+const BookingBox = ({
+  selectedShape,
+  ticketSetup = [],
+  shapes = [],
+  eventId,
+}) => {
+  const navigate = useNavigate();
+  const { lockSection } = useSectionLock(eventId);
   const index = selectedShape
     ? shapes.findIndex((s) => s.id === selectedShape.id)
     : -1;
@@ -18,8 +27,25 @@ const BookingBox = ({ selectedShape, ticketSetup = [], shapes = [], eventId }) =
     setQtyOpen(false);
   };
 
+  const handleBookNow = async () => {
+    lockSection(info.sectionId, quantity, (lockId) => {
+      if (!lockId) {
+        alert("Unable to lock seats. Please try again.");
+        return;
+      }
+
+      // Save lock details
+      localStorage.setItem("activeLockId", lockId);
+      localStorage.setItem("selectedSection", info.sectionId);
+      localStorage.setItem("selectedQuantity", quantity);
+
+      // Redirect
+      navigate(`/event/${eventId}/checkout`);
+    });
+  };
+
   return (
-    <div className="w-full lg:w-120 border rounded-xl shadow-md bg-white p-5 h-fit sticky top-5">
+    <div className="w-full hidden lg:block lg:w-120 border rounded-xl shadow-md bg-white p-5 h-fit sticky top-5">
       {selectedShape ? (
         <>
           <h2 className="font-bold text-lg mb-2">{selectedShape.title}</h2>
@@ -62,11 +88,13 @@ const BookingBox = ({ selectedShape, ticketSetup = [], shapes = [], eventId }) =
               </div>
             )}
           </div>
-          <Link to={`/event/${eventId}/checkout`}>
-            <button className="w-full py-3 bg-red-500 text-white rounded-lg text-lg font-semibold">
-              Book Now
-            </button>
-          </Link>
+
+          <button
+            onClick={handleBookNow}
+            className="w-full py-3 bg-red-500 text-white rounded-lg text-lg font-semibold"
+          >
+            Book Now
+          </button>
         </>
       ) : (
         <p className="text-gray-500 text-center py-2">Select a section</p>

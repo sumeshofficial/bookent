@@ -13,15 +13,23 @@ import logger from "./config/logger.js";
 import { errorHandler } from "./middlewares/common/error.handler.js";
 import { initSocket } from "./config/socket.conf.js";
 import http from "http";
+import { initRedisExpiryListener } from "./config/redisExpiry.conf.js";
+import { initSeatPubSub } from "./config/seatPubSub.conf.js";
 dotenv.config();
 
 const app = express();
 
 const PORT = process.env.PORT;
+const server = http.createServer(app);
 
 // Database connect
 await connectDB();
 await connectRedis();
+
+initSocket(server);
+
+await initRedisExpiryListener();
+await initSeatPubSub();
 
 // Logger
 // app.use((req, res, next) => {
@@ -51,9 +59,6 @@ app.use("/api/v1/s3", s3Router);
 
 app.use(errorHandler);
 
-const server = http.createServer(app);
-
-initSocket(server);
 // Server listening
 server.listen(PORT, () => {
   logger.info(`server running at http://localhost:${PORT}`);

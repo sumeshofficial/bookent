@@ -147,6 +147,8 @@ const CreateEventForm = () => {
         dirtyPayload.tags = data.tags;
         dirtyPayload.ticketSetup = dataWithoutImage.ticketSetup;
 
+        console.log(dirtyPayload);
+
         const { bannerImage, thumbnailImage, ...newData } = dirtyPayload;
 
         if (bannerImage) {

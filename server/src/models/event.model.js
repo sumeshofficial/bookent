@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const ticketSchema = new mongoose.Schema(
   {
+    sectionId: {
+      type: String,
+      required: true,
+    },
     seatPrice: {
       type: Number,
       required: true,

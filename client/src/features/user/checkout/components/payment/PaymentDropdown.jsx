@@ -22,7 +22,7 @@ const PaymentDropdown = ({ label, value, items = [] }) => {
       </div>
 
       {open && (
-        <div className="mt-2 space-y-1 text-sm text-gray-600 border-t border-gray-300">
+        <div className="mt-2 space-y-1 text-sm text-gray-600 border-t border-gray-200">
           {items.map((i, idx) => (
             <div key={idx} className="flex justify-between mt-2">
               <span>{i.label}</span>

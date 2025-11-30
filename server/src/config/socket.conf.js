@@ -20,10 +20,10 @@ export const initSocket = (server) => {
   io.use(socketAuth);
 
   io.on("connection", (socket) => {
-    logger.info("User connected:", socket.user.id);
+    logger.info("User connected:", socket.user._id);
 
     // JOIN room based on user ID
-    socket.join(socket.user.id);
+    socket.join(socket.user._id);
 
     // Attach all handlers
     userSocketHandlers(io, socket);
@@ -32,4 +32,9 @@ export const initSocket = (server) => {
   return io;
 };
 
-export const getIO = () => io;
+export const getIO = () => {
+  if (!io) {
+    throw new Error("Socket.io has not been initialized!");
+  }
+  return io;
+};

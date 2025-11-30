@@ -1,12 +1,27 @@
 import { useEffect } from "react";
 
-const TicketSetup = ({ title, register, errors, index, capacity, setValue }) => {
+const TicketSetup = ({
+  title,
+  register,
+  errors,
+  index,
+  capacity,
+  setValue,
+  id,
+}) => {
   useEffect(() => {
     setValue(`ticketSetup.${index}.totalTickets`, capacity, {
       shouldValidate: true,
       shouldDirty: true,
     });
-  }, [capacity]);
+
+    if (id) {
+      setValue(`ticketSetup.${index}.sectionId`, id, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  }, [capacity, id]);
 
   return (
     <>

@@ -23,6 +23,11 @@ export const generateRefreshToken = async ({ userId, role }) => {
     role === "user" ? userRefreshTokenExpiresIn : adminRefreshTokenExpiresIn;
 
   const tokenId = uuidv4();
+  console.log(
+    expiresIn,
+    { userId, role, tokenId },
+    process.env.JWT_REFRESH_SECRET
+  );
   const token = jwt.sign(
     { userId, role, tokenId },
     process.env.JWT_REFRESH_SECRET,
@@ -43,6 +48,7 @@ export const verifyRefreshToken = async (token) => {
   const dbToken = await RefreshToken.findOne({
     tokenId: payload.tokenId,
   });
+  console.log(dbToken, payload);
   if (!dbToken) {
     throw new Error("Invalid refresh token");
   }

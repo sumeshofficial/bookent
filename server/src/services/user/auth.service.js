@@ -222,6 +222,7 @@ export const refreshAccessToken = async (token) => {
     );
   }
 
+  console.log("payload", payload);
   await revokeRefreshToken(payload.tokenId);
 
   const user = {
@@ -237,10 +238,12 @@ export const handleLogout = async (res, tokenName, token) => {
   const refreshToken = res.req.cookies[tokenName];
 
   // Decode expiry for blacklist
-  const decoded = jwt.decode(token);
-  const expiresIn = decoded.exp - Math.floor(Date.now() / 1000);
+  if (token) {
+    const decoded = jwt.decode(token);
+    const expiresIn = decoded.exp - Math.floor(Date.now() / 1000);
 
-  await blacklistToken(token, expiresIn);
+    await blacklistToken(token, expiresIn);
+  }
 
   res.clearCookie(tokenName, {
     httpOnly: true,

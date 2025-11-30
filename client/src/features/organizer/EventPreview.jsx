@@ -288,7 +288,10 @@ const EventPreview = () => {
         <div className="grid grid-cols-2 gap-4">
           {isLoading
             ? [...Array(4)].map((_, i) => (
-                <div className="animate-pulse bg-gray-200 rounded-md h-24 w-full" />
+                <div
+                  key={i}
+                  className="animate-pulse bg-gray-200 rounded-md h-24 w-full"
+                />
               ))
             : data &&
               [
