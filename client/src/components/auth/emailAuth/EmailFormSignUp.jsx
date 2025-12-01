@@ -1,4 +1,5 @@
-import InputBox from "../../../sharedComponents/InputBox";
+// import InputBox from "../../../sharedComponents/InputBox";
+import InputBox from "../../../sharedComponents/user/InputBox";
 import { useContextForm } from "../../../utils/constants";
 
 const EmailFormSignUp = ({

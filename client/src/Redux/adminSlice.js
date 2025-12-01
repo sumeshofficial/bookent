@@ -8,12 +8,14 @@ export const loginAdmin = createAsyncThunk(
       if (!email || !password) return rejectWithValue("Missing fields");
 
       const response = await adminLogin({ email, password });
-      
-      localStorage.setItem('adminAccessToken', response.accessToken);
+
+      localStorage.setItem("adminAccessToken", response.accessToken);
 
       return response.admin;
     } catch (error) {
-      return rejectWithValue(error.response.data.message || "Something went wrong");
+      return rejectWithValue(
+        error.response.data.message || "Something went wrong"
+      );
     }
   }
 );
@@ -22,17 +24,14 @@ export const getAdmin = createAsyncThunk(
   "admin/getAdmin",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("adminAccessToken");
-
-      if (!token) return;
-      const res = await verifyTokenAdmin(token);
+      const res = await verifyTokenAdmin();
 
       return res.data.user;
     } catch (error) {
       return rejectWithValue(
         error.message ||
-        error.response.data.message ||
-        error.response.data.error ||
+          error.response.data.message ||
+          error.response.data.error ||
           "Something went wrong"
       );
     }

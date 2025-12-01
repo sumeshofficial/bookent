@@ -170,7 +170,6 @@ const ShapeWithTransformer = ({
       const angleLocal = startAngle + i * step;
       const rad = (angleLocal * Math.PI) / 180;
 
-      // place on ellipse by computing x,y using mid radii
       const x = midRadiusX * Math.cos(rad);
       const y = midRadiusY * Math.sin(rad);
 

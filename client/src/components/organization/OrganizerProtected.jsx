@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { getOrganizer } from "../../redux/organizerSlice";
-import OrganizerAccountForm from "../../pages/organizer/OrganizerAccountForm";
-import OrganizerAccRequested from "../../pages/organizer/OrganizerAccRequested";
+import OrganizerAccountForm from "../../features/organizer/OrganizerAccountForm";
+import OrganizerAccRequested from "../../features/organizer/OrganizerAccRequested";
 
 const OrganizerProtected = () => {
   const dispatch = useDispatch();

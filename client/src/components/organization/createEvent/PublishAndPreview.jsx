@@ -20,34 +20,6 @@ const PublishAndPreview = ({ register, errors, watch }) => {
         )}
       </div>
 
-      <div className="mt-2 sm:mt-5 flex gap-2">
-        <label className="text-xs sm:text-sm">Refund Available</label>
-        <input
-          type="checkbox"
-          {...register("refund")}
-          className="border text-xs sm:text-base border-gray-200 rounded-md py-2 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-xs sm:placeholder:text-base focus:outline-none"
-        />
-        {errors?.refund && (
-          <span className="text-red-500 text-[.5rem] sm:text-sm">
-            {errors.refund.message}
-          </span>
-        )}
-      </div>
-
-      <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-        <label className="text-xs sm:text-sm">Refund Policy</label>
-        <textarea
-          {...register("refundPolicy")}
-          placeholder="e.g., No refund after booking. Tickets are non-transferable."
-          className="border text-xs sm:text-base border-gray-200 h-20 sm:h-30 rounded-md py-2 px-2 sm:py-3 sm:px-3 placeholder:text-gray-400 placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
-        />
-        {errors?.refundPolicy && (
-          <span className="text-red-500 text-[.5rem] sm:text-sm">
-            {errors.refundPolicy.message}
-          </span>
-        )}
-      </div>
-
       <div className="mt-2 sm:mt-5 flex flex-col gap-2">
         <label className="text-xs sm:text-sm">Terms & Conditions</label>
         <textarea

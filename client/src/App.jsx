@@ -5,9 +5,11 @@ import AuthProvider from "./context/FormContext";
 import { Outlet } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import useOfflineTracker from "./hooks/useOfflineTracker";
+import useGlobalSeatEvents from "./hooks/useGlobalSeatEvents";
 
 function App() {
   useOfflineTracker();
+  useGlobalSeatEvents();
 
   return (
     <>

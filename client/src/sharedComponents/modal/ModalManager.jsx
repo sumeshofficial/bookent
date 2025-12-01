@@ -2,63 +2,76 @@ import { useModal } from "../../utils/constants";
 import AuthModal from "../../components/auth/AuthModal";
 import OTPInputForm from "../../components/auth/OTPVerify/OTPInputForm";
 import Modal from "./Modal";
-import EmailInputFormModal from "../../components/auth/EmailAuth/EmailInputModal";
-import EmailVerification from "../EmailVerification";
+import EmailVerification from "../../sharedComponents/user/EmailVerification";
 import ForgotPasswordInput from "../../components/auth/EmailAuth/ForgotPassword/ForgotPasswordInput";
 import ForgotPasswordEmail from "../../components/auth/EmailAuth/ForgotPassword/ForgotPasswordEmail";
-import EditUserProfile from "../../pages/user/EditUserProfile";
+import EditUserProfile from "../../features/user/profile/components/modal/EditUserProfile";
 import CropImageModal from "../../components/modal/CropImageModal";
 import DeleteConfirmationModal from "../../components/modal/DeleteConfirmationModal";
 import ConfirmationModal from "../../components/modal/ConfirmationModal";
 import UserBlockModal from "../../components/modal/UserBlockModal";
+import EmailInputFormModal from "../../components/auth/emailAuth/EmailInputModal";
+import ConfirmBackModal from "../../components/modal/ConfirmBackModal";
+import SeatLockErrorModal from "../../components/modal/SeatLockErrorModal";
 
 const ModalManager = () => {
+  const { modalType, modalData, closeModal } = useModal();
 
-    const { modalType, modalData, closeModal } = useModal();
+  if (!modalType) return null;
 
-    if(!modalType) return null;
+  let content;
+  switch (modalType) {
+    case "auth":
+      content = <AuthModal />;
+      break;
+    case "signup":
+      content = <EmailInputFormModal {...modalData} />;
+      break;
+    case "email":
+      content = <EmailVerification {...modalData} />;
+      break;
+    case "otp":
+      content = <OTPInputForm {...modalData} />;
+      break;
+    case "forgot":
+      content = <ForgotPasswordEmail {...modalData} />;
+      break;
+    case "forgot-password":
+      content = <ForgotPasswordInput {...modalData} />;
+      break;
+    case "email-verify":
+      content = <EmailVerification {...modalData} />;
+      break;
+    case "edit-profile":
+      content = <EditUserProfile {...modalData} />;
+      break;
+    case "crop-image":
+      content = <CropImageModal {...modalData} />;
+      break;
+    case "delete-confirmation":
+      content = <DeleteConfirmationModal {...modalData} />;
+      break;
+    case "confirmation":
+      content = <ConfirmationModal {...modalData} />;
+      break;
+    case "user-status-confirmation":
+      content = <UserBlockModal {...modalData} />;
+      break;
+    case "checkout-back-modal":
+      content = <ConfirmBackModal {...modalData} />;
+      break;
+    case "seat-lock-error":
+      content = <SeatLockErrorModal {...modalData} />;
+      break;
+    default:
+      return null;
+  }
 
-    let content;
-    switch(modalType) {
-        case "auth":
-            content = <AuthModal />
-            break;
-        case "signup" || "email":
-            content = <EmailInputFormModal {...modalData} />
-            break;
-        case "otp":
-            content = <OTPInputForm {...modalData} />
-            break;
-        case "forgot":
-            content = <ForgotPasswordEmail {...modalData}/>
-            break;
-        case "forgot-password":
-            content = <ForgotPasswordInput {...modalData}/>
-            break;
-        case "email-verify":
-            content = <EmailVerification {...modalData}/>
-            break;
-        case "edit-profile":
-            content = <EditUserProfile {...modalData}/>
-            break;
-        case "crop-image":
-            content = <CropImageModal {...modalData}/>
-            break;
-        case "delete-confirmation":
-            content = <DeleteConfirmationModal {...modalData}/>
-            break;
-        case "confirmation":
-            content = <ConfirmationModal {...modalData}/>
-            break;
-        case "user-status-confirmation":
-            content = <UserBlockModal {...modalData}/>
-            break;
-        default:
-            return null;
-    }
-
-    return <Modal isOpen={!!modalType} onClose={closeModal} >{ content }</Modal>
-
-}
+  return (
+    <Modal isOpen={!!modalType} onClose={closeModal}>
+      {content}
+    </Modal>
+  );
+};
 
 export default ModalManager;

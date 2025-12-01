@@ -63,6 +63,12 @@ export const validationSchema = [
       .array()
       .of(
         yup.object().shape({
+          availableTickets: yup
+            .number()
+            .typeError("Ticket count must be a valid number")
+            .required("Ticket count is required")
+            .min(1, "Ticket count must be greater than 0")
+            .max(100000, "Ticket count is too high"),
           seatPrice: yup
             .number()
             .typeError("Seat price must be a valid number")
@@ -114,12 +120,6 @@ export const validationSchema = [
       .required("Age restriction is required")
       .min(3, "Age restriction must be at least 3 characters long")
       .max(100, "Age restriction cannot exceed 100 characters"),
-
-    refundPolicy: yup
-      .string()
-      .required("Refund policy is required")
-      .min(10, "Refund policy must be at least 10 characters long")
-      .max(300, "Refund policy cannot exceed 300 characters"),
 
     termsAndConditions: yup
       .string()

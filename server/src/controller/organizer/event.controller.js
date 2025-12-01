@@ -20,6 +20,7 @@ import {
   findEvent,
   updateEvent,
 } from "../../services/organizer.service.js";
+import { redisClient } from "../../config/redis.conf.js";
 
 dotenv.config();
 
@@ -90,6 +91,59 @@ export const validateEventCreateController = async (req, res) => {
   }
 };
 
+// Finish Event Create
+export const finishEventCreateController = async (req, res) => {
+  try {
+    const { sessionId, bannerImageKey, thumbnailImageKey } = req.body;
+
+    logger.http(`${req.method} ${req.originalUrl}`);
+
+    logger.info("Fetch validated data from Redis");
+    const cached = await getRedisData(sessionId);
+
+    if (!cached) {
+      logger.warn("Validation session expired. Please start again.");
+      return res.status(statusCode.badRequest).json({
+        success: false,
+        error: "Validation session expired. Please start again.",
+      });
+    }
+
+    logger.debug("Parse cached data");
+    const data = JSON.parse(cached);
+
+    logger.info("Attach uploaded URLs");
+    data.bannerImageKey = bannerImageKey;
+    data.thumbnailImageKey = thumbnailImageKey;
+
+    logger.info("Save event to DB");
+    const event = await createEvent(data);
+
+    logger.info("Initializing Redis inventory for sections");
+
+    if (event.ticketSetup && event.ticketSetup.length > 0) {
+      for (const section of event.ticketSetup) {
+        const redisKey = `inventory:${event._id}:${section.sectionId}`;
+        await redisClient.set(redisKey, Number(section.availableTickets));
+      }
+    }
+
+    logger.info("Delete event session form redis");
+    await deleteRedisData(sessionId);
+
+    logger.info("Event created successfully");
+    res.status(statusCode.created).json({
+      success: true,
+      event,
+    });
+  } catch (error) {
+    logger.error(`Error create event: ${error.stack || error.message}`);
+    res
+      .status(statusCode.serverError)
+      .json({ success: false, error: "Server error" });
+  }
+};
+
 // Edit Event Validate
 export const editEventController = async (req, res) => {
   try {
@@ -131,6 +185,13 @@ export const editEventController = async (req, res) => {
     if (!data?.bannerImage && !data?.thumbnailImage) {
       logger.info("Update event without images");
       const updatedEvent = await updateEvent(eventId, data);
+
+      if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
+        for (const section of updatedEvent.ticketSetup) {
+          const redisKey = `inventory:${updatedEvent._id}:${section.sectionId}`;
+          await redisClient.set(redisKey, Number(section.availableTickets));
+        }
+      }
 
       logger.info("Event updated succssfully");
       return res.status(statusCode.success).json({
@@ -232,6 +293,14 @@ export const finishEventEditController = async (req, res) => {
 
     logger.info("Update event");
     const updatedEvent = await updateEvent(data.event._id, updatedData);
+    logger.info("Update Redis inventory for edited event sections");
+
+    if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
+      for (const section of updatedEvent.ticketSetup) {
+        const redisKey = `inventory:${updatedEvent._id}:${section.sectionId}`;
+        await redisClient.set(redisKey, Number(section.availableTickets));
+      }
+    }
 
     logger.info("Delete event session form redis");
     await deleteRedisData(sessionId);
@@ -244,50 +313,6 @@ export const finishEventEditController = async (req, res) => {
     });
   } catch (error) {
     logger.error(`Error edit event: ${error.stack || error.message}`);
-    res
-      .status(statusCode.serverError)
-      .json({ success: false, error: "Server error" });
-  }
-};
-
-// Finish Event Create
-export const finishEventCreateController = async (req, res) => {
-  try {
-    const { sessionId, bannerImageKey, thumbnailImageKey } = req.body;
-
-    logger.http(`${req.method} ${req.originalUrl}`);
-
-    logger.info("Fetch validated data from Redis");
-    const cached = await getRedisData(sessionId);
-
-    if (!cached) {
-      logger.warn("Validation session expired. Please start again.");
-      return res.status(statusCode.badRequest).json({
-        success: false,
-        error: "Validation session expired. Please start again.",
-      });
-    }
-
-    logger.debug("Parse cached data");
-    const data = JSON.parse(cached);
-
-    logger.info("Attach uploaded URLs");
-    data.bannerImageKey = bannerImageKey;
-    data.thumbnailImageKey = thumbnailImageKey;
-
-    logger.info("Save event to DB");
-    const event = await createEvent(data);
-
-    logger.info("Delete event session form redis");
-    await deleteRedisData(sessionId);
-
-    logger.info("Event created successfully");
-    res.status(statusCode.created).json({
-      success: true,
-      event,
-    });
-  } catch (error) {
-    logger.error(`Error create event: ${error.stack || error.message}`);
     res
       .status(statusCode.serverError)
       .json({ success: false, error: "Server error" });
@@ -539,6 +564,15 @@ export const deleteEventController = async (req, res) => {
     logger.info(`deleting event images eventId=${eventId}`);
     await deleteObject(event.bannerImageKey);
     await deleteObject(event.thumbnailImageKey);
+
+    // 🔥 Delete Redis Inventory Keys (IMPORTANT)
+    logger.info("Deleting Redis inventory for this event");
+    if (event.ticketSetup && event.ticketSetup.length > 0) {
+      for (const section of event.ticketSetup) {
+        const redisKey = `inventory:${event._id}:${section.sectionId}`;
+        await redisClient.del(redisKey);
+      }
+    }
 
     logger.info(`deleting event with eventId=${eventId}`);
     await deleteEventService(organizer._id, eventId);

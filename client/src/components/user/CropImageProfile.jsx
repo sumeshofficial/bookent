@@ -1,13 +1,11 @@
-import { Pencil, X } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
 
 const CropImageProfile = ({ imageUpdate, label, user }) => {
   const [image, setImage] = useState("");
   const [imageAfterCrop, setImageAfterCrop] = useState("");
-  const { organizer } = useSelector((store) => store.organizer);
 
   const inputRef = useRef();
   const { openModal, closeModal } = useModal();
@@ -95,7 +93,8 @@ const CropImageProfile = ({ imageUpdate, label, user }) => {
       <div className="relative w-32 h-32 sm:w-30 sm:h-30 mx-auto group cursor-pointer">
         <img
           src={
-            imageAfterCrop || user?.profileImage || 
+            imageAfterCrop ||
+            user?.profileImage ||
             "https://cdn-icons-png.flaticon.com/512/149/149071.png"
           }
           alt="Profile"

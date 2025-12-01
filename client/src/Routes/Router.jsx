@@ -1,33 +1,36 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Protected from "../components/Protected";
-import HomePage from "../pages/user/HomePage";
-import ProfilePage from "../pages/user/ProfilePage";
+import HomePage from "../features/user/HomePage";
+import ProfilePage from "../features/user/profile/ProfilePage";
 import GlobalLoader from "../components/GlobalLoader";
 import App from "../App";
 import ErrorPage from "../components/ErrorPage";
-import UserNotFoundPage from "../pages/user/UserNotFound";
+import UserNotFoundPage from "../features/user/UserNotFound";
 import AdminProtected from "../components/admin/AdminProtected";
-import AdminDashboard from "../pages/admin/AdminDashboard";
-import AdminLogin from "../pages/admin/AdminLogin";
-import AdminNotFoundPage from "../pages/admin/AdminNotFoundPage";
-import UsersList from "../pages/admin/UsersList";
-import OrganizersList from "../pages/admin/OrganizersList";
-import UserDetailsPage from "../pages/admin/UserDetailsPage";
-import OrganizerDetailsPage from "../pages/admin/OrganizerDetailsPage";
+import AdminDashboard from "../features/admin/AdminDashboard";
+import AdminLogin from "../features/admin/AdminLogin";
+import AdminNotFoundPage from "../features/admin/AdminNotFoundPage";
+import UsersList from "../features/admin/UsersList";
+import OrganizersList from "../features/admin/OrganizersList";
+import UserDetailsPage from "../features/admin/UserDetailsPage";
+import OrganizerDetailsPage from "../features/admin/OrganizerDetailsPage";
 import OrganizerProtected from "../components/organization/OrganizerProtected";
-import OrganizerDashboard from "../pages/organizer/OrganizerDashboard";
+import OrganizerDashboard from "../features/organizer/OrganizerDashboard";
 import OrganizerLayout from "../sharedComponents/organizer/OrganizerLayout";
 import AdminLayout from "../sharedComponents/admin/AdminLayout";
-import CreateEventForm from "../pages/organizer/CreateEventForm";
-import CreateStadium from "../pages/organizer/CreateStadium";
-import OrganizerEventsPage from "../pages/organizer/OrganizerEventsPage";
-import EventPreview from "../pages/organizer/EventPreview";
-import EventsPage from "../pages/user/EventsPage";
-import EventDetailPage from "../pages/user/EventDetailPage";
-import OrganizerProfilePage from "../pages/organizer/OrganizerProfilePage";
-import Stadiums from "../pages/organizer/Stadiums";
-import StadiumDetails from "../pages/organizer/StadiumDetails";
-import SeatSelectPage from "../pages/user/SeatSelectPage";
+import CreateEventForm from "../features/organizer/CreateEventForm";
+import CreateStadium from "../features/organizer/CreateStadium";
+import OrganizerEventsPage from "../features/organizer/OrganizerEventsPage";
+import EventPreview from "../features/organizer/EventPreview";
+import EventsPage from "../features/user/EventsPage";
+import EventDetailPage from "../features/user/EventDetailPage";
+import OrganizerProfilePage from "../features/organizer/OrganizerProfilePage";
+import Stadiums from "../features/organizer/Stadiums";
+import StadiumDetails from "../features/organizer/StadiumDetails";
+import SeatSelectPage from "../features/user/seatSelect/SeatSelectPage";
+import CheckoutPage from "../features/user/checkout/CheckoutPage";
+import SessionTimeout from "../sharedComponents/user/error/SessionTimeout";
+import ProtectedSessionTimeout from "../sharedComponents/user/ProtectedSessionTimeout";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +79,24 @@ const router = createBrowserRouter([
             element: (
               <Protected>
                 <SeatSelectPage />
+              </Protected>
+            ),
+          },
+          {
+            path: "event/:eventId/checkout",
+            element: (
+              <Protected>
+                <CheckoutPage />
+              </Protected>
+            ),
+          },
+          {
+            path: "/session-expired",
+            element: (
+              <Protected>
+                <ProtectedSessionTimeout>
+                  <SessionTimeout />
+                </ProtectedSessionTimeout>
               </Protected>
             ),
           },

@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const ticketSchema = new mongoose.Schema(
   {
+    sectionId: {
+      type: String,
+      required: true,
+    },
     seatPrice: {
       type: Number,
       required: true,
@@ -123,16 +127,6 @@ const eventSchema = new mongoose.Schema(
     ageRestriction: {
       type: String,
       required: true,
-    },
-    isRefundAvailable: {
-      type: Boolean,
-      default: false,
-    },
-    refundPolicy: {
-      type: String,
-      required: true,
-      minlength: 10,
-      maxlength: 300,
     },
     termsAndConditions: {
       type: String,

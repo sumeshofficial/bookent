@@ -17,6 +17,7 @@ const connectRedis = async () => {
   try {
     if (!redisClient.isOpen) {
       await redisClient.connect();
+      await redisClient.configSet("notify-keyspace-events", "Ex");
     }
   } catch (error) {
     logger.error("Redis connection failed:", error);

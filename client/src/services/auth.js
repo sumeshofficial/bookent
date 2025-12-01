@@ -20,17 +20,14 @@ export const sendOTPForSignup = async (data) => {
   return response.data.message;
 };
 
-export const sendOTP = async ({ data, purpose }) => {
+export const sendOTP = async ({ data, purpose, oldEmail = "" }) => {
   const { email } = data;
 
-  const response = await axios.post(
-    `${API_URL}/user/auth/send-otp`,
-    {
-      email,
-      purpose,
-    },
-    { withCredentials: true }
-  );
+  const response = await axios.post(`${API_URL}/user/auth/send-otp`, {
+    email,
+    purpose,
+    oldEmail,
+  });
 
   return response.data.message;
 };
@@ -80,16 +77,8 @@ export const verifyToken = async (token) => {
   });
 };
 
-export const verifyTokenAdmin = async (token) => {
-  const res = await adminApi.get(
-    `/admin/auth`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-    { withCredentials: true }
-  );
+export const verifyTokenAdmin = async () => {
+  return await adminApi.get("/admin/auth");
 };
 
 export const logout = async () => {
