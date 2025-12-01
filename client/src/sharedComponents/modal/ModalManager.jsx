@@ -2,7 +2,7 @@ import { useModal } from "../../utils/constants";
 import AuthModal from "../../components/auth/AuthModal";
 import OTPInputForm from "../../components/auth/OTPVerify/OTPInputForm";
 import Modal from "./Modal";
-import EmailInputFormModal from "../../sharedComponents/user/EmailVerification";
+import EmailVerification from "../../sharedComponents/user/EmailVerification";
 import ForgotPasswordInput from "../../components/auth/EmailAuth/ForgotPassword/ForgotPasswordInput";
 import ForgotPasswordEmail from "../../components/auth/EmailAuth/ForgotPassword/ForgotPasswordEmail";
 import EditUserProfile from "../../features/user/profile/components/modal/EditUserProfile";
@@ -10,6 +10,9 @@ import CropImageModal from "../../components/modal/CropImageModal";
 import DeleteConfirmationModal from "../../components/modal/DeleteConfirmationModal";
 import ConfirmationModal from "../../components/modal/ConfirmationModal";
 import UserBlockModal from "../../components/modal/UserBlockModal";
+import EmailInputFormModal from "../../components/auth/emailAuth/EmailInputModal";
+import ConfirmBackModal from "../../components/modal/ConfirmBackModal";
+import SeatLockErrorModal from "../../components/modal/SeatLockErrorModal";
 
 const ModalManager = () => {
   const { modalType, modalData, closeModal } = useModal();
@@ -25,7 +28,7 @@ const ModalManager = () => {
       content = <EmailInputFormModal {...modalData} />;
       break;
     case "email":
-      content = <EmailInputFormModal {...modalData} />;
+      content = <EmailVerification {...modalData} />;
       break;
     case "otp":
       content = <OTPInputForm {...modalData} />;
@@ -53,6 +56,12 @@ const ModalManager = () => {
       break;
     case "user-status-confirmation":
       content = <UserBlockModal {...modalData} />;
+      break;
+    case "checkout-back-modal":
+      content = <ConfirmBackModal {...modalData} />;
+      break;
+    case "seat-lock-error":
+      content = <SeatLockErrorModal {...modalData} />;
       break;
     default:
       return null;

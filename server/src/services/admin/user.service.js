@@ -1,6 +1,6 @@
 import { getIO } from "../../config/socket.conf.js";
 import { updateUserStatus } from "../../repositories/user/user.repository.js";
-import { STATUS_CODE } from "../../utility/constants.js";
+import { SOCKET_EVENTS, STATUS_CODE } from "../../utility/constants.js";
 import { AppError } from "../../utility/helpers.js";
 
 export const updateUserStatusService = async (data) => {
@@ -17,7 +17,7 @@ export const updateUserStatusService = async (data) => {
   await updateUserStatus(id, status);
 
   const io = getIO();
-  io.to(id).emit("user-blocked", {
+  io.to(id).emit(SOCKET_EVENTS.USER_BLOCKED, {
     message: "Your account was blocked by admin",
   });
 };

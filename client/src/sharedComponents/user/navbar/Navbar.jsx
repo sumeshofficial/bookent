@@ -47,7 +47,7 @@ const Navbar = () => {
   ];
 
   return (
-    <>
+    <div className="select-none">
       <Disclosure as="nav" className="bg-white relative z-50">
         {({ open }) => (
           <>
@@ -356,7 +356,7 @@ const Navbar = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

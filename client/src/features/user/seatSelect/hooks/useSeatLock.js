@@ -1,43 +1,69 @@
 import { useContext, useEffect, useState } from "react";
-import { SocketContext } from "../../../../utils/constants";
+import {
+  SOCKET_EVENTS,
+  SocketContext,
+  useModal,
+} from "../../../../utils/constants";
 
 export const useSectionLock = (eventId) => {
   const socket = useContext(SocketContext);
   const [sections, setSections] = useState({});
+  const { openModal, closeModal } = useModal();
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.emit("join-event", { eventId });
-
-    socket.on("seat-update", (data) => {
-      console.log("WS RECEIVED →", JSON.stringify(data, null, 2));
+    const seatUpdateHandler = (data) => {
       setSections((prev) => ({
         ...prev,
         [data.sectionId]: {
           status: data.status,
           qty: Number(data.qty),
-          lockedBy: data.lockedBy ?? null,
+          lockedBy: data.lockedBy || data.bookedBy,
         },
       }));
+    };
+
+    socket.on(SOCKET_EVENTS.CONNECT, () => {
+      socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId });
     });
 
-    return () => socket.off("seat-update");
+    socket.on(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
+
+    return () => {
+      socket.off(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
+      socket.off(SOCKET_EVENTS.CONNECT);
+    };
   }, [socket, eventId]);
 
   // ADD CALLBACK SUPPORT HERE
   const lockSection = (sectionId, qty, cb) => {
-    socket.emit("lock-section", { eventId, sectionId, qty }, (response) => {
-      cb(response?.lockId || null);
-    });
+    socket.emit(
+      SOCKET_EVENTS.LOCK_SECTION,
+      { eventId, sectionId, qty },
+      (response) => {
+        console.log(response);
+        if (!response.success) {
+          openModal("seat-lock-error", {
+            open: true,
+            message: response.error,
+            onClose: () => {
+              closeModal;
+              window.location.reload();
+            },
+          });
+        }
+        cb(response?.lockId || null);
+      }
+    );
   };
 
   const releaseSection = (lockId) => {
-    socket.emit("release-section", { lockId });
+    socket.emit(SOCKET_EVENTS.RELEASE_SECTION, { lockId });
   };
 
   const confirmBooking = (lockIds) => {
-    socket.emit("confirm-booking", { lockIds });
+    socket.emit(SOCKET_EVENTS.CONFIRM_BOOKING, { lockIds });
   };
 
   return { sections, lockSection, releaseSection, confirmBooking };

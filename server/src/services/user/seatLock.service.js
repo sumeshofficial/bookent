@@ -33,11 +33,7 @@ export const lockSectionQuantity = async ({
   userId,
 }) => {
   if (qty <= 0) {
-    throw new AppError(
-      STATUS_CODE.BAD_REQUEST,
-      "INVALID_QTY",
-      "Quantity must be greater than 0"
-    );
+    throw new Error("Quantity must be greater than 0");
   }
 
   const lockId = uuidv4();
@@ -55,7 +51,7 @@ export const lockSectionQuantity = async ({
 
     local current = tonumber(redis.call("GET", invKey) or "0")
     if current < qty then
-      return {err = "INSUFFICIENT"}
+      return {"INSUFFICIENT"}
     end
 
     redis.call("DECRBY", invKey, qty)
@@ -105,25 +101,18 @@ export const lockSectionQuantity = async ({
         qty,
         status: "locked",
         lockedBy: userId,
+        lockId: lockId,
       })
     );
 
     return { success: true, lockId };
   }
 
-  if (res && res.message === "INSUFFICIENT") {
-    throw new AppError(
-      STATUS_CODE.BAD_REQUEST,
-      "INSUFFICIENT_SEATS",
-      "Not enough tickets available"
-    );
+  if (res && res[0] === "INSUFFICIENT") {
+    throw new Error("Not enough tickets available");
   }
 
-  throw new AppError(
-    STATUS_CODE.SERVER_ERROR,
-    "LOCK_FAILED",
-    "Failed to lock tickets"
-  );
+  throw new Error("Failed to lock tickets");
 };
 
 // ========================================================================== //
@@ -219,6 +208,7 @@ export const releaseLockById = async ({ lockId }) => {
       eventId,
       sectionId,
       qty,
+      userId,
       status: "available",
       restored: qty,
     })
@@ -273,27 +263,20 @@ export const handleExpiredLockKey = async (expiredKey) => {
   pipeline.del(lockMetaKey(lockId));
   pipeline.sRem(userLocksKey(eventId, userId), expiredKey);
 
-  console.log(
-    PUB_CHANNEL,
-    JSON.stringify({
-      eventId,
-      sectionId,
-      qty,
-      status: "available",
-      restored: qty,
-    })
-  );
-
   pipeline.publish(
     PUB_CHANNEL,
     JSON.stringify({
       eventId,
       sectionId,
+      userId,
       qty,
       status: "available",
       restored: qty,
+      isExpired: true,
     })
   );
 
   await pipeline.exec();
+
+  console.log(await redisClient.get(`inventory:${eventId}:${sectionId}`));
 };

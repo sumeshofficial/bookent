@@ -5,7 +5,7 @@ import { logoutUser } from "../redux/userSlice";
 import { logoutOrganizer } from "../redux/organizerSlice";
 import { logout } from "../services/auth";
 import toast from "react-hot-toast";
-import { SocketContext } from "../utils/constants";
+import { SOCKET_EVENTS, SocketContext } from "../utils/constants";
 
 export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ export const SocketProvider = ({ children }) => {
     s.connect();
 
     // Listen for block event
-    s.on("user-blocked", (data) => {
+    s.on(SOCKET_EVENTS.USER_BLOCKED, (data) => {
       toast.error(data.message || "You have been blocked.");
       handleLogout();
     });

@@ -120,9 +120,9 @@ const CreateEventForm = () => {
         0
       );
 
-      dataWithoutImage.ticketSetup = dataWithoutImage.ticketSetup.map(
-        (tier) => ({ ...tier, availableTickets: tier.totalTickets })
-      );
+      // dataWithoutImage.ticketSetup = dataWithoutImage.ticketSetup.map(
+      //   (tier) => ({ ...tier, availableTickets: tier.totalTickets })
+      // );
 
       dataWithoutImage.totalTickets = totalTickets;
       dataWithoutImage.availableTickets = totalTickets;

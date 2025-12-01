@@ -1,8 +1,7 @@
 import { ChevronDown, Info } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useSectionLock } from "../hooks/useSeatLock";
-import { useSelector } from "react-redux";
 
 const BookingBox = ({
   selectedShape,
@@ -28,9 +27,9 @@ const BookingBox = ({
   };
 
   const handleBookNow = async () => {
+    console.log("clicked");
     lockSection(info.sectionId, quantity, (lockId) => {
       if (!lockId) {
-        alert("Unable to lock seats. Please try again.");
         return;
       }
 

@@ -16,13 +16,20 @@ export const ACTIONS = {
   SELECT: "SELECT",
   RECTANGLE: "RECTANGLE",
   CIRCLE: "CIRCLE",
-  ARC: "ARC"
+  ARC: "ARC",
 };
 
 export const PREFERENCE_OPTIONS = {
   sport: {
     label: "Your favorite Sport",
-    values: ["Football", "Cricket", "Basketball", "Tennis", "Badminton", "Volleyball"],
+    values: [
+      "Football",
+      "Cricket",
+      "Basketball",
+      "Tennis",
+      "Badminton",
+      "Volleyball",
+    ],
   },
   venue: {
     label: "Preferred Locations / Venues",
@@ -36,4 +43,16 @@ export const PREFERENCE_OPTIONS = {
     label: "Price Range",
     values: ["0 - 500", "500 - 2000", "2000 - 5000", "5000+"],
   },
+};
+
+// Socket events
+export const SOCKET_EVENTS = {
+  USER_BLOCKED: "user-blocked",
+  CONNECT: "connect",
+  JOIN_EVENT: "join-event",
+  SEAT_UPDATE: "seat-update",
+  LOCK_SECTION: "lock-section",
+  RELEASE_SECTION: "release-section",
+  CONFIRM_BOOKING: "confirm-booking",
+  PAYMENT_STATUS: "payment-status",
 };

@@ -7,6 +7,8 @@ import CheckoutNavbar from "../../../sharedComponents/user/navbar/CheckoutNavbar
 import SeatMap from "./components/SeatMap";
 import BookingBox from "./components/BookingBox";
 import MobileBookingBar from "./components/MobileBookingBar";
+import { useSectionLock } from "./hooks/useSeatLock";
+import SeatSelectNavbar from "../../../sharedComponents/user/navbar/SeatSelectNavbar";
 
 const SeatSelectPage = () => {
   const { eventId } = useParams();
@@ -21,9 +23,11 @@ const SeatSelectPage = () => {
 
   const [selectedShape, setSelectedShape] = useState(null);
 
+  const { lockSection } = useSectionLock(eventId);
+
   return (
     <>
-      {!isLoading && <CheckoutNavbar title={event?.eventTitle} />}
+      {!isLoading && <SeatSelectNavbar title={event?.eventTitle} /> }
 
       <div className="min-h-screen px-4 pt-4 pb-10 w-full bg-gray-100">
         {!isLoading && (
@@ -40,6 +44,7 @@ const SeatSelectPage = () => {
               ticketSetup={event?.ticketSetup || []}
               shapes={stadiumShapes}
               eventId={event._id}
+              lockSection={lockSection}
             />
 
             <MobileBookingBar
@@ -47,6 +52,7 @@ const SeatSelectPage = () => {
               ticketSetup={event?.ticketSetup || []}
               shapes={stadiumShapes}
               eventId={event._id}
+              lockSection={lockSection}
             />
           </div>
         )}

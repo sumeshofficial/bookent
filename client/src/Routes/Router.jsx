@@ -29,6 +29,8 @@ import Stadiums from "../features/organizer/Stadiums";
 import StadiumDetails from "../features/organizer/StadiumDetails";
 import SeatSelectPage from "../features/user/seatSelect/SeatSelectPage";
 import CheckoutPage from "../features/user/checkout/CheckoutPage";
+import SessionTimeout from "../sharedComponents/user/error/SessionTimeout";
+import ProtectedSessionTimeout from "../sharedComponents/user/ProtectedSessionTimeout";
 
 const router = createBrowserRouter([
   {
@@ -85,6 +87,16 @@ const router = createBrowserRouter([
             element: (
               <Protected>
                 <CheckoutPage />
+              </Protected>
+            ),
+          },
+          {
+            path: "/session-expired",
+            element: (
+              <Protected>
+                <ProtectedSessionTimeout>
+                  <SessionTimeout />
+                </ProtectedSessionTimeout>
               </Protected>
             ),
           },

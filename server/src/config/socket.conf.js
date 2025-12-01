@@ -3,6 +3,7 @@ import socketAuth from "../middlewares/common/socket.middleware.js";
 import dotenv from "dotenv";
 import logger from "./logger.js";
 import userSocketHandlers from "../sockets/user/user.socket.js";
+import { SOCKET_EVENTS } from "../utility/constants.js";
 
 dotenv.config();
 
@@ -16,25 +17,17 @@ export const initSocket = (server) => {
     },
   });
 
-  // Authenticate socket
   io.use(socketAuth);
 
-  io.on("connection", (socket) => {
-    logger.info("User connected:", socket.user._id);
+  io.on(SOCKET_EVENTS.CONNECTION, (socket) => {
+    logger.info(`User connected: ${socket.user._id}`);
 
-    // JOIN room based on user ID
     socket.join(socket.user._id);
 
-    // Attach all handlers
     userSocketHandlers(io, socket);
   });
 
   return io;
 };
 
-export const getIO = () => {
-  if (!io) {
-    throw new Error("Socket.io has not been initialized!");
-  }
-  return io;
-};
+export const getIO = () => io;

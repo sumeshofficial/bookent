@@ -63,6 +63,12 @@ export const validationSchema = [
       .array()
       .of(
         yup.object().shape({
+          availableTickets: yup
+            .number()
+            .typeError("Ticket count must be a valid number")
+            .required("Ticket count is required")
+            .min(1, "Ticket count must be greater than 0")
+            .max(100000, "Ticket count is too high"),
           seatPrice: yup
             .number()
             .typeError("Seat price must be a valid number")
