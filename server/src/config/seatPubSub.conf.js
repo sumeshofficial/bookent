@@ -3,7 +3,6 @@ import { getIO } from "./socket.conf.js";
 import logger from "./logger.js";
 import dotenv from "dotenv";
 import { SOCKET_EVENTS } from "../utility/constants.js";
-
 dotenv.config();
 
 export const initSeatPubSub = async () => {

@@ -28,6 +28,10 @@ export const useSectionLock = (eventId) => {
       socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId });
     });
 
+    if (socket.connected) {
+      socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId });
+    }
+
     socket.on(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
 
     return () => {
