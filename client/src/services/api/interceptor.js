@@ -90,16 +90,16 @@ export const createApiInstance = (type = "user") => {
       } catch (refreshError) {
         processQueue(refreshError, null);
 
-        const { default: store } = await import("../../redux/store");
+        const { default: store } = await import("../../app/store");
 
         if (type === "admin") {
-          const { logoutAdmin } = await import("../../redux/adminSlice");
+          const { logoutAdmin } = await import("../../app/adminSlice");
           await adminLogout();
           store.dispatch(logoutAdmin());
         } else {
-          const { logoutUser } = await import("../../redux/userSlice");
+          const { logoutUser } = await import("../../app/userSlice");
           const { logoutOrganizer } = await import(
-            "../../redux/organizerSlice"
+            "../../app/organizerSlice"
           );
           await logout();
           store.dispatch(logoutUser());

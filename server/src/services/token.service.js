@@ -26,6 +26,7 @@ export const generateRefreshToken = async ({ userId, role }) => {
   console.log(
     expiresIn,
     { userId, role, tokenId },
+    "expiresIn",
     process.env.JWT_REFRESH_SECRET
   );
   const token = jwt.sign(
@@ -48,7 +49,7 @@ export const verifyRefreshToken = async (token) => {
   const dbToken = await RefreshToken.findOne({
     tokenId: payload.tokenId,
   });
-  console.log(dbToken, payload);
+  console.log("verify", dbToken, payload);
   if (!dbToken) {
     throw new Error("Invalid refresh token");
   }

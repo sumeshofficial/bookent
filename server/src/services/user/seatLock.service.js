@@ -1,14 +1,13 @@
 import { redisClient } from "../../config/redis.conf.js";
 import dotenv from "dotenv";
 import { AppError } from "../../utility/helpers.js";
-import { STATUS_CODE } from "../../utility/constants.js";
+import { SOCKET_EVENTS, STATUS_CODE } from "../../utility/constants.js";
 import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 
 const LOCK_TTL_MS = Number(process.env.LOCK_TTL); // 2 minutes default
 const LOCKMETA_TTL_PAD = Number(process.env.LOCKMETA_TTL); // 5 seconds padding
-const PUB_CHANNEL = process.env.CHANNEL;
 
 // ---------------------------- REDIS KEY HELPERS ---------------------------- //
 
@@ -37,6 +36,8 @@ export const lockSectionQuantity = async ({
   }
 
   const lockId = uuidv4();
+
+  console.log(await redisClient.get(`inventory:${eventId}:${sectionId}`));
 
   const lua = `
     local invKey = KEYS[1]
@@ -70,6 +71,7 @@ export const lockSectionQuantity = async ({
     sectionId,
     qty: String(qty),
     userId: String(userId),
+    released: "0",
   };
 
   const metaArray = [];
@@ -92,9 +94,11 @@ export const lockSectionQuantity = async ({
     ],
   });
 
+  console.log(await redisClient.get(`inventory:${eventId}:${sectionId}`));
+
   if (Array.isArray(res) && res[0] === "OK") {
     await redisClient.publish(
-      PUB_CHANNEL,
+      SOCKET_EVENTS.SEAT_UPDATE,
       JSON.stringify({
         eventId,
         sectionId,
@@ -102,6 +106,7 @@ export const lockSectionQuantity = async ({
         status: "locked",
         lockedBy: userId,
         lockId: lockId,
+        expiresAt: Date.now() + LOCK_TTL_MS,
       })
     );
 
@@ -165,7 +170,7 @@ export const confirmBookingByLock = async ({
     pipeline2.sRem(userLocksKey(m.eventId, m.userId), lKey);
 
     pipeline2.publish(
-      PUB_CHANNEL,
+      SOCKET_EVENTS.SEAT_UPDATE,
       JSON.stringify({
         eventId: m.eventId,
         sectionId: m.sectionId,
@@ -196,6 +201,12 @@ export const releaseLockById = async ({ lockId }) => {
   const qty = Number(meta.qty || 0);
   const lKey = lockKey(eventId, sectionId, lockId);
 
+  if (meta.released === "1") {
+    return { success: false, reason: "Already released" };
+  }
+
+  await redisClient.hSet(lockMetaKey(lockId), "released", "1");
+
   const pipeline = redisClient.multi();
   pipeline.del(lKey);
   pipeline.del(lockMetaKey(lockId));
@@ -203,7 +214,7 @@ export const releaseLockById = async ({ lockId }) => {
   pipeline.incrBy(inventoryKey(eventId, sectionId), qty);
 
   pipeline.publish(
-    PUB_CHANNEL,
+    SOCKET_EVENTS.SEAT_UPDATE,
     JSON.stringify({
       eventId,
       sectionId,
@@ -243,11 +254,6 @@ export const releaseAllLocksForUser = async ({ eventId, userId }) => {
 // ========================================================================== //
 
 export const handleExpiredLockKey = async (expiredKey) => {
-  console.log("expiredKey:", expiredKey);
-  if (!expiredKey.startsWith("lock:")) {
-    return;
-  }
-
   const lockId = expiredKey.split(":").pop();
   const meta = await redisClient.hGetAll(lockMetaKey(lockId));
 
@@ -258,13 +264,19 @@ export const handleExpiredLockKey = async (expiredKey) => {
   const { eventId, sectionId, userId } = meta;
   const qty = Number(meta.qty || 0);
 
+  if (meta.released === "1") {
+    return;
+  }
+
+  await redisClient.hSet(lockMetaKey(lockId), "released", "1");
+
   const pipeline = redisClient.multi();
   pipeline.incrBy(inventoryKey(eventId, sectionId), qty);
   pipeline.del(lockMetaKey(lockId));
   pipeline.sRem(userLocksKey(eventId, userId), expiredKey);
 
   pipeline.publish(
-    PUB_CHANNEL,
+    SOCKET_EVENTS.SEAT_UPDATE,
     JSON.stringify({
       eventId,
       sectionId,
@@ -277,6 +289,47 @@ export const handleExpiredLockKey = async (expiredKey) => {
   );
 
   await pipeline.exec();
+};
 
-  console.log(await redisClient.get(`inventory:${eventId}:${sectionId}`));
+export const getAllCurrentLocks = async (eventId) => {
+  const pattern = `lock:${eventId}:*:*`;
+  const lockKeys = await redisClient.keys(pattern);
+
+  if (!lockKeys || lockKeys.length === 0) {
+    return {};
+  }
+
+  const aggregated = {};
+
+  for (const fullLockKey of lockKeys) {
+    const parts = fullLockKey.split(":");
+    const lockId = parts[parts.length - 1];
+
+    const meta = await redisClient.hGetAll(lockMetaKey(lockId));
+    if (!meta || !meta.sectionId) {
+      continue;
+    }
+
+    const sectionId = meta.sectionId;
+    const qty = Number(meta.qty || 0);
+
+    if (!aggregated[sectionId]) {
+      aggregated[sectionId] = {
+        sectionId,
+        qty: 0,
+        status: "locked",
+        lockedBy: meta.userId,
+        locks: [],
+      };
+    }
+
+    aggregated[sectionId].qty += qty;
+    aggregated[sectionId].locks.push({
+      lockId,
+      userId: meta.userId,
+      qty,
+    });
+  }
+
+  return aggregated;
 };

@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { addError, addUser, clearError } from "../../../redux/userSlice";
+import { addError, addUser, clearError } from "../../../app/userSlice";
 import { useModal } from "../../../utils/constants";
 
 const GoogleButton = ({ role = "user" }) => {

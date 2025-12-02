@@ -9,6 +9,7 @@ const SeatMap = ({
   ticketSetup = [],
   selectedShape,
   setSelectedShape,
+  lockedSections,
 }) => {
   const SVG_WIDTH = 900;
   const SVG_HEIGHT = 600;
@@ -34,14 +35,17 @@ const SeatMap = ({
               transformOrigin: "top left",
             }}
           >
-            {shapes.map((shape, index) => {
-              const ticket = ticketSetup?.[index];
-              const isDisabled = ticket?.availableTickets <= 0;
+            {shapes.map((shape) => {
+              const lockedInfo = lockedSections?.[shape.id];
+              const ticket = ticketSetup.find((t) => t.sectionId === shape.id);
+              const isDisabled =
+                ticket?.availableTickets === 0 ||
+                (lockedInfo?.status === "locked" &&
+                  ticket?.availableTickets - lockedInfo?.qty === 0);
               const isSelected = selectedShape?.id === shape.id;
 
               const commonProps = {
                 shape,
-                ticket,
                 isDisabled,
                 isSelected,
                 selectedShape,

@@ -51,6 +51,7 @@ export const SOCKET_EVENTS = {
   CONNECT: "connect",
   JOIN_EVENT: "join-event",
   SEAT_UPDATE: "seat-update",
+  SEAT_UPDATE_BULK: "seat-update-bulk",
   LOCK_SECTION: "lock-section",
   RELEASE_SECTION: "release-section",
   CONFIRM_BOOKING: "confirm-booking",

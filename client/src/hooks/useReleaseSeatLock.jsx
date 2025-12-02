@@ -14,9 +14,10 @@ const useReleaseSeatLock = (eventId) => {
         return;
       }
 
-      const lockId = localStorage.getItem("activeLockId");
+      const lockId = sessionStorage.getItem("lockId");
       if (lockId) {
         releaseSection(lockId);
+        sessionStorage.removeItem("lockId");
       }
     };
   }, []);

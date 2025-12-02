@@ -3,25 +3,26 @@ import {
   lockSectionQuantity,
   releaseLockById,
   confirmBookingByLock,
-  releaseAllLocksForUser,
+  getAllCurrentLocks,
 } from "../../services/user/seatLock.service.js";
 import { SOCKET_EVENTS } from "../../utility/constants.js";
 
 export default function userSocketHandlers(io, socket) {
-  // 1. JOIN EVENT ROOM
 
-  socket.on(SOCKET_EVENTS.JOIN_EVENT, ({ eventId }) => {
-    // Leave previous only if DIFFERENT event ID
+  socket.on(SOCKET_EVENTS.JOIN_EVENT, async ({ eventId }) => {
     if (socket.currentEvent && socket.currentEvent !== eventId) {
       socket.leave(socket.currentEvent);
       console.log("Left previous room:", socket.currentEvent);
     }
 
-    // Only join if not already joined
     if (!socket.rooms.has(eventId)) {
       socket.join(eventId);
       console.log("Joined room:", eventId);
     }
+
+    const existingLocks = await getAllCurrentLocks(eventId);
+
+    socket.emit(SOCKET_EVENTS.SEAT_UPDATE_BULK, existingLocks);
 
     socket.currentEvent = eventId;
 

@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { eventById } from "../../../services/user";
-import CheckoutNavbar from "../../../sharedComponents/user/navbar/CheckoutNavbar";
 
 import SeatMap from "./components/SeatMap";
 import BookingBox from "./components/BookingBox";
@@ -23,7 +22,9 @@ const SeatSelectPage = () => {
 
   const [selectedShape, setSelectedShape] = useState(null);
 
-  const { lockSection } = useSectionLock(eventId);
+  const { lockSection, sections } = useSectionLock(eventId);
+
+  
 
   return (
     <>
@@ -37,6 +38,7 @@ const SeatSelectPage = () => {
               ticketSetup={event?.ticketSetup || []}
               selectedShape={selectedShape}
               setSelectedShape={setSelectedShape}
+              lockedSections={sections}
             />
 
             <BookingBox
@@ -45,6 +47,7 @@ const SeatSelectPage = () => {
               shapes={stadiumShapes}
               eventId={event._id}
               lockSection={lockSection}
+              lockedSections={sections}
             />
 
             <MobileBookingBar
@@ -53,6 +56,7 @@ const SeatSelectPage = () => {
               shapes={stadiumShapes}
               eventId={event._id}
               lockSection={lockSection}
+              lockedSections={sections}
             />
           </div>
         )}

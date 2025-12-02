@@ -222,7 +222,6 @@ export const refreshAccessToken = async (token) => {
     );
   }
 
-  console.log("payload", payload);
   await revokeRefreshToken(payload.tokenId);
 
   const user = {

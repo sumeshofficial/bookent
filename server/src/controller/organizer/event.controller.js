@@ -189,7 +189,7 @@ export const editEventController = async (req, res) => {
       if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
         for (const section of updatedEvent.ticketSetup) {
           const redisKey = `inventory:${updatedEvent._id}:${section.sectionId}`;
-          await redisClient.set(redisKey, Number(section.availableTickets));
+          await redisClient.set(redisKey, section.availableTickets);
         }
       }
 
@@ -298,7 +298,7 @@ export const finishEventEditController = async (req, res) => {
     if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
       for (const section of updatedEvent.ticketSetup) {
         const redisKey = `inventory:${updatedEvent._id}:${section.sectionId}`;
-        await redisClient.set(redisKey, Number(section.availableTickets));
+        await redisClient.set(redisKey, section.availableTickets);
       }
     }
 

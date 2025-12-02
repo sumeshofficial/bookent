@@ -13,11 +13,8 @@ const useGlobalSeatEvents = () => {
       console.log("GLOBAL seat-update:", data);
 
       if (data?.isExpired && data?.userId === user?._id) {
-        localStorage.setItem("sessionExpired", "1");
-
-        Promise.resolve().then(() => {
-          navigate("/session-expired", { replace: true });
-        });
+        sessionStorage.removeItem("lockId");
+        navigate("/session-expired", { replace: true });
       }
     },
     [navigate, user?._id]

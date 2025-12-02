@@ -6,7 +6,7 @@ import {
   addUser,
   updateUserProfile,
   updateUserProfileData,
-} from "../../../redux/userSlice";
+} from "../../../app/userSlice";
 import { useModal } from "../../../utils/constants";
 import toast from "react-hot-toast";
 

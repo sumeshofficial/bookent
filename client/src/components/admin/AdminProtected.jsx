@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Loader } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getAdmin } from "../../redux/adminSlice";
+import { getAdmin } from "../../app/adminSlice";
 
 const AdminProtected = () => {
   const dispatch = useDispatch();

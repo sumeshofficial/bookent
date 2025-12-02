@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "../redux/userSlice";
+import { getUser } from "../app/userSlice";
 import WelcomePage from "../pages/user/WelcomePage"
 
 const Protected = ({ children }) => {

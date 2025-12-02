@@ -15,7 +15,7 @@ import ConfirmBackModal from "../../components/modal/ConfirmBackModal";
 import SeatLockErrorModal from "../../components/modal/SeatLockErrorModal";
 
 const ModalManager = () => {
-  const { modalType, modalData, closeModal } = useModal();
+  const { modalType, modalData } = useModal();
 
   if (!modalType) return null;
 
@@ -68,7 +68,7 @@ const ModalManager = () => {
   }
 
   return (
-    <Modal isOpen={!!modalType} onClose={closeModal}>
+    <Modal isOpen={!!modalType}>
       {content}
     </Modal>
   );

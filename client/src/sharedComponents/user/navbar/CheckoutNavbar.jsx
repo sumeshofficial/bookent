@@ -2,43 +2,71 @@ import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BookentLogo from "../../BookentLogo";
 import { useModal } from "../../../utils/constants";
-import { useEffect } from "react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useSectionLock } from "../../../features/user/seatSelect/hooks/useSeatLock";
 
 const CheckoutNavbar = ({ title, eventId }) => {
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
 
-  const hasPushed = useRef(false);
+  const blockBack = useRef(true);
+  const pushed = useRef(false);
+
+  const lockId = sessionStorage.getItem("lockId");
+
+  const { releaseSection } = useSectionLock(eventId);
 
   useEffect(() => {
-    if (!hasPushed.current) {
-      window.history.pushState(null, null);
-      hasPushed.current = true;
+    if (!pushed.current) {
+      window.history.pushState({ checkout: true }, "");
+      pushed.current = true;
     }
 
-    const handleBackButton = (e) => {
+    const handlePop = (e) => {
+      if (!blockBack.current) return;
+
       e.preventDefault();
+
+      window.history.pushState({ checkout: true }, "");
 
       openModal("checkout-back-modal", {
         open: true,
         onConfirm: () => {
+          releaseSection(lockId);
+          sessionStorage.removeItem("lockId");
+          blockBack.current = false;
           closeModal();
           navigate(`/event/${eventId}/seat-layout`);
         },
         onCancel: () => {
           closeModal();
-          window.history.pushState(null, "");
+          window.history.pushState({ checkout: true }, "");
         },
       });
     };
 
-    window.addEventListener("popstate", handleBackButton);
+    window.addEventListener("popstate", handlePop);
 
     return () => {
-      window.removeEventListener("popstate", handleBackButton);
+      window.removeEventListener("popstate", handlePop);
     };
   }, []);
+
+  const askBackConfirmation = () => {
+    openModal("checkout-back-modal", {
+      open: true,
+      onConfirm: () => {
+        releaseSection(lockId);
+        sessionStorage.removeItem("lockId");
+        blockBack.current = false;
+        closeModal();
+        navigate(`/event/${eventId}/seat-layout`);
+      },
+      onCancel: () => {
+        closeModal();
+      },
+    });
+  };
 
   return (
     <div className="w-full bg-white shadow-md select-none">
@@ -48,7 +76,7 @@ const CheckoutNavbar = ({ title, eventId }) => {
         </div>
 
         <div className="flex items-center gap-2 mx-auto">
-          <button onClick={() => window.history.back()}>
+          <button onClick={askBackConfirmation}>
             <ChevronLeft size={26} className="text-gray-700" />
           </button>
 

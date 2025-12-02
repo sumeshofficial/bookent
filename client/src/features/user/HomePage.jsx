@@ -3,7 +3,7 @@ import HeroCarousel from "../../components/home/HeroCarousel";
 import EventRow from "../../components/home/EventRow";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { updateUserProfile } from "../../redux/userSlice";
+import { updateUserProfile } from "../../app/userSlice";
 import useGeoLocation from "../../hooks/useGeoLocation";
 import { getEventsForUser } from "../../services/user";
 import toast from "react-hot-toast";

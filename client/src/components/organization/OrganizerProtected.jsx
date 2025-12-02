@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
-import { getOrganizer } from "../../redux/organizerSlice";
+import { getOrganizer } from "../../app/organizerSlice";
 import OrganizerAccountForm from "../../features/organizer/OrganizerAccountForm";
 import OrganizerAccRequested from "../../features/organizer/OrganizerAccRequested";
 

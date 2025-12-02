@@ -1,25 +1,58 @@
 import { ChevronDown, Info } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSectionLock } from "../hooks/useSeatLock";
 
 const BookingBox = ({
   selectedShape,
   ticketSetup = [],
-  shapes = [],
   eventId,
+  lockedSections,
 }) => {
   const navigate = useNavigate();
   const { lockSection } = useSectionLock(eventId);
-  const index = selectedShape
-    ? shapes.findIndex((s) => s.id === selectedShape.id)
-    : -1;
-  const info = index >= 0 ? ticketSetup?.[index] : null;
+
+  const info = selectedShape
+    ? ticketSetup.find((t) => t.sectionId === selectedShape.id)
+    : null;
+
+  let adjustedInfo = info;
+
+  if (info && lockedSections && lockedSections[selectedShape.id]) {
+    const lockedData = lockedSections[selectedShape.id];
+
+    if (!lockedData.lockedBy || lockedData.status === "available") {
+      adjustedInfo = {
+        ...info,
+        availableTickets: info.availableTickets,
+      };
+    } else {
+      adjustedInfo = {
+        ...info,
+        availableTickets: info.availableTickets - (lockedData.qty || 0),
+      };
+    }
+  }
 
   const [qtyOpen, setQtyOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
-  const maxQty = Math.min(info?.perUserLimit || 1, info?.availableTickets || 0);
+  const maxQty = Math.min(
+    adjustedInfo?.perUserLimit || 1,
+    adjustedInfo?.availableTickets || 0
+  );
+
+  useEffect(() => {
+    if (!adjustedInfo) return;
+
+    if (quantity > maxQty) {
+      setQuantity(maxQty || 1);
+    }
+
+    if (quantity < 1) {
+      setQuantity(1);
+    }
+  }, [selectedShape, adjustedInfo, maxQty, quantity]);
 
   const handleSelectQty = (v) => {
     setQuantity(v);
@@ -27,21 +60,20 @@ const BookingBox = ({
   };
 
   const handleBookNow = async () => {
-    console.log("clicked");
-    lockSection(info.sectionId, quantity, (lockId) => {
-      if (!lockId) {
-        return;
-      }
+    lockSection(adjustedInfo.sectionId, quantity, (lockId) => {
+      if (!lockId) return;
 
-      // Save lock details
-      localStorage.setItem("activeLockId", lockId);
-      localStorage.setItem("selectedSection", info.sectionId);
-      localStorage.setItem("selectedQuantity", quantity);
+      console.log(lockId);
+      sessionStorage.setItem("lockId", lockId);
 
-      // Redirect
       navigate(`/event/${eventId}/checkout`);
     });
   };
+
+  // Disable booking when no seats available
+  const isSoldOut =
+    (adjustedInfo?.availableTickets || 0) === 0 ||
+    (maxQty || 0) === 0;
 
   return (
     <div className="w-full hidden lg:block lg:w-120 border rounded-xl shadow-md bg-white p-5 h-fit sticky top-5">
@@ -50,12 +82,12 @@ const BookingBox = ({
           <h2 className="font-bold text-lg mb-2">{selectedShape.title}</h2>
 
           <p className="text-gray-600 mb-3">
-            Available Seats: {info?.availableTickets ?? 0} /{" "}
-            {info?.totalTickets ?? 0}
+            Available Seats: {adjustedInfo?.availableTickets ?? 0} /{" "}
+            {adjustedInfo?.totalTickets ?? 0}
           </p>
 
           <p className="text-gray-800 mb-3 font-semibold">
-            Price: ₹{info?.seatPrice ?? "—"}
+            Price: ₹{adjustedInfo?.seatPrice ?? "—"}
           </p>
 
           <div className="mb-3 relative">
@@ -63,10 +95,12 @@ const BookingBox = ({
 
             <div
               className={`w-full border rounded-lg p-2 cursor-pointer flex justify-between items-center ${
-                !info?.availableTickets ? "opacity-50 cursor-not-allowed" : ""
+                !adjustedInfo?.availableTickets
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
               onClick={() =>
-                info?.availableTickets ? setQtyOpen(!qtyOpen) : null
+                adjustedInfo?.availableTickets ? setQtyOpen(!qtyOpen) : null
               }
             >
               <span>{quantity}</span>
@@ -90,9 +124,15 @@ const BookingBox = ({
 
           <button
             onClick={handleBookNow}
-            className="w-full py-3 bg-red-500 text-white rounded-lg text-lg font-semibold"
+            disabled={isSoldOut}
+            className={
+              `w-full py-3 rounded-lg text-lg font-semibold ` +
+              (isSoldOut
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "bg-red-500 text-white")
+            }
           >
-            Book Now
+            {isSoldOut ? "Sold Out" : "Book Now"}
           </button>
         </>
       ) : (

@@ -16,7 +16,7 @@ export const sendTokens = async (res, user) => {
     role: user.role,
   });
 
-  console.log(refreshToken);
+  console.log("SendToken", refreshToken);
 
   res.cookie(`${user.role}_refreshToken`, refreshToken, {
     httpOnly: true,

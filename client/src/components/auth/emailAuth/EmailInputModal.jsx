@@ -5,7 +5,7 @@ import { loginUserWithEmail, sendOTPForSignup } from "../../../services/auth";
 import { useContextForm, useModal } from "../../../utils/constants";
 import { Loader } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { addUser } from "../../../redux/userSlice";
+import { addUser } from "../../../app/userSlice";
 import toast from "react-hot-toast";
 
 const EmailInputFormModal = () => {

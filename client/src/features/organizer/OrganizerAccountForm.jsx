@@ -12,7 +12,7 @@ import {
   addOrganizer,
   updateOrganizerProfile,
   updateOrganizerProfileData,
-} from "../../redux/organizerSlice";
+} from "../../app/organizerSlice";
 import { Link } from "react-router-dom";
 
 const OrganizarAccountForm = ({ isRejected = false }) => {

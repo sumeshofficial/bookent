@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ModalContext } from "../utils/constants";
 import { useDispatch } from "react-redux";
-import { clearError } from "../redux/userSlice";
+import { clearError } from "../app/userSlice";
 
 const ModalProvider = ({ children }) => {
   const [modalType, setModalType] = useState(null);

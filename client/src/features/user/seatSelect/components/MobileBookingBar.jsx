@@ -6,23 +6,42 @@ import { useEffect } from "react";
 const MobileBookingBar = ({
   selectedShape,
   ticketSetup = [],
-  shapes = [],
   eventId,
-  lockSection
+  lockSection,
+  lockedSections,
 }) => {
   const navigate = useNavigate();
-  const index = selectedShape
-    ? shapes.findIndex((s) => s.id === selectedShape.id)
-    : -1;
 
-  const info = index >= 0 ? ticketSetup?.[index] : null;
+  const info = selectedShape
+    ? ticketSetup.find((t) => t.sectionId === selectedShape.id)
+    : null;
+
+  let adjustedInfo = info;
+
+  if (info && lockedSections && lockedSections[selectedShape.id]) {
+    const lockedData = lockedSections[selectedShape.id];
+    if (!lockedData.lockedBy || lockedData.status === "available") {
+      adjustedInfo = {
+        ...info,
+        availableTickets: info.availableTickets,
+      };
+    } else {
+      adjustedInfo = {
+        ...info,
+        availableTickets: info.availableTickets - (lockedData.qty || 0),
+      };
+    }
+  }
 
   const [quantity, setQuantity] = useState(1);
 
-  const maxQty = Math.min(info?.perUserLimit || 1, info?.availableTickets || 0);
+  const maxQty = Math.min(
+    adjustedInfo?.perUserLimit || 1,
+    adjustedInfo?.availableTickets || 0
+  );
 
   useEffect(() => {
-    if (!info) return;
+    if (!adjustedInfo) return;
 
     if (quantity > maxQty) {
       setQuantity(maxQty || 1);
@@ -31,19 +50,22 @@ const MobileBookingBar = ({
     if (quantity < 1) {
       setQuantity(1);
     }
-  }, [selectedShape, info, maxQty]);
+  }, [selectedShape, adjustedInfo, maxQty]);
 
   const handleBookNow = async () => {
-    lockSection(info.sectionId, quantity, (lockId) => {
+    lockSection(adjustedInfo.sectionId, quantity, (lockId) => {
       if (!lockId) return;
 
-      localStorage.setItem("activeLockId", lockId);
-      localStorage.setItem("selectedSection", info.sectionId);
-      localStorage.setItem("selectedQuantity", quantity);
+      console.log(lockId);
+
+      sessionStorage.setItem("lockId", lockId);
 
       navigate(`/event/${eventId}/checkout`);
     });
   };
+
+  // Disable booking when no tickets available
+  const isSoldOut = (adjustedInfo?.availableTickets || 0) === 0 || (maxQty || 0) === 0;
 
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white shadow-xl border-t p-4 z-50">
@@ -52,11 +74,11 @@ const MobileBookingBar = ({
           <div className="flex flex-col">
             <span className="font-bold text-base">{selectedShape.title}</span>
             <span className="text-sm text-gray-600">
-              Available: {info?.availableTickets ?? 0} /{" "}
-              {info?.totalTickets ?? 0}
+              Available: {adjustedInfo?.availableTickets ?? 0} /{" "}
+              {adjustedInfo?.totalTickets ?? 0}
             </span>
             <span className="font-semibold text-gray-800">
-              ₹{info?.seatPrice ?? "—"}
+              ₹{adjustedInfo?.seatPrice ?? "—"}
             </span>
 
             {/* Quantity Selector */}
@@ -84,9 +106,15 @@ const MobileBookingBar = ({
 
           <button
             onClick={handleBookNow}
-            className="py-3 px-6 bg-red-500 text-white rounded-lg text-lg font-semibold whitespace-nowrap"
+            disabled={isSoldOut}
+            className={
+              `py-3 px-6 rounded-lg text-lg font-semibold whitespace-nowrap ` +
+              (isSoldOut
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "bg-red-500 text-white")
+            }
           >
-            Book Now
+            {isSoldOut ? "Sold Out" : "Book Now"}
           </button>
         </div>
       ) : (

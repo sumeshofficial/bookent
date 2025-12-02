@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import {
   updateUserProfile,
   updateUserProfileData,
-} from "../../../../redux/userSlice";
+} from "../../../../app/userSlice";
 import {
   generateImageUrl,
   generateUploadUrl,

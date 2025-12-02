@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { clearError } from "../../../redux/userSlice";
+import { clearError } from "../../../app/userSlice";
 import { useModal } from "../../../utils/constants";
 
 const EmailButton = () => {

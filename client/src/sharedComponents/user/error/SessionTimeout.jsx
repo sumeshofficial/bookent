@@ -1,30 +1,11 @@
 import { AlarmClock, ArrowLeft } from "lucide-react";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../../assets/bookent-logo-black.png";
 
 const SessionTimeout = () => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    localStorage.setItem("sessionExpired", "1");
-
-    window.history.pushState(null, null, window.location.href);
-
-    const onPop = () => {
-      navigate("/", { replace: true });
-    };
-
-    window.addEventListener("popstate", onPop);
-
-    return () => {
-      window.removeEventListener("popstate", onPop);
-      localStorage.removeItem("sessionExpired");
-    };
-  }, [navigate]);
-
   const goBack = () => {
-    localStorage.removeItem("sessionExpired");
     navigate("/", { replace: true });
   };
 

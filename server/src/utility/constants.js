@@ -20,6 +20,20 @@ export const STATUS_CODE = {
   CONFLICT: 409,
   NOTFOUND: 404,
   PERMISSION_DENIED: 403,
+  GONE: 410,
+};
+
+// Errors
+export const ERRORS = {
+  USER_NOT_FOUND: { CODE: "USER_NOT_FOUND" },
+  LOCK_EXPIRED: {
+    CODE: "LOCK_EXPIRED",
+    MSG: "Your session has expired. Please select seats again.",
+  },
+  LOCK_NOT_FOUND: {
+    CODE: "LOCK_NOT_FOUND",
+    MSG: "Lock no longer exists. Please reselect seats.",
+  },
 };
 
 // Socket events
@@ -29,6 +43,7 @@ export const SOCKET_EVENTS = {
   CONNECTION: "connection",
   JOIN_EVENT: "join-event",
   SEAT_UPDATE: "seat-update",
+  SEAT_UPDATE_BULK: "seat-update-bulk",
   LOCK_SECTION: "lock-section",
   RELEASE_SECTION: "release-section",
   CONFIRM_BOOKING: "confirm-booking",

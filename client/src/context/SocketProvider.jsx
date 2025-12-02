@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { createSocket } from "../lib/socket";
 import { useDispatch } from "react-redux";
-import { logoutUser } from "../redux/userSlice";
-import { logoutOrganizer } from "../redux/organizerSlice";
+import { logoutUser } from "../app/userSlice";
+import { logoutOrganizer } from "../app/organizerSlice";
 import { logout } from "../services/auth";
 import toast from "react-hot-toast";
 import { SOCKET_EVENTS, SocketContext } from "../utils/constants";

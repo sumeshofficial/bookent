@@ -12,7 +12,7 @@ import {
   validateOtpRequest,
   verifyOtp,
 } from "../../services/user/auth.service.js";
-import { STATUS_CODE, statusCode } from "../../utility/constants.js";
+import { STATUS_CODE } from "../../utility/constants.js";
 import {
   sendPopupResponse,
   validateGoogleUser,
@@ -156,7 +156,9 @@ export const sendOtpController = asyncHandler(async (req, res) => {
 export const forgotPasswordController = asyncHandler(async (req, res) => {
   await forgotPassword(req.body);
 
-  res.status(statusCode.success).json({
-    message: "Password updated successfully",
-  });
+  sendResponse(
+    res,
+    { message: "Password updated successfully" },
+    STATUS_CODE.SUCCESS
+  );
 });

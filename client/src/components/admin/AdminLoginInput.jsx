@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { clearError, loginAdmin } from "../../redux/adminSlice";
+import { clearError, loginAdmin } from "../../app/adminSlice";
 
 const AdminLoginInput = () => {
   const dispatch = useDispatch();

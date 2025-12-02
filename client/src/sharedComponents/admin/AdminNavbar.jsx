@@ -2,7 +2,7 @@ import { ChevronDown, ChevronRight, List, UserCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { adminLogout } from "../../services/auth";
-import { logoutAdmin } from "../../redux/adminSlice";
+import { logoutAdmin } from "../../app/adminSlice";
 import toast from "react-hot-toast";
 
 const AdminNavbar = ({

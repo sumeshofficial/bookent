@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   updateOrganizerProfile,
   updateOrganizerProfileData,
-} from "../../redux/organizerSlice";
+} from "../../app/organizerSlice";
 import toast from "react-hot-toast";
 import CropImageProfile from "../../components/user/CropImageProfile";
 import {

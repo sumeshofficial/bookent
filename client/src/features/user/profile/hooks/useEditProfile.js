@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   updateUserProfile,
   updateUserProfileData,
-} from "../../../../redux/userSlice";
+} from "../../../../app/userSlice";
 import { sendOTP } from "../../../../services/auth";
 import toast from "react-hot-toast";
 import { useModal } from "../../../../utils/constants";

@@ -14,12 +14,13 @@ export const useSectionLock = (eventId) => {
     if (!socket) return;
 
     const seatUpdateHandler = (data) => {
+      console.log(data);
       setSections((prev) => ({
         ...prev,
         [data.sectionId]: {
           status: data.status,
           qty: Number(data.qty),
-          lockedBy: data.lockedBy || data.bookedBy,
+          lockedBy: data.lockedBy || data.bookedBy || data.userId,
         },
       }));
     };
@@ -34,13 +35,16 @@ export const useSectionLock = (eventId) => {
 
     socket.on(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
 
+    socket.on(SOCKET_EVENTS.SEAT_UPDATE_BULK, (lockData) => {
+      setSections(lockData);
+    });
+
     return () => {
       socket.off(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
       socket.off(SOCKET_EVENTS.CONNECT);
     };
   }, [socket, eventId]);
 
-  // ADD CALLBACK SUPPORT HERE
   const lockSection = (sectionId, qty, cb) => {
     socket.emit(
       SOCKET_EVENTS.LOCK_SECTION,
@@ -56,6 +60,7 @@ export const useSectionLock = (eventId) => {
               window.location.reload();
             },
           });
+          return;
         }
         cb(response?.lockId || null);
       }
