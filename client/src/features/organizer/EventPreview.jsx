@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Calendar,
   Clock,
@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 const EventPreview = () => {
   const [selectedTab, setSelectedTab] = useState("about");
   const [menuOpen, setMenuOpen] = useState(false);
-  const { organizerId, eventId } = useParams();
+  const { organizerId, eventSlug } = useParams();
   const { openModal, closeModal } = useModal();
   const { organizer } = useSelector((store) => store.organizer);
 
@@ -32,12 +32,13 @@ const EventPreview = () => {
   }
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["event", eventId],
-    queryFn: () => getEvent(eventId),
+    queryKey: ["event", eventSlug],
+    queryFn: () => getEvent(eventSlug),
   });
 
   useEffect(() => {
     if (error) {
+      console.log(error);
       toast.dismiss();
       toast.error("Something went wrong");
       navigate("/error");
@@ -79,6 +80,7 @@ const EventPreview = () => {
       toast.success("Event deleted");
     },
     onError: (err) => {
+      console.log(err);
       toast.dismiss();
       toast.error("Something went wrong");
     },
@@ -126,7 +128,7 @@ const EventPreview = () => {
                   <button
                     onClick={() => {
                       navigate(
-                        `/listmyshow/organizer/${eventData.organizer}/event/${eventData._id}/edit`
+                        `/listmyshow/organizer/${eventData.organizer}/event/${eventData.slug}/edit`
                       );
                       setMenuOpen((prev) => !prev);
                     }}

@@ -13,7 +13,7 @@ const SeatSelectNavbar = ({ title }) => {
         </div>
 
         <div className="flex items-center gap-2 mx-auto">
-          <button onClick={() => navigate(-1)}>
+          <button onClick={() => navigate('/')}>
             <ChevronLeft size={26} className="text-gray-700" />
           </button>
           <h1 className="text-base lg:text-lg font-semibold text-center truncate max-w-[140px] sm:max-w-full">

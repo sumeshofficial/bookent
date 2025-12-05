@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 const VenueAndTicket = ({ register, errors, watch, setValue }) => {
   const watchedStadiumId = watch("stadium");
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ["stadiums"],
     queryFn: () => getStadiums(),
     keepPreviousData: true,

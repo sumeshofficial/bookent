@@ -2,50 +2,27 @@ import mongoose from "mongoose";
 
 const ticketSchema = new mongoose.Schema(
   {
-    sectionId: {
-      type: String,
-      required: true,
-    },
-    seatPrice: {
-      type: Number,
-      required: true,
-      min: 1,
-      max: 100000,
-    },
-    perUserLimit: {
-      type: Number,
-      required: true,
-      min: 1,
-      max: 10,
-    },
-    totalTickets: {
-      type: Number,
-      required: true,
-    },
-    availableTickets: {
-      type: Number,
-      required: true,
-    },
-    soldTickets: {
-      type: Number,
-      default: 0,
-    },
+    sectionId: { type: String, required: true },
+    seatPrice: { type: Number, required: true, min: 1, max: 100000 },
+    perUserLimit: { type: Number, required: true, min: 1, max: 10 },
+    totalTickets: { type: Number, required: true },
+    availableTickets: { type: Number, required: true },
+    soldTickets: { type: Number, default: 0 },
   },
   { _id: false }
 );
 
 const eventSchema = new mongoose.Schema(
   {
-    eventTitle: {
+    slug: {
       type: String,
       required: true,
-      minlength: 10,
-      maxlength: 50,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
-    sportType: {
-      type: String,
-      required: true,
-    },
+    eventTitle: { type: String, required: true, minlength: 10, maxlength: 50 },
+    sportType: { type: String, required: true },
     eventDescription: {
       type: String,
       required: true,
@@ -64,70 +41,21 @@ const eventSchema = new mongoose.Schema(
       ref: "Stadium",
       required: true,
     },
-    stadiumName: {
-      type: String,
-      required: true,
-    },
-    stadiumAddress: {
-      type: String,
-      required: true,
-    },
-    minPrice: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
-    maxPrice: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
-    ticketSetup: {
-      type: [ticketSchema],
-      required: true,
-    },
-    totalTickets: {
-      type: Number,
-      required: true,
-    },
-    availableTickets: {
-      type: Number,
-      required: true,
-    },
-    soldTickets: {
-      type: Number,
-      default: 0,
-    },
-    matchDate: {
-      type: Date,
-      required: true,
-    },
-    matchTime: {
-      type: String,
-      required: true,
-    },
-    gateOpenTime: {
-      type: String,
-      required: true,
-    },
-    matchDuration: {
-      type: Number,
-      required: true,
-      min: 30,
-      max: 300,
-    },
-    bannerImageKey: {
-      type: String,
-      required: true,
-    },
-    thumbnailImageKey: {
-      type: String,
-      required: true,
-    },
-    ageRestriction: {
-      type: String,
-      required: true,
-    },
+    stadiumName: { type: String, required: true },
+    stadiumAddress: { type: String, required: true },
+    minPrice: { type: Number, required: true, min: 1 },
+    maxPrice: { type: Number, required: true, min: 1 },
+    ticketSetup: { type: [ticketSchema], required: true },
+    totalTickets: { type: Number, required: true },
+    availableTickets: { type: Number, required: true },
+    soldTickets: { type: Number, default: 0 },
+    matchDate: { type: Date, required: true },
+    matchTime: { type: String, required: true },
+    gateOpenTime: { type: String, required: true },
+    matchDuration: { type: Number, required: true, min: 30, max: 300 },
+    bannerImageKey: { type: String, required: true },
+    thumbnailImageKey: { type: String, required: true },
+    ageRestriction: { type: String, required: true },
     termsAndConditions: {
       type: String,
       required: true,
@@ -156,28 +84,17 @@ const eventSchema = new mongoose.Schema(
       isCancelled: { type: Boolean, default: false },
       reason: { type: String, maxlength: 300 },
     },
-    isBookingOpen: {
-      type: Boolean,
-      default: true,
-    },
+    isBookingOpen: { type: Boolean, default: true },
 
     organizer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Organizer",
       required: true,
     },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
-    deletedAt: {
-      type: Date,
-      default: null,
-    },
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 const Event = mongoose.model("Event", eventSchema);

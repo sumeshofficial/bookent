@@ -11,7 +11,7 @@ const EventCard = ({ event }) => {
   };
   return (
     <div
-      onClick={() => navigate(`/event/${event._id}`)}
+      onClick={() => navigate(`/event/${event.slug}`)}
       className="min-w-32 max-w-32 sm:min-w-55 sm:max-w-55 transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]"
     >
       <div className="w-full aspect-9/16 rounded-lg overflow-hidden bg-gray-200">

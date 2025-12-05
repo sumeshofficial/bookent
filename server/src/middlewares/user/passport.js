@@ -13,7 +13,6 @@ const opts = {
   secretOrKey: process.env.JWT_SECRET,
 };
 
-// configure JWT strategy
 passport.use(
   new JwtStrategy(opts, async (jwt_payload, done) => {
     try {
@@ -29,7 +28,6 @@ passport.use(
   })
 );
 
-// Configure Google strategy
 passport.use(
   new GoogleStrategy(
     {

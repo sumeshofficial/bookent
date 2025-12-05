@@ -1,4 +1,5 @@
 import { STATUS_CODE } from "./constants.js";
+import slugify from "slugify";
 
 export class AppError extends Error {
   constructor(
@@ -19,4 +20,15 @@ export const sendResponse = (res, data, statusCode = STATUS_CODE.SUCCESS) => {
 
 export const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+export const createSlug = (text) => {
+  if (!text || typeof text !== "string") {
+    return "";
+  }
+  return slugify(text, {
+    lower: true,
+    strict: true,
+    trim: true,
+  });
 };

@@ -11,16 +11,20 @@ import {
   getObjectURL,
   putObject,
 } from "../../services/s3.service.js";
-import { statusCode } from "../../utility/constants.js";
+import { ERRORS, STATUS_CODE, statusCode } from "../../utility/constants.js";
 import {
   checkOrganizer,
-  createEvent,
   deleteEventService,
   fetchEventsWithOrganizerId,
   findEvent,
   updateEvent,
 } from "../../services/organizer.service.js";
 import { redisClient } from "../../config/redis.conf.js";
+import { finishCreateEvent } from "../../services/organizer/event.service.js";
+import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
+import { findeEventByOrganizerIdAndEventId } from "../../repositories/organizer/event.repository.js";
+import { isSlugExists } from "../../utility/event.utils.js";
+import Event from "../../models/event.model.js";
 
 dotenv.config();
 
@@ -92,68 +96,31 @@ export const validateEventCreateController = async (req, res) => {
 };
 
 // Finish Event Create
-export const finishEventCreateController = async (req, res) => {
-  try {
-    const { sessionId, bannerImageKey, thumbnailImageKey } = req.body;
+export const finishEventCreateController = asyncHandler(async (req, res) => {
+  const { sessionId, bannerImageKey, thumbnailImageKey } = req.body;
 
-    logger.http(`${req.method} ${req.originalUrl}`);
-
-    logger.info("Fetch validated data from Redis");
-    const cached = await getRedisData(sessionId);
-
-    if (!cached) {
-      logger.warn("Validation session expired. Please start again.");
-      return res.status(statusCode.badRequest).json({
-        success: false,
-        error: "Validation session expired. Please start again.",
-      });
-    }
-
-    logger.debug("Parse cached data");
-    const data = JSON.parse(cached);
-
-    logger.info("Attach uploaded URLs");
-    data.bannerImageKey = bannerImageKey;
-    data.thumbnailImageKey = thumbnailImageKey;
-
-    logger.info("Save event to DB");
-    const event = await createEvent(data);
-
-    logger.info("Initializing Redis inventory for sections");
-
-    if (event.ticketSetup && event.ticketSetup.length > 0) {
-      for (const section of event.ticketSetup) {
-        const redisKey = `inventory:${event._id}:${section.sectionId}`;
-        await redisClient.set(redisKey, Number(section.availableTickets));
-      }
-    }
-
-    logger.info("Delete event session form redis");
-    await deleteRedisData(sessionId);
-
-    logger.info("Event created successfully");
-    res.status(statusCode.created).json({
-      success: true,
-      event,
-    });
-  } catch (error) {
-    logger.error(`Error create event: ${error.stack || error.message}`);
-    res
-      .status(statusCode.serverError)
-      .json({ success: false, error: "Server error" });
+  if (!sessionId || !bannerImageKey || !thumbnailImageKey) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
   }
-};
+  const event = await finishCreateEvent(req.body);
+
+  sendResponse(res, event, STATUS_CODE.CREATED);
+});
 
 // Edit Event Validate
 export const editEventController = async (req, res) => {
   try {
-    const { eventId } = req.params;
+    const { eventSlug } = req.params;
     const userId = req.user._id;
     const data = req.body;
 
     logger.http(`${req.method} ${req.originalUrl}`);
 
-    if (!data || !eventId || !userId) {
+    if (!data || !eventSlug || !userId) {
       logger.warn("Required fields are missing");
       return res.status(statusCode.missingField).json({
         error: "Required fields are missing",
@@ -171,9 +138,9 @@ export const editEventController = async (req, res) => {
     }
 
     logger.info(
-      `Check event is exixts for organizerId=${organizer._id}, eventId=${eventId}`
+      `Check event is exixts for organizerId=${organizer._id}, eventId=${eventSlug}`
     );
-    const event = await findEvent(organizer._id, eventId);
+    const event = await findEvent(organizer._id, eventSlug);
     if (!event) {
       logger.warn("Event not found or unauthorized");
       return res.status(statusCode.notFound).json({
@@ -182,9 +149,14 @@ export const editEventController = async (req, res) => {
       });
     }
 
+    if (data?.eventTitle) {
+      const slug = await isSlugExists(Event, data.eventTitle, event._id);
+      data.slug = slug;
+    }
+
     if (!data?.bannerImage && !data?.thumbnailImage) {
       logger.info("Update event without images");
-      const updatedEvent = await updateEvent(eventId, data);
+      const updatedEvent = await updateEvent(event._id, data);
 
       if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
         for (const section of updatedEvent.ticketSetup) {
@@ -472,14 +444,14 @@ export const getEventsController = async (req, res) => {
 // Find Event
 export const getEventController = async (req, res) => {
   try {
-    const { eventId } = req.params;
+    const { eventSlug } = req.params;
     const user = req.user;
 
     const organizer = await checkOrganizer({ userId: user._id });
 
     logger.http(`${req.method}, ${req.originalUrl}`);
 
-    if (!organizer || !eventId) {
+    if (!organizer || !eventSlug) {
       logger.warn("Required fields are misiing");
       return res.status(statusCode.missingField).json({
         success: false,
@@ -488,9 +460,9 @@ export const getEventController = async (req, res) => {
     }
 
     logger.info(
-      `Fetching event with organizerId=${organizer._id}, eventId=${eventId}`
+      `Fetching event with organizerId=${organizer._id}, eventId=${eventSlug}`
     );
-    const event = await findEvent(organizer._id, eventId);
+    const event = await findEvent(organizer._id, eventSlug);
 
     if (!event) {
       logger.warn("Event not found or organizerId not match");
@@ -552,7 +524,10 @@ export const deleteEventController = async (req, res) => {
     }
 
     logger.info(`Check event is exists eventId=${eventId}`);
-    const event = await findEvent(organizer._id, eventId);
+    const event = await findeEventByOrganizerIdAndEventId(
+      organizer._id,
+      eventId
+    );
     if (!event) {
       logger.warn("Event not found");
       return res.status(statusCode.notFound).json({
@@ -565,7 +540,6 @@ export const deleteEventController = async (req, res) => {
     await deleteObject(event.bannerImageKey);
     await deleteObject(event.thumbnailImageKey);
 
-    // 🔥 Delete Redis Inventory Keys (IMPORTANT)
     logger.info("Deleting Redis inventory for this event");
     if (event.ticketSetup && event.ticketSetup.length > 0) {
       for (const section of event.ticketSetup) {

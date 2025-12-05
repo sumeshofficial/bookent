@@ -26,8 +26,6 @@ export const eventSchema = yup.object({
 
   ageRestriction: yup.string().required("Age restriction is required"),
 
-  refundPolicy: yup.string().required("Refund policy is required"),
-
   termsAndConditions: yup
     .string()
     .required("Terms and conditions are required"),

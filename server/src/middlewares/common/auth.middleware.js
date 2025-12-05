@@ -1,5 +1,5 @@
 import logger from "../../config/logger.js";
-import { verifyTokenAndGetUser } from "../../services/auth.service.js";
+import { verifyTokenAndGetUser } from "../../repositories/user/user.repository.js";
 import { getObjectURL } from "../../services/s3.service.js";
 import { isTokenBlacklisted } from "../../services/token.service.js";
 import { STATUS_CODE, statusCode } from "../../utility/constants.js";
@@ -13,7 +13,7 @@ export const protect = async (req, res, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       logger.warn("Missing or invalid Authorization header");
       return res
-        .status(statusCode.unAuthorized)
+        .status(STATUS_CODE.UNAUTHORIZED)
         .json({ message: "Unauthorized" });
     }
 
@@ -22,7 +22,7 @@ export const protect = async (req, res, next) => {
 
     if (!user) {
       return res
-        .status(statusCode.unAuthorized)
+        .status(STATUS_CODE.UNAUTHORIZED)
         .json({ message: "User not found" });
     }
 

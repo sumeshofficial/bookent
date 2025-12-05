@@ -75,7 +75,7 @@ const EventsCard = ({
                   <button
                     onClick={() =>
                       navigate(
-                        `/listmyshow/organizer/${organizer._id}/event/${event._id}`
+                        `/listmyshow/organizer/${organizer._id}/event/${event.slug}`
                       )
                     }
                     className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
@@ -86,7 +86,7 @@ const EventsCard = ({
                   <button
                     onClick={() =>
                       navigate(
-                        `/listmyshow/organizer/${organizer._id}/event/${event._id}/edit`
+                        `/listmyshow/organizer/${organizer._id}/event/${event.slug}/edit`
                       )
                     }
                     className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
@@ -216,7 +216,7 @@ const EventsCard = ({
               <button
                 onClick={() =>
                   navigate(
-                    `/listmyshow/organizer/${organizer._id}/event/${event._id}`
+                    `/listmyshow/organizer/${organizer._id}/event/${event.slug}`
                   )
                 }
                 className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-semibold flex items-center gap-2 text-sm"
@@ -227,7 +227,7 @@ const EventsCard = ({
               <button
                 onClick={() =>
                   navigate(
-                    `/listmyshow/organizer/${organizer._id}/event/${event._id}/edit`
+                    `/listmyshow/organizer/${organizer._id}/event/${event.slug}/edit`
                   )
                 }
                 className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center gap-2 text-sm"

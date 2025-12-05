@@ -1,18 +1,34 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDebounce } from "use-debounce";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { getStadiumsWithOrganizerId } from "../../services/organization";
+import toast from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
 
 const Stadiums = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initialSearch = searchParams.get("search") || "";
+  const initialSort = searchParams.get("sort") || "capacity-low";
+  const initialPage = Number(searchParams.get("page")) || 1;
+
   const { organizer } = useSelector((store) => store.organizer);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sort, setSort] = useState("capacity-low");
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [sort, setSort] = useState(initialSort);
   const [debouncedSearch] = useDebounce(searchQuery, 500);
+
+  useEffect(() => {
+    const params = {};
+    if (searchQuery) params.search = searchQuery;
+    if (sort) params.sort = sort;
+    params.page = currentPage;
+    setSearchParams(params);
+  }, [searchQuery, sort, currentPage, setSearchParams]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["stadiums", organizer._id, debouncedSearch, sort, currentPage],
@@ -71,7 +87,10 @@ const Stadiums = () => {
             <span className="font-semibold text-gray-700 text-sm">Sort</span>
 
             <button
-              onClick={() => setSort("capacity-high")}
+              onClick={() => {
+                setCurrentPage(1);
+                setSort("capacity-high");
+              }}
               className={`${
                 sort === "capacity-high"
                   ? "font-semibold text-purple-600"
@@ -82,7 +101,10 @@ const Stadiums = () => {
             </button>
 
             <button
-              onClick={() => setSort("capacity-low")}
+              onClick={() => {
+                setCurrentPage(1);
+                setSort("capacity-low");
+              }}
               className={`${
                 sort === "capacity-low"
                   ? "font-semibold text-purple-600"
@@ -158,7 +180,7 @@ const Stadiums = () => {
                   </p>
                 </div>
 
-                <Link to={`/listmyshow/stadium/${stadium._id}`}>
+                <Link to={`/listmyshow/stadium/${stadium.slug}`}>
                   <button className="mt-4 w-full bg-violet-600 text-white py-2 rounded-md text-sm hover:bg-violet-700 transition">
                     View Stadium
                   </button>

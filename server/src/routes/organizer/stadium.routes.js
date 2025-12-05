@@ -1,23 +1,23 @@
 import express from "express";
 import {
   checkStadiumName,
-  createStadium,
-  deleteStadium,
+  createStadiumController,
+  deleteStadiumController,
   getStadium,
   getStadiums,
   getStadiumsForOrganizer,
-  updateStadium,
+  updateStadiumController,
 } from "../../controller/organizer/stadium.controller.js";
 const router = express.Router();
 
 router.get("/", getStadiums);
 router.get("/or/:organizerId", getStadiumsForOrganizer);
 router.get("/check-name", checkStadiumName);
-router.get("/:stadiumId", getStadium);
+router.get("/:stadiumSlug", getStadium);
 
-router.post("/create", createStadium);
+router.post("/create", createStadiumController);
 
-router.patch("/:stadiumId", updateStadium);
-router.patch("/:stadiumId/delete", deleteStadium);
+router.patch("/:stadiumId", updateStadiumController);
+router.patch("/:stadiumId/delete", deleteStadiumController);
 
 export default router;

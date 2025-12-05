@@ -1,3 +1,4 @@
+import { STATUS_CODES } from "http";
 import logger from "../../config/logger.js";
 import {
   lockSectionQuantity,
@@ -27,6 +28,8 @@ export default function userSocketHandlers(io, socket) {
     socket.currentEvent = eventId;
 
     console.log("ROOMS NOW:", [...socket.rooms]);
+
+
   });
 
   // 2. LOCK SECTION

@@ -1,18 +1,45 @@
 import { useEffect, useState, useRef } from "react";
 import EventCard from "../../components/home/EventCard";
-import { useParams } from "react-router-dom";
-import { X, SlidersHorizontal } from "lucide-react";
+import { X, SlidersHorizontal, ChevronDown } from "lucide-react";
 import Navbar from "../../sharedComponents/user/navbar/Navbar";
 import { getFilterAndSortEvent } from "../../services/user";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 
 const EventsPage = () => {
-  const [selectedDateFilters, setSelectedDateFilters] = useState("");
-  const [selectedCategoryFilters, setSelectedCategoryFilters] = useState("");
-  const [selectedPriceFilters, setSelectedPriceFilters] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [sortOption, setSortOption] = useState("");
-  const [page, setPage] = useState(1);
+  const page = Number(searchParams.get("page")) || 1;
+  const category = searchParams.get("category") || "all";
+
+  const dateParam = searchParams.get("date") || "";
+  const selectedDateFilters = dateParam ? dateParam.split("-").join(" ") : "";
+  const selectedCategoryFilters = searchParams.get("category") || "";
+  const min = searchParams.get("min_price");
+  const max = searchParams.get("max_price");
+  const selectedPriceFilters = min && max ? `${min} - ${max}` : "";
+
+  useEffect(() => {
+    const legacy = searchParams.get("price");
+    if (!legacy) return;
+
+    const decoded = decodeURIComponent(legacy).replace(/\+/g, " ");
+    const parts = decoded
+      .split("-")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (parts.length === 2) {
+      const [lmin, lmax] = parts;
+      const sp = new URLSearchParams(searchParams);
+      sp.set("min_price", lmin);
+      sp.set("max_price", lmax);
+      sp.delete("price");
+      sp.set("page", 1);
+      setSearchParams(sp);
+    }
+  }, []);
+  const sortOption = searchParams.get("sort") || "";
+
   const [results, setResults] = useState([]);
   const [hasMore, setHasMore] = useState(true);
 
@@ -21,7 +48,13 @@ const EventsPage = () => {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
 
-  const { category } = useParams();
+  const setPage = (val) => {
+    const sp = new URLSearchParams(searchParams);
+    sp.set("page", val);
+    setSearchParams(sp);
+  };
+
+  // const { category } = useParams();
   const title = category.charAt(0).toUpperCase() + category.slice(1);
 
   const dateFilters = ["Today", "Tomorrow", "This Week", "This Month"];
@@ -40,7 +73,7 @@ const EventsPage = () => {
       page,
       homeCategory: category,
       sort: sortOption,
-      date: selectedDateFilters.split(' ').join('-'),
+      date: selectedDateFilters.split(" ").join("-"),
       category: selectedCategoryFilters,
       price: selectedPriceFilters,
     };
@@ -53,29 +86,18 @@ const EventsPage = () => {
     };
   };
 
-
   const { data, isFetching } = useQuery({
-    queryKey: [
-      "events",
-      selectedDateFilters,
-      selectedCategoryFilters,
-      selectedPriceFilters,
-      sortOption,
-      page,
-    ],
+    queryKey: ["events", searchParams.toString(), page],
     queryFn: fetchEvents,
     keepPreviousData: true,
   });
 
   useEffect(() => {
     setResults([]);
-    setPage(1);
-  }, [
-    selectedDateFilters,
-    selectedCategoryFilters,
-    selectedPriceFilters,
-    sortOption,
-  ]);
+    if (page !== 1) {
+      setPage(1);
+    }
+  }, [searchParams.toString()]);
 
   useEffect(() => {
     if (!data) return;
@@ -92,7 +114,7 @@ const EventsPage = () => {
       (entries) => {
         const first = entries[0];
         if (first.isIntersecting && hasMore && !isFetching) {
-          setPage((prev) => prev + 1);
+          setPage(page + 1);
         }
       },
       { threshold: 1 }
@@ -104,21 +126,61 @@ const EventsPage = () => {
   }, [hasMore, isFetching]);
 
   const toggleFilter = (filter, type) => {
-    const change = (setter, state) => {
-      if (state === filter) setter("");
-      else setter(filter);
-    };
+    const sp = new URLSearchParams(searchParams);
 
-    if (type === "date") change(setSelectedDateFilters, selectedDateFilters);
-    if (type === "category")
-      change(setSelectedCategoryFilters, selectedCategoryFilters);
-    if (type === "price") change(setSelectedPriceFilters, selectedPriceFilters);
+    if (type === "price") {
+      const [min, max] = filter.split(" - ").map((s) => s.trim());
+
+      const currentMin = sp.get("min_price");
+      const currentMax = sp.get("max_price");
+
+      if (currentMin === min && currentMax === max) {
+        sp.delete("min_price");
+        sp.delete("max_price");
+      } else {
+        sp.set("min_price", min);
+        sp.set("max_price", max);
+      }
+
+      if (sp.has("price")) sp.delete("price");
+
+      sp.set("page", 1);
+      setSearchParams(sp);
+      return;
+    }
+
+    if (type === "date") {
+      const current = sp.get("date") || "";
+      const encoded = filter.split(" ").join("-");
+
+      const value = current === encoded ? "" : encoded;
+
+      if (value) sp.set("date", value);
+      else sp.delete("date");
+
+      sp.set("page", 1);
+      setSearchParams(sp);
+      return;
+    }
+
+    const current = sp.get(type) || "";
+    const value = current === filter ? "" : filter;
+
+    if (value) sp.set(type, value);
+    else sp.delete(type);
+
+    sp.set("page", 1);
+    setSearchParams(sp);
   };
 
   const isFilterSelected = (filter, type) => {
     if (type === "date") return selectedDateFilters === filter;
     if (type === "category") return selectedCategoryFilters === filter;
-    if (type === "price") return selectedPriceFilters === filter;
+    if (type === "price") {
+      const [minF, maxF] = filter.split(" - ");
+
+      return selectedPriceFilters === `${minF} - ${maxF}`;
+    }
     return false;
   };
 
@@ -220,17 +282,31 @@ const EventsPage = () => {
               {title}
             </h1>
 
-            <select
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-              className="hidden md:block border px-3 py-2 rounded-lg text-sm bg-white"
-            >
-              <option value="">Sort</option>
-              <option value="popular">Popularity</option>
-              <option value="low-high">Price: Low to High</option>
-              <option value="high-low">Price: High to Low</option>
-              <option value="latest">Latest</option>
-            </select>
+            <div className="relative hidden md:block">
+              <select
+                value={sortOption}
+                onChange={(e) => {
+                  const sp = new URLSearchParams(searchParams);
+                  sp.set("sort", e.target.value);
+                  sp.set("page", 1);
+                  setSearchParams(sp);
+                }}
+                className="appearance-none border px-3 py-2 pr-10 rounded-lg text-sm bg-white w-full cursor-pointer"
+              >
+                <option value="" disabled>
+                  Sort
+                </option>
+                <option value="popular">Popularity</option>
+                <option value="low-high">Price: Low to High</option>
+                <option value="high-low">Price: High to Low</option>
+                <option value="latest">Latest</option>
+              </select>
+
+              <ChevronDown
+                size={18}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-6">
@@ -281,7 +357,10 @@ const EventsPage = () => {
               <button
                 className="block w-full text-left py-2"
                 onClick={() => {
-                  setSortOption("popular");
+                  const sp = new URLSearchParams(searchParams);
+                  sp.set("sort", "popular");
+                  sp.set("page", 1);
+                  setSearchParams(sp);
                   setSortOpen(false);
                 }}
               >
@@ -291,7 +370,10 @@ const EventsPage = () => {
               <button
                 className="block w-full text-left py-2"
                 onClick={() => {
-                  setSortOption("low-high");
+                  const sp = new URLSearchParams(searchParams);
+                  sp.set("sort", "low-high");
+                  sp.set("page", 1);
+                  setSearchParams(sp);
                   setSortOpen(false);
                 }}
               >
@@ -301,7 +383,10 @@ const EventsPage = () => {
               <button
                 className="block w-full text-left py-2"
                 onClick={() => {
-                  setSortOption("high-low");
+                  const sp = new URLSearchParams(searchParams);
+                  sp.set("sort", "high-low");
+                  sp.set("page", 1);
+                  setSearchParams(sp);
                   setSortOpen(false);
                 }}
               >
@@ -311,7 +396,10 @@ const EventsPage = () => {
               <button
                 className="block w-full text-left py-2"
                 onClick={() => {
-                  setSortOption("latest");
+                  const sp = new URLSearchParams(searchParams);
+                  sp.set("sort", "latest");
+                  sp.set("page", 1);
+                  setSearchParams(sp);
                   setSortOpen(false);
                 }}
               >

@@ -2,16 +2,16 @@ import Navbar from "../../sharedComponents/user/navbar/Navbar";
 import EventDetails from "../../components/user/EventDetails";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { eventById, getEventsForUser } from "../../services/user";
+import { eventBySlug, getEventsForUser } from "../../services/user";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
 const EventDetailPage = () => {
-  const { eventId } = useParams();
+  const { eventSlug } = useParams();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["event", eventId],
-    queryFn: () => eventById(eventId),
+    queryKey: ["event", eventSlug],
+    queryFn: () => eventBySlug(eventSlug),
     retry: 1,
   });
 

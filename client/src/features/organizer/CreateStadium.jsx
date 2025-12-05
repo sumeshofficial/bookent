@@ -23,8 +23,8 @@ const CreateStadium = () => {
   const [isModified, setIsModified] = useState(false);
   const navigate = useNavigate();
 
-  const { stadiumId } = useParams();
-  const isEditMode = !!stadiumId;
+  const { stadiumSlug } = useParams();
+  const isEditMode = !!stadiumSlug;
   const { organizer } = useSelector((store) => store.organizer);
 
   const queryClient = useQueryClient();
@@ -47,8 +47,8 @@ const CreateStadium = () => {
   const { errors, isSubmitting, dirtyFields } = formState;
 
   const { data, error } = useQuery({
-    queryKey: ["stadium", stadiumId],
-    queryFn: () => getStadium(stadiumId),
+    queryKey: ["stadium", stadiumSlug],
+    queryFn: () => getStadium(stadiumSlug),
     enabled: isEditMode,
     retry: 1,
   });
@@ -145,6 +145,7 @@ const CreateStadium = () => {
       queryClient.invalidateQueries(["stadium"]);
     },
     onError: (err) => {
+      console.log(err);
       toast.dismiss();
       toast.error("Something went wrong");
     },
@@ -176,12 +177,12 @@ const CreateStadium = () => {
       layoutImageKey,
     };
 
-    const data = await handleStadiumCreateMutation.mutateAsync({
+    const stadium = await handleStadiumCreateMutation.mutateAsync({
       payload,
     });
 
     toast.success("Stadium Created Successfully");
-    navigate(`/listmyshow/stadium/${data.stadium._id}`);
+    navigate(`/listmyshow/stadium/${stadium.slug}`);
   };
 
   const handleStadiumEditMutation = useMutation({
@@ -192,6 +193,7 @@ const CreateStadium = () => {
       queryClient.invalidateQueries(["stadium"]);
     },
     onError: (err) => {
+      console.log(err);
       toast.dismiss();
       toast.error("Something went wrong");
     },
@@ -267,12 +269,12 @@ const CreateStadium = () => {
       }
 
       const res = await handleStadiumEditMutation.mutateAsync({
-        stadiumId,
+        stadiumId: stadiumData._id,
         payload: patchPayload,
       });
 
       setIsSubmitted(true);
-      navigate(`/listmyshow/stadium/${res.stadium._id}`);
+      navigate(`/listmyshow/stadium/${res.stadium.slug}`);
     } catch (err) {
       toast.error(err.message || "Update failed");
     }

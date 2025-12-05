@@ -106,6 +106,13 @@ const stadiumSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     stadiumDetails: {
       stadiumName: {
         type: String,

@@ -1,6 +1,7 @@
 export const parseLocation = (user) => {
-  if (!user || !user.location)
+  if (!user || !user.location) {
     return { formattedLocation: "Location not available" };
+  }
 
   const parts = (user.location.address || "").split(",");
   const city = parts[parts.length - 2]?.trim() || "";

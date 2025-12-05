@@ -19,15 +19,15 @@ const StadiumDetails = () => {
 
   const { openModal, closeModal } = useModal();
 
-  const { stadiumId } = useParams();
+  const { stadiumSlug } = useParams();
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["stadium", stadiumId],
-    queryFn: () => getStadium(stadiumId),
-    enabled: !!stadiumId,
+    queryKey: ["stadium", stadiumSlug],
+    queryFn: () => getStadium(stadiumSlug),
+    enabled: !!stadiumSlug,
     retry: 1,
   });
 
@@ -47,6 +47,7 @@ const StadiumDetails = () => {
       navigate("/listmyshow/stadiums");
     },
     onError: (err) => {
+      console.log(err);
       toast.dismiss();
       toast.error("Something went wrong");
     },

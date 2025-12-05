@@ -1,15 +1,13 @@
 import { redisClient } from "../../config/redis.conf.js";
 import dotenv from "dotenv";
 import { AppError } from "../../utility/helpers.js";
-import { SOCKET_EVENTS, STATUS_CODE } from "../../utility/constants.js";
+import { SOCKET_EVENTS, ERRORS } from "../../utility/constants.js";
 import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 
-const LOCK_TTL_MS = Number(process.env.LOCK_TTL); // 2 minutes default
-const LOCKMETA_TTL_PAD = Number(process.env.LOCKMETA_TTL); // 5 seconds padding
-
-// ---------------------------- REDIS KEY HELPERS ---------------------------- //
+const LOCK_TTL_MS = Number(process.env.LOCK_TTL);
+const LOCKMETA_TTL_PAD = Number(process.env.LOCKMETA_TTL);
 
 const inventoryKey = (eventId, sectionId) =>
   `inventory:${eventId}:${sectionId}`;
@@ -21,10 +19,6 @@ const lockMetaKey = (lockId) => `lockmeta:${lockId}`;
 
 const userLocksKey = (eventId, userId) => `userlocks:${eventId}:${userId}`;
 
-// ========================================================================== //
-//                        1) LOCK SECTION QUANTITY                            //
-// ========================================================================== //
-
 export const lockSectionQuantity = async ({
   eventId,
   sectionId,
@@ -32,7 +26,7 @@ export const lockSectionQuantity = async ({
   userId,
 }) => {
   if (qty <= 0) {
-    throw new Error("Quantity must be greater than 0");
+    throw new Error(ERRORS.INVALID_QUANTITY.MSG);
   }
 
   const lockId = uuidv4();
@@ -114,15 +108,11 @@ export const lockSectionQuantity = async ({
   }
 
   if (res && res[0] === "INSUFFICIENT") {
-    throw new Error("Not enough tickets available");
+    throw new Error(ERRORS.INSUFFICIENT_TICKETS.MSG);
   }
 
-  throw new Error("Failed to lock tickets");
+  throw new Error(ERRORS.LOCK_FAILED.MSG);
 };
-
-// ========================================================================== //
-//                            2) CONFIRM BOOKING                              //
-// ========================================================================== //
 
 export const confirmBookingByLock = async ({
   lockIds = [],
@@ -139,24 +129,12 @@ export const confirmBookingByLock = async ({
 
   for (const m of metas) {
     if (!m || !m.userId) {
-      throw new AppError(
-        STATUS_CODE.BAD_REQUEST,
-        "INVALID_LOCK",
-        "One or more locks are invalid"
-      );
+      throw new Error(ERRORS.INVALID_LOCK.MSG);
     }
     if (m.userId !== String(userId)) {
-      throw new AppError(
-        STATUS_CODE.FORBIDDEN,
-        "LOCK_NOT_OWNED",
-        "One or more locks do not belong to this user"
-      );
+      throw new Error(ERRORS.UNAUTHORIZED_LOCK.MSG);
     }
   }
-
-  // 🔥 NOTE: YOU SHOULD WRITE BOOKING TO DB HERE BEFORE RELEASING LOCKS
-  // Example:
-  // await Booking.create({ eventId: metas[0].eventId, details: metas });
 
   const pipeline2 = redisClient.multi();
 
@@ -185,10 +163,6 @@ export const confirmBookingByLock = async ({
 
   return { success: true };
 };
-
-// ========================================================================== //
-//                       3) MANUAL RELEASE (cancel)                           //
-// ========================================================================== //
 
 export const releaseLockById = async ({ lockId }) => {
   const meta = await redisClient.hGetAll(lockMetaKey(lockId));
@@ -230,10 +204,6 @@ export const releaseLockById = async ({ lockId }) => {
   return { success: true };
 };
 
-// ========================================================================== //
-//                4) RELEASE ALL LOCKS WHEN USER DISCONNECTS                  //
-// ========================================================================== //
-
 export const releaseAllLocksForUser = async ({ eventId, userId }) => {
   const setKey = userLocksKey(eventId, userId);
   const lockKeys = await redisClient.sMembers(setKey);
@@ -248,10 +218,6 @@ export const releaseAllLocksForUser = async ({ eventId, userId }) => {
 
   return lockKeys;
 };
-
-// ========================================================================== //
-//                      5) HANDLE TTL EXPIRATION EVENT                        //
-// ========================================================================== //
 
 export const handleExpiredLockKey = async (expiredKey) => {
   const lockId = expiredKey.split(":").pop();

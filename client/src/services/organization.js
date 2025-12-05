@@ -48,8 +48,8 @@ export const getStadiums = async () => {
 };
 
 // Get all Stadiums
-export const getStadium = async (stadiumId) => {
-  const res = await api.get(`/organizer/stadiums/${stadiumId}`);
+export const getStadium = async (stadiumSlug) => {
+  const res = await api.get(`/organizer/stadiums/${stadiumSlug}`);
   return res.data;
 };
 
@@ -134,14 +134,14 @@ export const getEvents = async ({
 };
 
 // Get event
-export const getEvent = async (eventId) => {
-  const res = await api.get(`/organizer/events/${eventId}`);
+export const getEvent = async (eventSlug) => {
+  const res = await api.get(`/organizer/events/${eventSlug}`);
   return res.data;
 };
 
 // Update event
-export const updateEvent = async (eventId, data) => {
-  const res = await api.patch(`/organizer/events/${eventId}/edit`, data);
+export const updateEvent = async (eventSlug, data) => {
+  const res = await api.patch(`/organizer/events/${eventSlug}/edit`, data);
   return res.data;
 };
 

@@ -1,5 +1,4 @@
 import express from "express";
-import passport from "../../middlewares/user/passport.js";
 import {
   forgotPasswordController,
   googleAuthController,
@@ -12,39 +11,14 @@ import {
   verifyOtpController,
 } from "../../controller/user/auth.controller.js";
 import dotenv from "dotenv";
-import { sendPopupResponse } from "../../utility/user/googleAuth.js";
+import { googleCallbackMiddleware } from "../../middlewares/user/googleCallbackMiddleware.js";
+import { googleInitMiddleware } from "../../middlewares/user/googleInitMiddleware.js";
 
 dotenv.config();
-
 const router = express.Router();
 
-router.get("/google", (req, res, next) => {
-  const state = req.query.state;
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    state,
-  })(req, res, next);
-});
-
-router.get("/google/callback", (req, res, next) => {
-  passport.authenticate("google", { session: false }, (err, user) => {
-    const FRONTEND_URL = process.env.FRONTEND_URL;
-    if (err) {
-      return sendPopupResponse(res, { error: "${err.message}" }, FRONTEND_URL);
-    }
-
-    if (!user) {
-      return sendPopupResponse(
-        res,
-        { error: "Authentication failed" },
-        FRONTEND_URL
-      );
-    }
-
-    req.user = user;
-    googleAuthController(req, res, next);
-  })(req, res, next);
-});
+router.get("/google", googleInitMiddleware);
+router.get("/google/callback", googleCallbackMiddleware, googleAuthController);
 
 router.post("/refresh-token", refreshAccessTokenController);
 router.post("/email/signup", registerUserWithEmailController);

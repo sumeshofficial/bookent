@@ -5,7 +5,7 @@ import {
   isUserExists,
   updatePassword,
 } from "../../repositories/user/user.repository.js";
-import { STATUS_CODE } from "../../utility/constants.js";
+import { ERRORS, RES_MESSAGES, STATUS_CODE } from "../../utility/constants.js";
 import { AppError } from "../../utility/helpers.js";
 import { checkOtp, generateOtp, delOtp } from "../notifications/otp.service.js";
 import { sendTokens } from "../../utility/sendTokens.js";
@@ -24,16 +24,16 @@ export const signupUser = async (data) => {
   if (!fullname || !email || !password || !purpose) {
     throw new AppError(
       STATUS_CODE.MISSING_FIELD,
-      "ALL_FIELDS_ARE_REQUIRED",
-      "fullname, email, password, purpose fields are required."
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
     );
   }
 
   if (await isUserExists(email)) {
     throw new AppError(
       STATUS_CODE.CONFLICT,
-      "EMAIL_ALREADY_EXISTS",
-      "A user with this email address already exists."
+      ERRORS.EMAIL_ALREADY_EXISTS.CODE,
+      ERRORS.EMAIL_ALREADY_EXISTS.MSG
     );
   }
 
@@ -51,8 +51,8 @@ export const signinUser = async (data) => {
   if (!email || !password || !purpose) {
     throw new AppError(
       STATUS_CODE.MISSING_FIELD,
-      "ALL_FIELDS_ARE_REQUIRED",
-      "email, purpose and password required."
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
     );
   }
 
@@ -61,8 +61,8 @@ export const signinUser = async (data) => {
   if (!user) {
     throw new AppError(
       STATUS_CODE.NOTFOUND,
-      "USER_NOT_FOUND",
-      "User not found"
+      ERRORS.USER_NOT_FOUND.CODE,
+      ERRORS.USER_NOT_FOUND.MSG
     );
   }
 
@@ -71,16 +71,16 @@ export const signinUser = async (data) => {
   if (!isPasswordValid) {
     throw new AppError(
       STATUS_CODE.UNAUTHORIZED,
-      "INVALID_CREDENTIALS",
-      "Invalid credentials"
+      ERRORS.AUTHENTICATION_FAILED.CODE,
+      ERRORS.AUTHENTICATION_FAILED.MSG
     );
   }
 
   if (user.status === "blocked") {
     throw new AppError(
       STATUS_CODE.UNAUTHORIZED,
-      "USER_BLOCKED",
-      "You are blocked by the admin"
+      ERRORS.USER_BLOCKED.CODE,
+      ERRORS.USER_BLOCKED.MSG
     );
   }
 
@@ -96,8 +96,8 @@ export const resednOtp = async (data) => {
   if (!email || !purpose) {
     throw new AppError(
       STATUS_CODE.MISSING_FIELD,
-      "ALL_FIELDS_ARE_REQUIRED",
-      "email and purpose are required."
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
     );
   }
 
@@ -106,8 +106,8 @@ export const resednOtp = async (data) => {
   if (!userData) {
     throw new AppError(
       STATUS_CODE.NOTFOUND,
-      "NO_PENDING_OTP",
-      "No pending OTP found for user."
+      ERRORS.NO_PENDING_OTP.CODE,
+      ERRORS.NO_PENDING_OTP.MSG
     );
   }
 
@@ -119,8 +119,8 @@ export const validateOtpRequest = ({ email, otp, purpose }) => {
   if (!email || !otp || !purpose) {
     throw new AppError(
       STATUS_CODE.MISSING_FIELD,
-      "ALL_FIELDS_ARE_REQUIRED",
-      "email, purpose and otp are required"
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
     );
   }
 };
@@ -132,13 +132,17 @@ export const verifyOtp = async ({ email, otp, purpose }) => {
   if (!userData) {
     throw new AppError(
       STATUS_CODE.NOTFOUND,
-      "OTP_EXPIRED",
-      "OTP expired or not found"
+      ERRORS.OTP_EXPIRED.CODE,
+      ERRORS.OTP_EXPIRED.MSG
     );
   }
 
   if (userData.otp !== otp || userData.purpose !== purpose) {
-    throw new AppError(STATUS_CODE.BAD_REQUEST, "OTP_INVALID", "Invalid OTP");
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.OTP_INVALID.CODE,
+      ERRORS.OTP_INVALID.MSG
+    );
   }
 
   await delOtp(email, purpose);
@@ -158,7 +162,7 @@ export const handleOtpPurpose = async ({ purpose, userData, res }) => {
       return await handleForgotPasswordOtp(email);
 
     default:
-      return { message: "User verified successfully" };
+      return { message: RES_MESSAGES.USER_VERIFIED };
   }
 };
 
@@ -179,7 +183,7 @@ const handleSignupOtp = async ({ userData, res }) => {
 
   return {
     success: true,
-    message: "User verified successfully",
+    message: RES_MESSAGES.USER_VERIFIED,
     user: updatedUser,
     accessToken,
   };
@@ -192,13 +196,13 @@ const handleForgotPasswordOtp = async (email) => {
   if (!user) {
     throw new AppError(
       STATUS_CODE.NOTFOUND,
-      "USER_NOT_FOUND",
-      "User not found"
+      ERRORS.USER_NOT_FOUND.CODE,
+      ERRORS.USER_NOT_FOUND.MSG
     );
   }
 
   return {
-    message: "User verified successfully",
+    message: RES_MESSAGES.USER_VERIFIED,
   };
 };
 
@@ -206,9 +210,9 @@ const handleForgotPasswordOtp = async (email) => {
 export const refreshAccessToken = async (token) => {
   if (!token) {
     throw new AppError(
-      STATUS_CODE.MISSING_FIELD,
-      "TOKEN_MISSING",
-      "Missing Refresh Token."
+      STATUS_CODE.UNAUTHORIZED,
+      ERRORS.TOKEN_MISSING.CODE,
+      ERRORS.TOKEN_MISSING.MSG
     );
   }
 
@@ -217,8 +221,8 @@ export const refreshAccessToken = async (token) => {
   if (!payload) {
     throw new AppError(
       STATUS_CODE.UNAUTHORIZED,
-      "INVALID_TOKEN",
-      "Invalid or expired refresh token."
+      ERRORS.AUTHENTICATION_FAILED.CODE,
+      ERRORS.AUTHENTICATION_FAILED.MSG
     );
   }
 
@@ -236,26 +240,28 @@ export const refreshAccessToken = async (token) => {
 export const handleLogout = async (res, tokenName, token) => {
   const refreshToken = res.req.cookies[tokenName];
 
-  // Decode expiry for blacklist
-  if (token) {
-    const decoded = jwt.decode(token);
-    const expiresIn = decoded.exp - Math.floor(Date.now() / 1000);
-
-    await blacklistToken(token, expiresIn);
-  }
-
   res.clearCookie(tokenName, {
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "lax",
     secure: false,
   });
+
+  if (token && token !== "null" && token !== "undefined") {
+    const decoded = jwt.decode(token);
+    if (decoded?.exp) {
+      const expiresIn = decoded.exp - Math.floor(Date.now() / 1000);
+      await blacklistToken(token, expiresIn);
+    }
+  }
 
   if (!refreshToken) {
     return;
   }
 
   const payload = await verifyRefreshToken(refreshToken);
-  await revokeRefreshToken(payload.tokenId);
+  if (payload?.tokenId) {
+    await revokeRefreshToken(payload.tokenId);
+  }
 };
 
 // Send otp service
@@ -264,8 +270,8 @@ export const sendOtp = async (data) => {
   if (!email || !purpose) {
     throw new AppError(
       STATUS_CODE.MISSING_FIELD,
-      "ALL_FIELDS_ARE_REQUIRED",
-      "email and purpose are required."
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
     );
   }
 
@@ -274,8 +280,8 @@ export const sendOtp = async (data) => {
   if (!user && !purpose === "edit-email") {
     throw new AppError(
       STATUS_CODE.NOTFOUND,
-      "USER_NOT_FOUND",
-      "User not found"
+      ERRORS.USER_NOT_FOUND.CODE,
+      ERRORS.USER_NOT_FOUND.MSG
     );
   }
 
@@ -295,8 +301,8 @@ export const forgotPassword = async (data) => {
   if (!password || !email) {
     throw new AppError(
       STATUS_CODE.MISSING_FIELD,
-      "ALL_FIELDS_ARE_REQUIRED",
-      "email and pasword required."
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
     );
   }
 
@@ -304,8 +310,8 @@ export const forgotPassword = async (data) => {
   if (!user) {
     throw new AppError(
       STATUS_CODE.NOTFOUND,
-      "USER_NOT_FOUND",
-      "User not found"
+      ERRORS.USER_NOT_FOUND.CODE,
+      ERRORS.USER_NOT_FOUND.MSG
     );
   }
 

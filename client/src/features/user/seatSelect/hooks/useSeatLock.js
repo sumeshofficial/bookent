@@ -11,7 +11,7 @@ export const useSectionLock = (eventId) => {
   const { openModal, closeModal } = useModal();
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !eventId) return;
 
     const seatUpdateHandler = (data) => {
       console.log(data);
@@ -46,6 +46,7 @@ export const useSectionLock = (eventId) => {
   }, [socket, eventId]);
 
   const lockSection = (sectionId, qty, cb) => {
+    if (!eventId) return;
     socket.emit(
       SOCKET_EVENTS.LOCK_SECTION,
       { eventId, sectionId, qty },

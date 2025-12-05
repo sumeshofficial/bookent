@@ -1,38 +1,48 @@
-import { calculateGrandTotal } from "../utils/priceCalculator.js";
-import { calculateBaseFee } from "../utils/baseFeeCalculator.js";
-import { FEE_CONFIG } from "../constants/feeConfig.js";
+import { useQuery } from "@tanstack/react-query";
+import { verifySeatLock } from "../../../../services/user.js";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export const useCheckoutLogic = () => {
-  const ticketPrice = 1500;
+  const lockId = sessionStorage.getItem("lockId");
+  const navigate = useNavigate();
 
-  const baseFee = calculateBaseFee(ticketPrice);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["ticket", lockId],
+    queryFn: () => verifySeatLock(lockId),
+    enabled: !!lockId,
+  });
 
-  const gst = +(baseFee * FEE_CONFIG.gstPercent).toFixed(2);
+  if (error) {
+    console.log(error);
+    toast.error(error.message || "Something went wrong");
+    navigate("/session-expired");
+  }
 
-  const bookingFee = +(baseFee + gst).toFixed(2);
+  const event = data?.event;
+  const section = data?.section;
+  const pricing = data?.pricing;
 
   const tickets = {
-    title: "Kerala Blasters VS NorthEast United FC",
-    count: 2,
-    venue: "JLN Stadium, Kochi",
-    date: "21 October 2025",
-    time: "08:00 PM",
-    section: "South Lower (1500)",
+    title: event?.title,
+    count: section?.qty,
+    venue: event?.venue,
+    date: event?.date,
+    time: event?.time,
+    section: section?.name?.toUpperCase(),
   };
 
   const fees = {
-    orderAmount: ticketPrice,
-    baseFee,
-    gst,
-    bookingFee,
+    orderAmount: pricing?.orderAmount,
+    baseFee: pricing?.baseFee,
+    gst: pricing?.gst,
+    bookingFee: pricing?.bookingFee,
   };
 
   return {
     tickets,
     fees,
-    grandTotal: calculateGrandTotal({
-      orderAmount: ticketPrice,
-      bookingFee,
-    }),
+    grandTotal: pricing?.grandTotal,
+    isLoading,
   };
 };

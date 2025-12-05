@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Plus,
@@ -7,7 +7,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import EventsCard from "../../components/organization/showEvents/EventsCard";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteEvent, getEvents } from "../../services/organization";
 import toast from "react-hot-toast";
@@ -15,47 +15,51 @@ import { useSelector } from "react-redux";
 import { useDebounce } from "use-debounce";
 
 const OrganizerEventsPage = () => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [showMenu, setShowMenu] = useState(null);
 
   const queryClient = useQueryClient();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sort, setSort] = useState("latest");
-  const [debouncedSearch] = useDebounce(searchQuery, 500);
-
-  const [category, setCategory] = useState("");
-  const [priceFilter, setPriceFilter] = useState("");
-
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-
   const { organizer } = useSelector((store) => store.organizer);
   const organizerId = organizer?._id;
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = Number(searchParams.get("page")) || 1;
+  const search = searchParams.get("search") || "";
+  const sortParam = searchParams.get("sort") || "latest";
+  const categoryParam = searchParams.get("category") || "";
+  const priceParam = searchParams.get("price") || "";
+  const startDateParam = searchParams.get("start_date") || "";
+  const endDateParam = searchParams.get("end_date") || "";
+
+  const [searchInput, setSearchInput] = useState(search);
+  const [debouncedSearch] = useDebounce(searchInput, 500);
+
+  useEffect(() => {
+    const sp = new URLSearchParams(searchParams);
+    if (debouncedSearch) sp.set("search", debouncedSearch);
+    else sp.delete("search");
+    sp.set("page", 1);
+    setSearchParams(sp);
+  }, [debouncedSearch, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
+
   const { data, isLoading } = useQuery({
-    queryKey: [
-      "events",
-      organizerId,
-      debouncedSearch,
-      sort,
-      category,
-      priceFilter,
-      startDate,
-      endDate,
-      currentPage,
-    ],
+    queryKey: ["events", organizerId, searchParams.toString()],
     queryFn: () =>
       getEvents({
         id: organizerId,
-        page: currentPage,
-        limit: 8,
-        search: debouncedSearch,
-        sort,
-        category,
-        priceFilter,
-        startDate,
-        endDate,
+        page,
+        limit: 5,
+        search,
+        sort: sortParam,
+        category: categoryParam,
+        priceFilter: priceParam,
+        startDate: startDateParam,
+        endDate: endDateParam,
       }),
     enabled: !!organizerId,
     retry: 1,
@@ -73,6 +77,7 @@ const OrganizerEventsPage = () => {
       queryClient.invalidateQueries(["events"]);
     },
     onError: (err) => {
+      console.log(err);
       toast.dismiss();
       toast.error("Something went wrong");
     },
@@ -85,7 +90,9 @@ const OrganizerEventsPage = () => {
   };
 
   const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
+    const sp = new URLSearchParams(searchParams);
+    sp.set("page", pageNumber);
+    setSearchParams(sp);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -140,10 +147,9 @@ const OrganizerEventsPage = () => {
               <input
                 type="text"
                 placeholder="Search..."
-                value={searchQuery}
+                value={searchInput}
                 onChange={(e) => {
-                  setCurrentPage(1);
-                  setSearchQuery(e.target.value);
+                  setSearchInput(e.target.value);
                 }}
                 className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-full
                    text-sm focus:ring-2 focus:ring-purple-500"
@@ -160,10 +166,13 @@ const OrganizerEventsPage = () => {
               </span>
 
               <select
-                value={category}
+                value={categoryParam}
                 onChange={(e) => {
-                  setCategory(e.target.value);
-                  setCurrentPage(1);
+                  const sp = new URLSearchParams(searchParams);
+                  if (e.target.value) sp.set("category", e.target.value);
+                  else sp.delete("category");
+                  sp.set("page", 1);
+                  setSearchParams(sp);
                 }}
                 className="bg-transparent text-sm text-gray-700 focus:outline-none cursor-pointer 
                     px-2 py-1 w-full sm:w-auto"
@@ -175,10 +184,13 @@ const OrganizerEventsPage = () => {
               </select>
 
               <select
-                value={priceFilter}
+                value={priceParam}
                 onChange={(e) => {
-                  setPriceFilter(e.target.value);
-                  setCurrentPage(1);
+                  const sp = new URLSearchParams(searchParams);
+                  if (e.target.value) sp.set("price", e.target.value);
+                  else sp.delete("price");
+                  sp.set("page", 1);
+                  setSearchParams(sp);
                 }}
                 className="bg-transparent text-sm text-gray-700 focus:outline-none cursor-pointer 
                     px-2 py-1 w-full sm:w-auto"
@@ -192,10 +204,13 @@ const OrganizerEventsPage = () => {
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <input
                   type="date"
-                  value={startDate}
+                  value={startDateParam}
                   onChange={(e) => {
-                    setStartDate(e.target.value);
-                    setCurrentPage(1);
+                    const sp = new URLSearchParams(searchParams);
+                    if (e.target.value) sp.set("start_date", e.target.value);
+                    else sp.delete("start_date");
+                    sp.set("page", 1);
+                    setSearchParams(sp);
                   }}
                   className="text-xs bg-transparent 
                      focus:outline-none cursor-pointer w-full sm:w-auto"
@@ -205,10 +220,13 @@ const OrganizerEventsPage = () => {
 
                 <input
                   type="date"
-                  value={endDate}
+                  value={endDateParam}
                   onChange={(e) => {
-                    setEndDate(e.target.value);
-                    setCurrentPage(1);
+                    const sp = new URLSearchParams(searchParams);
+                    if (e.target.value) sp.set("end_date", e.target.value);
+                    else sp.delete("end_date");
+                    sp.set("page", 1);
+                    setSearchParams(sp);
                   }}
                   className="text-xs bg-transparent
                      focus:outline-none cursor-pointer w-full sm:w-auto"
@@ -224,9 +242,14 @@ const OrganizerEventsPage = () => {
               <span className="font-semibold text-gray-700 text-sm">Sort</span>
 
               <button
-                onClick={() => setSort("price-high")}
+                onClick={() => {
+                  const sp = new URLSearchParams(searchParams);
+                  sp.set("sort", "price-high");
+                  sp.set("page", 1);
+                  setSearchParams(sp);
+                }}
                 className={`${
-                  sort === "price-high"
+                  sortParam === "price-high"
                     ? "font-semibold text-purple-600"
                     : "text-gray-700"
                 }`}
@@ -235,9 +258,14 @@ const OrganizerEventsPage = () => {
               </button>
 
               <button
-                onClick={() => setSort("price-low")}
+                onClick={() => {
+                  const sp = new URLSearchParams(searchParams);
+                  sp.set("sort", "price-low");
+                  sp.set("page", 1);
+                  setSearchParams(sp);
+                }}
                 className={`${
-                  sort === "price-low"
+                  sortParam === "price-low"
                     ? "font-semibold text-purple-600"
                     : "text-gray-700"
                 }`}
@@ -246,9 +274,14 @@ const OrganizerEventsPage = () => {
               </button>
 
               <button
-                onClick={() => setSort("latest")}
+                onClick={() => {
+                  const sp = new URLSearchParams(searchParams);
+                  sp.set("sort", "latest");
+                  sp.set("page", 1);
+                  setSearchParams(sp);
+                }}
                 className={`${
-                  sort === "latest"
+                  sortParam === "latest"
                     ? "font-semibold text-purple-600"
                     : "text-gray-700"
                 }`}
@@ -309,10 +342,10 @@ const OrganizerEventsPage = () => {
         {pagination.totalPages > 1 && (
           <div className="flex justify-center items-center gap-2 mt-8">
             <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
+              onClick={() => paginate(page - 1)}
+              disabled={page === 1}
               className={`p-2 rounded-lg ${
-                currentPage === 1
+                page === 1
                   ? "bg-gray-200 text-gray-400"
                   : "bg-white text-purple-600 hover:bg-purple-50"
               }`}
@@ -325,7 +358,7 @@ const OrganizerEventsPage = () => {
                 key={index}
                 onClick={() => paginate(index + 1)}
                 className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg font-semibold ${
-                  currentPage === index + 1
+                  page === index + 1
                     ? "bg-purple-600 text-white"
                     : "bg-white text-gray-700 hover:bg-purple-50"
                 }`}
@@ -335,10 +368,10 @@ const OrganizerEventsPage = () => {
             ))}
 
             <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === pagination.totalPages}
+              onClick={() => paginate(page + 1)}
+              disabled={page === pagination.totalPages}
               className={`p-2 rounded-lg ${
-                currentPage === pagination.totalPages
+                page === pagination.totalPages
                   ? "bg-gray-200 text-gray-400"
                   : "bg-white text-purple-600 hover:bg-purple-50"
               }`}

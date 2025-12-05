@@ -6,7 +6,7 @@ import { useEffect } from "react";
 const MobileBookingBar = ({
   selectedShape,
   ticketSetup = [],
-  eventId,
+  eventSlug,
   lockSection,
   lockedSections,
 }) => {
@@ -60,7 +60,7 @@ const MobileBookingBar = ({
 
       sessionStorage.setItem("lockId", lockId);
 
-      navigate(`/event/${eventId}/checkout`);
+      navigate(`/event/${eventSlug}/checkout`);
     });
   };
 

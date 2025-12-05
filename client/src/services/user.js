@@ -30,7 +30,16 @@ export const searchEvent = async (params) => {
 };
 
 // Fetch Event
-export const eventById = async (eventId) => {
-  const res = await api.get(`/user/events/${eventId}`);
+export const eventBySlug = async (eventSlug) => {
+  const res = await api.get(`/user/events/${eventSlug}`);
+  return res.data;
+};
+
+// Checkout verify lock
+export const verifySeatLock = async (lockId) => {
+  const res = await api.post("/user/checkout/verify-lock", {
+    lockId,
+  });
+
   return res.data;
 };

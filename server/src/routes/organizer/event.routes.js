@@ -11,13 +11,13 @@ import {
 const router = express.Router();
 
 router.get("/", getEventsController);
-router.get("/:eventId", getEventController);
+router.get("/:eventSlug", getEventController);
 
 router.post("/create/validate", validateEventCreateController);
 router.post("/create/finish", finishEventCreateController);
 router.post("/edit/finish", finishEventEditController);
 
-router.patch("/:eventId/edit", editEventController);
+router.patch("/:eventSlug/edit", editEventController);
 router.patch("/delete", deleteEventController);
 
 export default router;

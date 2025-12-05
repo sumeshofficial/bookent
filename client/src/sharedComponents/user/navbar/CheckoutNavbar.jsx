@@ -5,7 +5,7 @@ import { useModal } from "../../../utils/constants";
 import { useEffect, useRef } from "react";
 import { useSectionLock } from "../../../features/user/seatSelect/hooks/useSeatLock";
 
-const CheckoutNavbar = ({ title, eventId }) => {
+const CheckoutNavbar = ({ title, eventId, eventSlug }) => {
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
 
@@ -36,7 +36,7 @@ const CheckoutNavbar = ({ title, eventId }) => {
           sessionStorage.removeItem("lockId");
           blockBack.current = false;
           closeModal();
-          navigate(`/event/${eventId}/seat-layout`);
+          navigate(`/event/${eventSlug}/seat-layout`);
         },
         onCancel: () => {
           closeModal();
@@ -60,7 +60,7 @@ const CheckoutNavbar = ({ title, eventId }) => {
         sessionStorage.removeItem("lockId");
         blockBack.current = false;
         closeModal();
-        navigate(`/event/${eventId}/seat-layout`);
+        navigate(`/event/${eventSlug}/seat-layout`);
       },
       onCancel: () => {
         closeModal();

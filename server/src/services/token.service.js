@@ -63,6 +63,9 @@ export const revokeRefreshToken = async (tokenId) => {
 
 // Add token to blacklist
 export const blacklistToken = async (token, expiresInSeconds) => {
+  if (!expiresInSeconds || expiresInSeconds <= 0) {
+    return;
+  }
   const key = `blacklist:${token}`;
   await storeInRedis(key, expiresInSeconds, "blacklisted");
 };

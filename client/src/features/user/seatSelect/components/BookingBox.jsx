@@ -1,16 +1,15 @@
 import { ChevronDown, Info } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSectionLock } from "../hooks/useSeatLock";
 
 const BookingBox = ({
   selectedShape,
   ticketSetup = [],
-  eventId,
   lockedSections,
+  eventSlug,
+  lockSection
 }) => {
   const navigate = useNavigate();
-  const { lockSection } = useSectionLock(eventId);
 
   const info = selectedShape
     ? ticketSetup.find((t) => t.sectionId === selectedShape.id)
@@ -63,14 +62,12 @@ const BookingBox = ({
     lockSection(adjustedInfo.sectionId, quantity, (lockId) => {
       if (!lockId) return;
 
-      console.log(lockId);
       sessionStorage.setItem("lockId", lockId);
 
-      navigate(`/event/${eventId}/checkout`);
+      navigate(`/event/${eventSlug}/checkout`);
     });
   };
 
-  // Disable booking when no seats available
   const isSoldOut =
     (adjustedInfo?.availableTickets || 0) === 0 ||
     (maxQty || 0) === 0;

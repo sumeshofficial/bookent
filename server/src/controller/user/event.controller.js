@@ -1,90 +1,22 @@
 import logger from "../../config/logger.js";
 import { getObjectURL } from "../../services/s3.service.js";
 import {
-  eventDetails,
   filterAndSortService,
   findEventsForUser,
+  eventDetails,
 } from "../../services/user.service.js";
-import { statusCode } from "../../utility/constants.js";
+import { STATUS_CODE, statusCode } from "../../utility/constants.js";
+import { getHomeEventsService } from "../../services/user/event.service.js";
+import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Home Page Events List controller
-export const getHomeEventSectionsController = async (req, res) => {
-  try {
-    const user = req.user;
-    logger.http(`${req.method} ${req.originalUrl}`);
+export const getHomeEventSectionsController = asyncHandler(async (req, res) => {
+  const city = req.user?.preferences?.venue;
 
-    const city = user?.preferences?.venue;
+  const sections = await getHomeEventsService(city);
 
-    logger.info("Fetching events");
-    const events = await findEventsForUser();
-
-    logger.info("Fetch images from S3 bucket");
-    const updatedEvents = await Promise.all(
-      events.map(async (event) => {
-        const bannerKey = event.bannerImageKey;
-        const thumbnailKey = event.thumbnailImageKey;
-
-        const bannerImage = await getObjectURL(bannerKey);
-        const thumbnailImage = await getObjectURL(thumbnailKey);
-
-        const updatedEvent = {
-          ...event,
-          bannerImage,
-          thumbnailImage,
-        };
-
-        return updatedEvent;
-      })
-    );
-
-    const recommendedEvents = updatedEvents
-      .filter((event) => {
-        return event.matchDate >= new Date();
-      })
-      .sort((a, b) => b.soldTickets - a.soldTickets)
-      .slice(0, 10);
-
-    const trendingEvents = [...updatedEvents]
-      // .filter((event) => event.soldTickets > 500)
-      .sort((a, b) => b.soldTickets - a.soldTickets)
-      .slice(0, 10);
-
-    const today = new Date().toISOString().split("T")[0];
-    const liveEvents = updatedEvents.filter((e) => {
-      if (!e.matchDate) {
-        return false;
-      }
-      const eventDate = new Date(e.matchDate).toISOString().split("T")[0];
-      return eventDate === today;
-    });
-
-    let popularInYourCity = [];
-    if (city) {
-      popularInYourCity = updatedEvents
-        .filter((event) => {
-          return (
-            event?.stadium?.stadiumDetails?.city?.toLowerCase() ===
-            city.toLowerCase()
-          );
-        })
-        .slice(0, 10);
-    }
-
-    logger.info("Events fetched successfully");
-    res.status(statusCode.success).json({
-      success: true,
-      sections: {
-        recommendedEvents,
-        trendingEvents,
-        liveEvents,
-        popularInYourCity,
-      },
-    });
-  } catch (error) {
-    logger.error(`HOME EVENT ERROR: ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({ error: "Something went wrong" });
-  }
-};
+  sendResponse(res, sections, STATUS_CODE.SUCCESS);
+});
 
 export const filterAndSortEventsController = async (req, res) => {
   try {
@@ -108,23 +40,42 @@ export const filterAndSortEventsController = async (req, res) => {
         return x;
       };
 
-      if (date === "Today") {
-        query.matchDate = { $gte: startOfDay(now), $lte: endOfDay(now) };
-      } else if (date === "Tomorrow") {
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        query.matchDate = {
-          $gte: startOfDay(tomorrow),
-          $lte: endOfDay(tomorrow),
-        };
-      } else if (date === "This-Week") {
-        const end = new Date(now);
-        end.setDate(end.getDate() + 7);
-        query.matchDate = { $gte: startOfDay(now), $lte: endOfDay(end) };
-      } else if (date === "This-Month") {
-        const start = new Date(now.getFullYear(), now.getMonth(), 1);
-        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        query.matchDate = { $gte: startOfDay(start), $lte: endOfDay(end) };
+      const normalized = date.toLowerCase();
+
+      switch (normalized) {
+        case "today": {
+          query.matchDate = { $gte: startOfDay(now), $lte: endOfDay(now) };
+          break;
+        }
+        case "tomorrow": {
+          const tomorrow = new Date(now);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          query.matchDate = {
+            $gte: startOfDay(tomorrow),
+            $lte: endOfDay(tomorrow),
+          };
+          break;
+        }
+        case "this-week": {
+          const weekStart = startOfDay(now);
+          const weekEnd = new Date(now);
+          const day = now.getDay();
+
+          const daysLeft = 7 - day;
+          weekEnd.setDate(weekEnd.getDate() + daysLeft);
+
+          query.matchDate = { $gte: weekStart, $lte: endOfDay(weekEnd) };
+          break;
+        }
+        case "this-month": {
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          query.matchDate = {
+            $gte: startOfDay(monthStart),
+            $lte: endOfDay(monthEnd),
+          };
+          break;
+        }
       }
     }
 
@@ -215,11 +166,11 @@ export const filterAndSortEventsController = async (req, res) => {
 };
 
 export const getSingleEventController = async (req, res) => {
-  const { eventId } = req.params;
+  const { eventSlug } = req.params;
 
   logger.http(`${req.method} ${req.originalUrl}`);
   try {
-    if (!eventId) {
+    if (!eventSlug) {
       logger.warn("Missing required field");
       return res.status(statusCode.missingField).json({
         success: false,
@@ -227,8 +178,8 @@ export const getSingleEventController = async (req, res) => {
       });
     }
 
-    logger.info(`Fetching Event by id ${eventId}`);
-    const event = await eventDetails(eventId);
+    logger.info(`Fetching Event by id ${eventSlug}`);
+    const event = await eventDetails(eventSlug);
 
     const bannerKey = event.bannerImageKey;
     const thumbnailKey = event.thumbnailImageKey;
@@ -243,7 +194,7 @@ export const getSingleEventController = async (req, res) => {
     };
 
     if (!updatedEvent) {
-      logger.info(`Event not found for ${eventId}`);
+      logger.info(`Event not found for ${eventSlug}`);
       return res
         .status(statusCode.missingField)
         .json({ error: "Event not found" });
@@ -294,7 +245,7 @@ export const searchEventController = async (req, res) => {
     }
 
     const updatedEvents = events.reduce((acc, event) => {
-      acc.push({ title: event.eventTitle, id: event._id });
+      acc.push({ title: event.eventTitle, id: event._id, slug: event.slug });
       return acc;
     }, []);
 

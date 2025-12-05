@@ -20,10 +20,10 @@ const HomePage = () => {
     onError: () => toast.error("Failed to load events"),
   });
 
-  const recommendedEvents = data?.sections?.recommendedEvents || [];
-  const trendingEvents = data?.sections?.trendingEvents || [];
-  const liveEvents = data?.sections?.liveEvents || [];
-  const popularInYourCity = data?.sections?.popularInYourCity || [];
+  const recommendedEvents = data?.recommendedEvents || [];
+  const trendingEvents = data?.trendingEvents || [];
+  const liveEvents = data?.liveEvents || [];
+  const popularInYourCity = data?.popularInYourCity || [];
 
   useEffect(() => {
     if (user && !user.location && locationInfo) {

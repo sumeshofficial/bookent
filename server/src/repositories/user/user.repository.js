@@ -48,9 +48,7 @@ export const verifyTokenAndGetUser = async (token) => {
     throw new Error("User not found");
   }
 
-  const updatedUser = sanitizeUser(user);
-
-  return updatedUser;
+  return user;
 };
 
 // Update user

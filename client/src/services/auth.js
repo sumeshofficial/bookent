@@ -70,11 +70,15 @@ export const onResend = async ({ email, purpose }) => {
 };
 
 export const verifyToken = async (token) => {
-  return await api.get(`/user/account/getUser`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  return await api.get(
+    `/user/account/getUser`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+    { withCredentials: true }
+  );
 };
 
 export const verifyTokenAdmin = async () => {

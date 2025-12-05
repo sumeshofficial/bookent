@@ -6,6 +6,9 @@ export const getUser = createAsyncThunk(
   "user/getUser",
   async (_, { rejectWithValue }) => {
     try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
       const res = await verifyToken();
 
       return res.data.user;
@@ -79,7 +82,7 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(updateUserProfile.pending, (state, action) => {
+      .addCase(updateUserProfile.pending, (state) => {
         state.error = null;
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { eventById } from "../../../services/user";
+import { eventBySlug } from "../../../services/user";
 
 import SeatMap from "./components/SeatMap";
 import BookingBox from "./components/BookingBox";
@@ -10,10 +10,10 @@ import { useSectionLock } from "./hooks/useSeatLock";
 import SeatSelectNavbar from "../../../sharedComponents/user/navbar/SeatSelectNavbar";
 
 const SeatSelectPage = () => {
-  const { eventId } = useParams();
+  const { eventSlug } = useParams();
   const { data, isLoading } = useQuery({
-    queryKey: ["event", eventId],
-    queryFn: () => eventById(eventId),
+    queryKey: ["event", eventSlug],
+    queryFn: () => eventBySlug(eventSlug),
     retry: 1,
   });
 
@@ -22,13 +22,11 @@ const SeatSelectPage = () => {
 
   const [selectedShape, setSelectedShape] = useState(null);
 
-  const { lockSection, sections } = useSectionLock(eventId);
-
-  
+  const { lockSection, sections } = useSectionLock(event?._id);
 
   return (
     <>
-      {!isLoading && <SeatSelectNavbar title={event?.eventTitle} /> }
+      <SeatSelectNavbar title={event?.eventTitle} />
 
       <div className="min-h-screen px-4 pt-4 pb-10 w-full bg-gray-100">
         {!isLoading && (
@@ -45,6 +43,7 @@ const SeatSelectPage = () => {
               selectedShape={selectedShape}
               ticketSetup={event?.ticketSetup || []}
               shapes={stadiumShapes}
+              eventSlug={eventSlug}
               eventId={event._id}
               lockSection={lockSection}
               lockedSections={sections}
@@ -54,6 +53,7 @@ const SeatSelectPage = () => {
               selectedShape={selectedShape}
               ticketSetup={event?.ticketSetup || []}
               shapes={stadiumShapes}
+              eventSlug={eventSlug}
               eventId={event._id}
               lockSection={lockSection}
               lockedSections={sections}

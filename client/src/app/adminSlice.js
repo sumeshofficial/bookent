@@ -24,7 +24,10 @@ export const getAdmin = createAsyncThunk(
   "admin/getAdmin",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await verifyTokenAdmin();
+      const token = localStorage.getItem("adminAccessToken");
+
+      if (!token) return;
+      const res = await verifyTokenAdmin(token);
 
       return res.data.user;
     } catch (error) {

@@ -10,6 +10,6 @@ const router = express.Router();
 router.get("/", filterAndSortEventsController);
 router.get("/search", searchEventController);
 router.get("/home", getHomeEventSectionsController);
-router.get("/:eventId", getSingleEventController);
+router.get("/:eventSlug", getSingleEventController);
 
 export default router;

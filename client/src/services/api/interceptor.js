@@ -49,6 +49,14 @@ export const createApiInstance = (type = "user") => {
         return Promise.reject(error);
       }
 
+      const storedToken = localStorage.getItem(
+        type === "admin" ? "adminAccessToken" : "accessToken"
+      );
+
+      if (!storedToken) {
+        return Promise.reject(error);
+      }
+
       if (isRefreshing) {
         try {
           const token = await new Promise((resolve, reject) => {
@@ -98,9 +106,7 @@ export const createApiInstance = (type = "user") => {
           store.dispatch(logoutAdmin());
         } else {
           const { logoutUser } = await import("../../app/userSlice");
-          const { logoutOrganizer } = await import(
-            "../../app/organizerSlice"
-          );
+          const { logoutOrganizer } = await import("../../app/organizerSlice");
           await logout();
           store.dispatch(logoutUser());
           store.dispatch(logoutOrganizer());

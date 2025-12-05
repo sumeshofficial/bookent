@@ -2,234 +2,89 @@ import logger from "../../config/logger.js";
 import { findOrganizerById } from "../../services/auth.service.js";
 import {
   checkOrganizer,
-  createStadiumFn,
   findAllStadiumsWithOrgnaizerId,
   findStadium,
   findStadiums,
-  softDeleteStadiumService,
   stadiumExists,
-  updateStadiumService,
 } from "../../services/organizer.service.js";
-import { deleteObject, getObjectURL } from "../../services/s3.service.js";
-import { statusCode } from "../../utility/constants.js";
+import {
+  createStadium,
+  deleteStadium,
+  updateStadium,
+} from "../../services/organizer/stadium.service.js";
+import { getObjectURL } from "../../services/s3.service.js";
+import {
+  ERRORS,
+  RES_MESSAGES,
+  STATUS_CODE,
+  statusCode,
+} from "../../utility/constants.js";
+import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Create Stadium
-export const createStadium = async (req, res) => {
-  try {
-    const { stadiumDetails, shapes, layoutImageKey, organizerId } = req.body;
+export const createStadiumController = asyncHandler(async (req, res) => {
+  const { stadiumDetails, shapes, layoutImageKey, organizerId } = req.body;
 
-    if (!shapes || !stadiumDetails || !layoutImageKey || !organizerId) {
-      logger.warn(
-        `Missing Required field shapes=${shapes}, stadiumDetails=${stadiumDetails}, layoutImageKey=${layoutImageKey}, organizerId=${organizerId}`
-      );
-      return res
-        .status(statusCode.missingField)
-        .json({ message: "Missing field" });
-    }
-
-    const payload = {
-      organizerId,
-      stadiumDetails,
-      shapes,
-      layoutImageKey,
-    };
-
-    const stadium = await createStadiumFn(payload);
-
-    res.status(statusCode.created).json({
-      stadium,
-    });
-  } catch (error) {
-    logger.error(`Error create stadium ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({
-      error: "Something went worng",
-    });
+  if (!shapes || !stadiumDetails || !layoutImageKey || !organizerId) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
   }
-};
+
+  const payload = {
+    organizerId,
+    stadiumDetails,
+    shapes,
+    layoutImageKey,
+  };
+
+  const stadium = await createStadium(payload);
+
+  sendResponse(res, stadium, STATUS_CODE.CREATED);
+});
 
 // Update stadium
-export const updateStadium = async (req, res) => {
-  try {
-    logger.http(`${req.method}, ${req.originalUrl}`);
+export const updateStadiumController = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { stadiumId } = req.params;
+  const payload = req.body;
 
-    const user = req.user;
-    const { stadiumId } = req.params;
-    const payload = req.body;
-
-    if (!stadiumId || !payload) {
-      logger.warn(
-        `Missing required fields stadiumId-${stadiumId}, payload=${payload}`
-      );
-      return res.status(statusCode.missingField).json({
-        error: "Missing stadiumId or payload",
-      });
-    }
-
-    logger.info(`Checking organizer for userId=${user._id}`);
-    const organizer = await checkOrganizer({ userId: user._id });
-    if (!organizer) {
-      logger.warn(`Organizer not found userId=${user._id}`);
-      return res.status(statusCode.notFound).json({
-        error: "Organizer not found",
-      });
-    }
-
-    logger.info(
-      `Finding stadium for organizerId=${organizer._id}, stadiumId=${stadiumId}`
+  if (!stadiumId || !payload) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
     );
-    const existing = await findStadium(organizer._id, stadiumId);
-
-    if (!existing) {
-      logger.warn("Stadium not found or unauthorized");
-      return res.status(statusCode.notFound).json({
-        error: "Stadium not found or unauthorized",
-      });
-    }
-
-    const updateData = {};
-    const oldDetails = existing.stadiumDetails;
-
-    if (payload.stadiumDetails) {
-      updateData["stadiumDetails"] = {
-        stadiumName:
-          payload.stadiumDetails.stadiumName ?? oldDetails.stadiumName,
-        address: payload.stadiumDetails.address ?? oldDetails.address,
-        city: payload.stadiumDetails.city ?? oldDetails.city,
-        state: payload.stadiumDetails.state ?? oldDetails.state,
-        stateCode: payload.stadiumDetails.stateCode ?? oldDetails.stateCode,
-        pincode: payload.stadiumDetails.pincode ?? oldDetails.pincode,
-        location: payload.stadiumDetails.location ?? oldDetails.location,
-        capacity: payload.stadiumDetails.capacity ?? oldDetails.capacity,
-      };
-    }
-
-    if (payload.stadiumLayout?.shapes) {
-      const newShapes = payload.stadiumLayout.shapes;
-      const oldShapes = existing.shapes;
-
-      const newIds = newShapes.map((s) => s.id);
-
-      const finalShapes = [];
-
-      for (const newShape of newShapes) {
-        const oldShape = oldShapes.find((s) => s.id === newShape.id);
-
-        if (oldShape) {
-          if (
-            newShape.imageKey &&
-            newShape.imageKey !== oldShape.imageKey &&
-            oldShape.imageKey
-          ) {
-            logger.info(`Deleting old shape image: ${oldShape.imageKey}`);
-            await deleteObject(oldShape.imageKey);
-          }
-
-          finalShapes.push(newShape);
-        } else {
-          finalShapes.push(newShape);
-        }
-      }
-
-      const removedShapes = oldShapes.filter((s) => !newIds.includes(s.id));
-      for (const removed of removedShapes) {
-        if (removed.imageKey) {
-          logger.info(`Deleting removed shape image: ${removed.imageKey}`);
-          await deleteObject(removed.imageKey);
-        }
-      }
-
-      updateData.shapes = finalShapes;
-    }
-
-    if (payload.layoutImageKey) {
-      logger.info("Uploading new stadium layout image");
-
-      if (existing.layoutImageKey) {
-        logger.info(`Deleting old layout image key=${existing.layoutImageKey}`);
-        await deleteObject(existing.layoutImageKey);
-      }
-
-      updateData.layoutImageKey = payload.layoutImageKey;
-    }
-
-    const updatedStadium = await updateStadiumService(stadiumId, updateData);
-
-    logger.info("Stadium updated successfully");
-
-    res.status(statusCode.success).json({
-      message: "Stadium updated successfully",
-      stadium: updatedStadium,
-    });
-  } catch (error) {
-    logger.error(`Error update stadium: ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({
-      error: "Something went wrong",
-    });
   }
-};
+
+  const updatedStadium = await updateStadium(stadiumId, payload, user._id);
+
+  sendResponse(res, { stadium: updatedStadium }, STATUS_CODE.SUCCESS);
+});
 
 // Delete Stadium
-export const deleteStadium = async (req, res) => {
-  try {
-    logger.http(`${req.method} ${req.originalUrl}`);
-    const user = req.user;
-    const { stadiumId } = req.params;
+export const deleteStadiumController = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { stadiumId } = req.params;
 
-    if (!stadiumId) {
-      return res.status(statusCode.missingField).json({
-        message: "Missing stadiumId",
-      });
-    }
-
-    logger.info(`Checking organizer for userId=${user._id}`);
-    const organizer = await checkOrganizer({ userId: user._id });
-
-    if (!organizer) {
-      return res.status(statusCode.notFound).json({
-        success: false,
-        message: "Organizer not found",
-      });
-    }
-
-    logger.info(
-      `Finding stadium for organizerId=${organizer._id}, stadiumId=${stadiumId}`
+  if (!stadiumId) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
     );
-    const stadium = await findStadium(organizer._id, stadiumId);
-
-    if (!stadium) {
-      return res.status(statusCode.notFound).json({
-        success: false,
-        message: "Stadium not found or unauthorized",
-      });
-    }
-
-    logger.info("Deleting stadium layout image from S3");
-    if (stadium.layoutImageKey) {
-      await deleteObject(stadium.layoutImageKey);
-    }
-
-    logger.info("Deleting stadium shape images from S3");
-    for (const shape of stadium.shapes) {
-      if (shape.imageKey) {
-        await deleteObject(shape.imageKey);
-      }
-    }
-
-    logger.info("Soft deleting stadium record");
-
-    await softDeleteStadiumService(stadiumId, organizer._id);
-
-    res.status(statusCode.success).json({
-      success: true,
-      message: "Stadium deleted successfully",
-    });
-  } catch (error) {
-    logger.error(`Error delete stadium: ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({
-      message: "Something went wrong",
-    });
   }
-};
+
+  await deleteStadium(user._id, stadiumId);
+
+  sendResponse(
+    res,
+    { message: RES_MESSAGES.STADIUM_DELETED.MSG },
+    STATUS_CODE.SUCCESS
+  );
+});
 
 // Get stadiums
 export const getStadiums = async (req, res) => {
@@ -361,18 +216,18 @@ export const getStadiumsForOrganizer = async (req, res) => {
 export const getStadium = async (req, res) => {
   try {
     logger.http(`${req.method} ${req.originalUrl}`);
-    const { stadiumId } = req.params;
+    const { stadiumSlug } = req.params;
     const user = req.user;
 
     logger.info("Check organizer is exist");
     const organizer = await checkOrganizer({ userId: user._id });
 
     logger.info("Fetching stadium form db");
-    const stadium = await findStadium(organizer._id, stadiumId);
+    const stadium = await findStadium(organizer._id, stadiumSlug);
 
     if (!stadium) {
       logger.warn(
-        `Stadium not found for organizerId=${organizer._id} stadiumId=${stadiumId}`
+        `Stadium not found for organizerId=${organizer._id} stadiumId=${stadiumSlug}`
       );
       return res.status(statusCode.notFound).json({
         error: "Stadium not found",

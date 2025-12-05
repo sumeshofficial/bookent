@@ -1,5 +1,4 @@
 import logger from "../../config/logger.js";
-import { reverseGeocoding } from "../../services/user.service.js";
 import {
   forgotPassword,
   handleLogout,
@@ -12,14 +11,16 @@ import {
   validateOtpRequest,
   verifyOtp,
 } from "../../services/user/auth.service.js";
-import { STATUS_CODE } from "../../utility/constants.js";
-import {
-  sendPopupResponse,
-  validateGoogleUser,
-} from "../../utility/user/googleAuth.js";
+import { ERRORS, STATUS_CODE, RES_MESSAGES } from "../../utility/constants.js";
+import { sendPopupResponse } from "../../utility/user/googleAuth.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 import { sendTokens } from "../../utility/sendTokens.js";
-import { sanitizeUser } from "../../utility/user/sanitizeUser.js";
+import {
+  enrichUserLocation,
+  generateGoogleTokens,
+  prepareGoogleResponse,
+  validateGoogleLogin,
+} from "./helpers/googleAuth.helper.js";
 
 // Google Authentication controller
 export const googleAuthController = async (req, res) => {
@@ -27,41 +28,25 @@ export const googleAuthController = async (req, res) => {
   const FRONTEND_URL = process.env.FRONTEND_URL;
 
   try {
-    const validationError = validateGoogleUser(user);
-    if (validationError) {
-      return sendPopupResponse(res, validationError, FRONTEND_URL);
+    if (!validateGoogleLogin(user, FRONTEND_URL, res)) {
+      return;
     }
 
-    const accessToken = await sendTokens(res, user);
+    const accessToken = await generateGoogleTokens(user, FRONTEND_URL, res);
     if (!accessToken) {
-      return sendPopupResponse(
-        res,
-        { error: "Token generation failed" },
-        FRONTEND_URL
-      );
+      return;
     }
 
-    if (user.role === "user" && user.location) {
-      const geoAddress = await reverseGeocoding({
-        lat: user.location.latitude,
-        lng: user.location.longitude,
-      });
+    await enrichUserLocation(user);
 
-      user.location.address = geoAddress;
-    }
+    const response = prepareGoogleResponse(user, accessToken);
 
-    const safeUser = sanitizeUser(user);
-
-    return sendPopupResponse(
-      res,
-      { accessToken, user: safeUser },
-      FRONTEND_URL
-    );
+    sendPopupResponse(res, response, FRONTEND_URL);
   } catch (error) {
     logger.error(`Error: ${error.stack || error.message}`);
-    return sendPopupResponse(
+    sendPopupResponse(
       res,
-      { error: "Authentication failed. Please try again." },
+      { error: ERRORS.AUTHENTICATION_FAILED.MSG },
       FRONTEND_URL
     );
   }
@@ -74,7 +59,7 @@ export const registerUserWithEmailController = asyncHandler(
 
     sendResponse(
       res,
-      { message: `OTP sent successfully to ${email}` },
+      { message: `${RES_MESSAGES.OTP_SENT.MSG} to ${email}` },
       STATUS_CODE.CREATED
     );
   }
@@ -88,7 +73,7 @@ export const loginwithEmailController = asyncHandler(async (req, res) => {
 
   const response = {
     user,
-    message: "User logged in successfully",
+    message: RES_MESSAGES.USER_LOGGED_IN.MSG,
     accessToken,
   };
 
@@ -101,7 +86,7 @@ export const resendOTPController = asyncHandler(async (req, res) => {
 
   sendResponse(
     res,
-    { message: "OTP resent successfully" },
+    { message: RES_MESSAGES.OTP_RESENT.MSG },
     STATUS_CODE.CREATED
   );
 });
@@ -136,7 +121,7 @@ export const logoutUserController = asyncHandler(async (req, res) => {
 
   sendResponse(
     res,
-    { message: "User logged out successfully" },
+    { message: RES_MESSAGES.USER_LOGGED_OUT.MSG },
     STATUS_CODE.SUCCESS
   );
 });
@@ -147,7 +132,7 @@ export const sendOtpController = asyncHandler(async (req, res) => {
 
   sendResponse(
     res,
-    { message: `OTP sent successfully to ${email}` },
+    { message: `${RES_MESSAGES.OTP_SENT.MSG} to ${email}` },
     STATUS_CODE.CREATED
   );
 });
@@ -158,7 +143,7 @@ export const forgotPasswordController = asyncHandler(async (req, res) => {
 
   sendResponse(
     res,
-    { message: "Password updated successfully" },
+    { message: RES_MESSAGES.PASSWORD_UPDATED.MSG },
     STATUS_CODE.SUCCESS
   );
 });

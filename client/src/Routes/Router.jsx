@@ -66,7 +66,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: "event/:eventId",
+            path: "event/:eventSlug",
             element: (
               <Protected>
                 <EventDetailPage />
@@ -74,7 +74,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: "event/:eventId/seat-layout",
+            path: "event/:eventSlug/seat-layout",
             element: (
               <Protected>
                 <SeatSelectPage />
@@ -82,7 +82,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: "event/:eventId/checkout",
+            path: "event/:eventSlug/checkout",
             element: (
               <Protected>
                 <CheckoutPage />
@@ -123,7 +123,7 @@ const router = createBrowserRouter([
                     element: <CreateEventForm />,
                   },
                   {
-                    path: "organizer/:organizerId/event/:eventId/edit",
+                    path: "organizer/:organizerId/event/:eventSlug/edit",
                     element: <CreateEventForm />,
                   },
                   {
@@ -135,7 +135,7 @@ const router = createBrowserRouter([
                     element: <OrganizerEventsPage />,
                   },
                   {
-                    path: "organizer/:organizerId/event/:eventId",
+                    path: "organizer/:organizerId/event/:eventSlug",
                     element: <EventPreview />,
                   },
                   {
@@ -147,11 +147,11 @@ const router = createBrowserRouter([
                     element: <Stadiums />,
                   },
                   {
-                    path: "stadium/:stadiumId",
+                    path: "stadium/:stadiumSlug",
                     element: <StadiumDetails />,
                   },
                   {
-                    path: "stadium/:stadiumId/edit",
+                    path: "stadium/:stadiumSlug/edit",
                     element: <CreateStadium />,
                   },
                 ],

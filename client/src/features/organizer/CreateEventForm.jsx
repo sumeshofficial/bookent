@@ -29,23 +29,23 @@ const CreateEventForm = () => {
   const { organizer } = useSelector((store) => store.organizer);
   const [isModified, setIsModified] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [updatedEventId, setUpdatedEventId] = useState(null);
+  const [updatedEventSlug, setUpdatedEventSlug] = useState(null);
 
   const queryClient = useQueryClient();
 
-  const { organizerId, eventId } = useParams();
-  const isEditMode = !!eventId;
+  const { organizerId, eventSlug } = useParams();
+  const isEditMode = !!eventSlug;
   const navigate = useNavigate();
 
   useEffect(() => {
     if (organizer && organizerId && organizerId !== organizer._id) {
       navigate("/error");
     }
-  }, [organizer, organizerId]);
+  }, [navigate, organizer, organizerId]);
 
   const { data, error } = useQuery({
-    queryKey: ["event", eventId],
-    queryFn: () => getEvent(eventId),
+    queryKey: ["event", eventSlug],
+    queryFn: () => getEvent(eventSlug),
     enabled: isEditMode,
     retry: 1,
   });
@@ -54,6 +54,7 @@ const CreateEventForm = () => {
 
   useEffect(() => {
     if (error) {
+      console.log(error);
       toast.dismiss();
       toast.error("Something went wrong");
       navigate("/error");
@@ -94,7 +95,7 @@ const CreateEventForm = () => {
     },
     onError: (err) => {
       toast.dismiss();
-      toast.error("Something went wrong");
+      toast.error(err.response.data.error.message || "Something went wrong");
     },
   });
 
@@ -106,8 +107,9 @@ const CreateEventForm = () => {
       queryClient.invalidateQueries(["event"]);
     },
     onError: (err) => {
+      console.log(err);
       toast.dismiss();
-      toast.error("Something went wrong");
+      toast.error(err.response.data.error.message || "Something went wrong");
     },
   });
 
@@ -119,10 +121,6 @@ const CreateEventForm = () => {
         (sum, tier) => sum + tier.totalTickets,
         0
       );
-
-      // dataWithoutImage.ticketSetup = dataWithoutImage.ticketSetup.map(
-      //   (tier) => ({ ...tier, availableTickets: tier.totalTickets })
-      // );
 
       dataWithoutImage.totalTickets = totalTickets;
       dataWithoutImage.availableTickets = totalTickets;
@@ -159,14 +157,14 @@ const CreateEventForm = () => {
           newData.thumbnailImage = true;
         }
 
-        const updatedEvent = await updateEvent(eventId, newData);
+        const updatedEvent = await updateEvent(eventData.slug, newData);
 
         const uploadUrls = updatedEvent?.uploadUrls;
 
         if (!uploadUrls) {
           setIsModified(false);
           setIsSubmitted(true);
-          return setUpdatedEventId(updatedEvent.event._id);
+          return setUpdatedEventSlug(updatedEvent.event.slug);
         }
 
         if (uploadUrls) {
@@ -180,7 +178,7 @@ const CreateEventForm = () => {
             images.bannerImageKey = uploadUrls.bannerImage.key;
           }
           if (uploadUrls?.thumbnailImage?.thumbnailURL) {
-            await uploadFile({
+              uploadFile({
               file: dirtyPayload.thumbnailImage,
               contentType: dirtyPayload.thumbnailImage.type,
               signedUrl: uploadUrls.thumbnailImage.thumbnailURL,
@@ -193,7 +191,8 @@ const CreateEventForm = () => {
             images,
           });
 
-          setUpdatedEventId(res.event._id);
+          console.log(res);
+          setUpdatedEventSlug(res.event.slug);
         }
       } else {
         const resData = await createEventValidate(dataWithoutImage);
@@ -211,33 +210,35 @@ const CreateEventForm = () => {
           signedUrl: uploadUrls.thumbnailImage.thumbnailURL,
         });
 
-        const res = await handleEventCreateMutation.mutateAsync({
+        const event = await handleEventCreateMutation.mutateAsync({
           sessionId,
           bannerImageKey: uploadUrls.bannerImage.key,
           thumbnailImageKey: uploadUrls.thumbnailImage.key,
         });
 
-        setUpdatedEventId(res.event._id);
+        console.log(event);
+        setUpdatedEventSlug(event.slug);
       }
 
       setIsModified(false);
       setIsSubmitted(true);
     } catch (error) {
+      console.log(error);
       toast.error("Something went wrong");
     }
   };
 
   useEffect(() => {
-    if (isSubmitted && updatedEventId) {
+    if (isSubmitted && updatedEventSlug) {
       navigate(
-        `/listmyshow/organizer/${organizer._id}/event/${updatedEventId}`
+        `/listmyshow/organizer/${organizer._id}/event/${updatedEventSlug}`
       );
     }
-  }, [isSubmitted, updatedEventId]);
+  }, [isSubmitted, navigate, organizer._id, updatedEventSlug]);
 
   useNavigationGuard(isModified);
 
-  const handleNextStep = async (e) => {
+  const handleNextStep = async () => {
     const isStepValid = await trigger();
     if (isStepValid) setCurrentStep((prev) => Math.min(prev + 1, 5));
   };
@@ -264,7 +265,6 @@ const CreateEventForm = () => {
             errors={errors}
             setValue={setValue}
             watch={watch}
-            onLayoutCreated={() => setLayoutCreated(true)}
           />
         )}
         {currentStep === 3 && (

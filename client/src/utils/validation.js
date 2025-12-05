@@ -68,7 +68,17 @@ export const validationSchema = [
             .typeError("Ticket count must be a valid number")
             .required("Ticket count is required")
             .min(1, "Ticket count must be greater than 0")
-            .max(100000, "Ticket count is too high"),
+            .test(
+              "capacity-limit",
+              "Available tickets cannot exceed capacity",
+              function (value) {
+                const { totalTickets } = this.parent;
+
+                if (!value || !totalTickets) return true;
+
+                return value <= totalTickets;
+              }
+            ),
           seatPrice: yup
             .number()
             .typeError("Seat price must be a valid number")

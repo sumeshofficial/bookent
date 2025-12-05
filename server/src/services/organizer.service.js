@@ -79,12 +79,6 @@ export const updateRequest = async ({ id, status, reason }) => {
   return organizer;
 };
 
-// Create stadium
-export const createStadiumFn = async (payload) => {
-  const stadium = await Stadium.create(payload);
-  return stadium;
-};
-
 // Find Stadiums
 export const findStadiums = async () => {
   const stadiums = await Stadium.find({ isDeleted: false }).lean();
@@ -107,11 +101,6 @@ export const stadiumExists = async (name, stadiumId) => {
   return Stadium.exists(query);
 };
 
-// Create Event
-export const createEvent = async (data) => {
-  return await Event.create(data);
-};
-
 // Fetch events
 export const fetchEventsWithOrganizerId = async ({
   query,
@@ -119,6 +108,7 @@ export const fetchEventsWithOrganizerId = async ({
   skip,
   limit,
 }) => {
+  console.log(limit);
   const events = await Event.find(query)
     .sort(sortOption)
     .skip(skip)
@@ -130,9 +120,9 @@ export const fetchEventsWithOrganizerId = async ({
 };
 
 // Fetch Event by id
-export const findEvent = async (organizerId, eventId) => {
+export const findEvent = async (organizerId, eventSlug) => {
   return await Event.findOne({
-    _id: eventId,
+    slug: eventSlug,
     organizer: organizerId,
     isDeleted: false,
   });
@@ -227,10 +217,10 @@ export const findAllStadiumsWithOrgnaizerId = async ({
 };
 
 // Find stadium
-export const findStadium = async (organizerId, stadiumId) => {
+export const findStadium = async (organizerId, stadiumSlug) => {
   const stadium = await Stadium.findOne({
     organizerId,
-    _id: stadiumId,
+    slug: stadiumSlug,
     isDeleted: false,
   }).lean();
   return stadium;
@@ -239,17 +229,4 @@ export const findStadium = async (organizerId, stadiumId) => {
 // Update stadium
 export const updateStadiumService = async (stadiumId, data) => {
   return Stadium.findByIdAndUpdate(stadiumId, { $set: data }, { new: true });
-};
-
-// Delete Stadium
-export const softDeleteStadiumService = async (stadiumId, organizerId) => {
-  return Stadium.updateOne(
-    { _id: stadiumId, organizerId },
-    {
-      $set: {
-        isDeleted: true,
-        deletedAt: new Date(),
-      },
-    }
-  );
 };

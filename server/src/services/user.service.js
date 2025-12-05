@@ -101,8 +101,8 @@ export const filterAndSortService = async ({
 };
 
 // Event details
-export const eventDetails = async (eventId) => {
-  return await Event.findById(eventId)
+export const eventDetails = async (eventSlug) => {
+  return await Event.findOne({ slug: eventSlug })
     .populate("stadium")
     .populate("organizer")
     .lean();

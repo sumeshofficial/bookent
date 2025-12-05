@@ -55,13 +55,19 @@ const TicketSetup = ({
                 type="number"
                 {...register(`ticketSetup.${index}.availableTickets`, {
                   valueAsNumber: true,
+                  validate: (value) => {
+                    console.log(value);
+                    value <= capacity ||
+                      `Available tickets cannot exceed ${capacity}`;
+                  },
                 })}
+                placeholder="E.g. 5000"
                 className="text-xs placeholder:text-gray-400 sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md focus:ring-2 focus:ring-violet-500 outline-none"
               />
             </div>
-            {errors?.perUserLimit && (
+            {errors?.availableTickets && (
               <span className="text-red-500 text-[.6rem] sm:text-[.8rem]">
-                {errors.perUserLimit.message}
+                {errors.availableTickets.message}
               </span>
             )}
           </div>
