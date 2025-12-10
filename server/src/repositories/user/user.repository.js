@@ -1,6 +1,6 @@
 import User from "../../models/user.model.js";
 import jwt from "jsonwebtoken";
-import { sanitizeUser } from "../../utility/user/sanitizeUser.js";
+import { ENV } from "../../config/envConfig.js";
 
 // Check user is exists
 export const isUserExists = async (email) => {
@@ -41,7 +41,7 @@ export const updatePassword = async ({ email, password }) => {
 
 // Verify Token and Get User
 export const verifyTokenAndGetUser = async (token) => {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const decoded = jwt.verify(token, ENV.JWT_SECRET);
 
   const user = await User.findById(decoded.id).select("-password");
   if (!user) {

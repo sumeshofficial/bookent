@@ -3,10 +3,11 @@ import { getIO } from "./socket.conf.js";
 import logger from "./logger.js";
 import dotenv from "dotenv";
 import { REDIS_EVENTS } from "../utility/constants.js";
+import { ENV } from "./envConfig.js";
 dotenv.config();
 
 export const initSeatPubSub = async () => {
-  const sub = createClient({ url: process.env.REDIS_URI });
+  const sub = createClient({ url: ENV.REDIS_URI });
   await sub.connect();
 
   await sub.subscribe(REDIS_EVENTS.SEAT_UPDATE, (message) => {

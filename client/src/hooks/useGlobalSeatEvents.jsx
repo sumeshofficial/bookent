@@ -11,11 +11,6 @@ const useGlobalSeatEvents = () => {
   const handleSeatUpdate = useCallback(
     (data) => {
       console.log("GLOBAL seat-update:", data);
-
-      if (data?.isExpired && data?.userId === user?._id) {
-        sessionStorage.removeItem("lockId");
-        navigate("/session-expired", { replace: true });
-      }
     },
     [navigate, user?._id]
   );

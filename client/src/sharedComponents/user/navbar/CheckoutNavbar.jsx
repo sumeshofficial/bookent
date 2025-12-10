@@ -1,6 +1,5 @@
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import BookentLogo from "../../BookentLogo";
 import { useModal } from "../../../utils/constants";
 import { useEffect, useRef } from "react";
 import { useSectionLock } from "../../../features/user/seatSelect/hooks/useSeatLock";
@@ -71,10 +70,6 @@ const CheckoutNavbar = ({ title, eventId, eventSlug }) => {
   return (
     <div className="w-full bg-white shadow-md select-none">
       <div className="relative flex items-center px-4 py-5">
-        <div className="hidden sm:block absolute left-4">
-          <BookentLogo />
-        </div>
-
         <div className="flex items-center gap-2 mx-auto">
           <button onClick={askBackConfirmation}>
             <ChevronLeft size={26} className="text-gray-700" />

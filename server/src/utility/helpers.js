@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 import { STATUS_CODE } from "./constants.js";
 import slugify from "slugify";
 
@@ -31,4 +32,34 @@ export const createSlug = (text) => {
     strict: true,
     trim: true,
   });
+};
+
+export const convertToUSD = (amountInINR, rateDecimal) => {
+  const INR_TO_USD_RATE = new Decimal(1).div(rateDecimal);
+  return new Decimal(amountInINR).times(INR_TO_USD_RATE);
+};
+
+export const validateEventAvailability = (event, blockHours = 4) => {
+  if (!event.matchDate || !event.matchTime) {
+    return false;
+  }
+
+  // Build event datetime using LOCAL time
+  const eventDate = new Date(event.matchDate);
+  const [hours, minutes] = event.matchTime.split(":").map(Number);
+
+  eventDate.setHours(hours);
+  eventDate.setMinutes(minutes);
+  eventDate.setSeconds(0);
+  eventDate.setMilliseconds(0);
+
+  if (isNaN(eventDate)) {
+    return false;
+  }
+
+  const now = new Date();
+  const diffMs = eventDate.getTime() - now.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+
+  return eventDate >= now && diffHours >= blockHours;
 };

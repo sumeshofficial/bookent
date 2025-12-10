@@ -25,11 +25,12 @@ import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 import { findeEventByOrganizerIdAndEventId } from "../../repositories/organizer/event.repository.js";
 import { isSlugExists } from "../../utility/event.utils.js";
 import Event from "../../models/event.model.js";
+import { ENV } from "../../config/envConfig.js";
 
 dotenv.config();
 
 const eventCreateValidationExpiresIn =
-  process.env.REDIS_EVENT_VALIDATION_EXPIRES_IN;
+  ENV.REDIS_EVENT_VALIDATION_EXPIRES_IN;
 
 // Create Event Validate
 export const validateEventCreateController = async (req, res) => {

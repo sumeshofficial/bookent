@@ -1,13 +1,13 @@
 import { redisClient } from "../../config/redis.conf.js";
 import dotenv from "dotenv";
-import { AppError } from "../../utility/helpers.js";
 import { SOCKET_EVENTS, ERRORS } from "../../utility/constants.js";
 import { v4 as uuidv4 } from "uuid";
+import { ENV } from "../../config/envConfig.js";
 
 dotenv.config();
 
-const LOCK_TTL_MS = Number(process.env.LOCK_TTL);
-const LOCKMETA_TTL_PAD = Number(process.env.LOCKMETA_TTL);
+const LOCK_TTL_MS = Number(ENV.LOCK_TTL);
+const LOCKMETA_TTL_PAD = Number(ENV.LOCKMETA_TTL);
 
 const inventoryKey = (eventId, sectionId) =>
   `inventory:${eventId}:${sectionId}`;

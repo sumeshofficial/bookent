@@ -1,10 +1,11 @@
 import { otpTemplate, sendEmail } from "./email.service.js";
 import { redisClient } from "../../config/redis.conf.js";
 import dotenv from "dotenv";
+import { ENV } from "../../config/envConfig.js";
 
 dotenv.config();
 
-const redisExpiresIn = process.env.REDIS_OTP_EXPIRES_IN;
+const redisExpiresIn = ENV.REDIS_OTP_EXPIRES_IN;
 
 // Generate OTP
 export const generateOtp = async ({ email, userData, purpose }) => {

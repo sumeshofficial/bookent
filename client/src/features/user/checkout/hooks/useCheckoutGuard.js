@@ -7,8 +7,6 @@ export const useCheckoutGuard = () => {
   useEffect(() => {
     const lockId = sessionStorage.getItem("lockId");
 
-    console.log(lockId);
-
     if (!lockId) {
       navigate("/session-expired", { replace: true });
       return;

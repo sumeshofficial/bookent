@@ -2,7 +2,7 @@ import { formatDate, formatTime } from "../../utils/dateTimeFormatter";
 
 const TicketCard = ({ data, isLoading }) => {
   const formattedDate = formatDate(data?.date);
-const formattedTime = formatTime(data?.time);
+  const formattedTime = formatTime(data?.time);
 
   return (
     <div className="bg-white rounded-xl border shadow-sm p-5">

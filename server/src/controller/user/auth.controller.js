@@ -21,11 +21,12 @@ import {
   prepareGoogleResponse,
   validateGoogleLogin,
 } from "./helpers/googleAuth.helper.js";
+import { ENV } from "../../config/envConfig.js";
 
 // Google Authentication controller
 export const googleAuthController = async (req, res) => {
   const user = req.user;
-  const FRONTEND_URL = process.env.FRONTEND_URL;
+  const FRONTEND_URL = ENV.FRONTEND_URL;
 
   try {
     if (!validateGoogleLogin(user, FRONTEND_URL, res)) {

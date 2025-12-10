@@ -119,6 +119,14 @@ export const ERRORS = {
     CODE: "TICKET_NOT_FOUND",
     MSG: "Ticket and Section details not found",
   },
+  PAYPAL_ORDER_ERROR: {
+    CODE: "ORDER_CREATION_FAILED",
+    MSG: "Failed to create PayPal order",
+  },
+  PAYPAL_ORDER_CAPTURE_ERROR: {
+    CODE: "ORDER_CAPUTURE_FAILED",
+    MSG: "Failed to capture PayPal order",
+  },
 };
 
 // Response Messages
@@ -182,6 +190,6 @@ export const DB_EVENTS = {
 };
 
 export const FEE_CONFIG = {
-  bookingFeePercent: 0.07,
+  bookingFeePercent: 0.08,
   gstPercent: 0.18,
 };

@@ -6,24 +6,25 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import dotenv from "dotenv";
+import { ENV } from "../config/envConfig.js";
 dotenv.config();
 
-const region = process.env.AWS_BUCKET_REGION;
-const expiresIn = process.env.AWS_SIGNED_URI_EXPIRES_IN;
+const region = ENV.AWS_BUCKET_REGION;
+const expiresIn = ENV.AWS_SIGNED_URI_EXPIRES_IN;
 
 // AWS S3 bucket client
 const s3Client = new S3Client({
   region,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: ENV.AWS_ACCESS_KEY_ID,
+    secretAccessKey: ENV.AWS_SECRET_ACCESS_KEY,
   },
 });
 
 // AWS S3 bucket create signed URL for getObject
 export const getObjectURL = async (key) => {
   const command = new GetObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: ENV.AWS_BUCKET_NAME,
     Key: key,
   });
 
@@ -36,7 +37,7 @@ export const putObject = async ({ fileName, contentType, folderName }) => {
   const key = `uploads/${folderName}/${fileName}`;
 
   const command = new PutObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: ENV.AWS_BUCKET_NAME,
     Key: key,
     ContentType: contentType,
   });
@@ -49,7 +50,7 @@ export const putObject = async ({ fileName, contentType, folderName }) => {
 // AWS S3 bucket delete object
 export const deleteObject = async (key) => {
   const command = new DeleteObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: ENV.AWS_BUCKET_NAME,
     Key: key,
   });
 

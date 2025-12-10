@@ -1,5 +1,6 @@
 import winston from "winston";
 import dotenv from "dotenv";
+import { ENV } from "./envConfig.js";
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ const logger = createLogger({
     debug: 5,
     silly: 6,
   },
-  level: process.env.LOG_LEVEL || "info",
+  level: ENV.LOG_LEVEL || "info",
   format: format.combine(
     format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     format.errors({ stack: true }),

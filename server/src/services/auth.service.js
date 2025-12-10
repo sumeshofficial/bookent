@@ -8,6 +8,7 @@ import {
   revokeRefreshToken,
   verifyRefreshToken,
 } from "./token.service.js";
+import { ENV } from "../config/envConfig.js";
 
 // Check user is already exists
 export const isUserExists = async (email) => {
@@ -86,7 +87,7 @@ export const findOrganizerById = async (id) => {
 
 // Verify Token and Get User
 export const verifyTokenAndGetUser = async (token) => {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const decoded = jwt.verify(token, ENV.JWT_SECRET);
 
   const user = await User.findById(decoded.id).select("-password").lean();
   if (!user) {

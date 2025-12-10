@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { verifySeatLock } from "../../../../services/user.js";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 export const useCheckoutLogic = () => {
   const lockId = sessionStorage.getItem("lockId");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["ticket", lockId],
@@ -14,10 +15,19 @@ export const useCheckoutLogic = () => {
   });
 
   if (error) {
-    console.log(error);
+    sessionStorage.removeItem("lockId");
     toast.error(error.message || "Something went wrong");
     navigate("/session-expired");
   }
+
+  const recheckLock = async () => {
+    const result = await queryClient.fetchQuery({
+      queryKey: ["ticket", lockId],
+      queryFn: () => verifySeatLock(lockId),
+    });
+
+    return result?.isValid;
+  };
 
   const event = data?.event;
   const section = data?.section;
@@ -44,5 +54,6 @@ export const useCheckoutLogic = () => {
     fees,
     grandTotal: pricing?.grandTotal,
     isLoading,
+    recheckLock,
   };
 };

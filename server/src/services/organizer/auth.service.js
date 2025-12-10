@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { AppError } from "../../utility/helpers.js";
 import { STATUS_CODE } from "../../utility/constants.js";
 import { checkOrganizer } from "../../repositories/organizer/organizer.repository.js";
+import { ENV } from "../../config/envConfig.js";
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ export const sendOtp = async (data) => {
   return email;
 };
 
-const redisExpiresIn = process.env.REDIS_OTP_EXPIRES_IN;
+const redisExpiresIn = ENV.REDIS_OTP_EXPIRES_IN;
 
 export const createOtp = async ({ email, organizer, purpose }) => {
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString();

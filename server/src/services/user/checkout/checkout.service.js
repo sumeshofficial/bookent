@@ -5,10 +5,20 @@ import { validateEvent } from "../../helper/validateEvent.helper.js";
 import { validateSeatLock } from "./helper/validateSeatLock.helper.js";
 import { checkoutFeeCalculations } from "./helper/checkoutFeeCalculations.helper.js";
 import { validateStadium } from "./helper/validateStadium.helper.js";
+import { OrdersController } from "@paypal/paypal-server-sdk";
+import { client } from "../../../utility/paypal.js";
+import { fetchRealTimeRate } from "../../helper/currency.service.js";
+import {
+  buildPaypalOrderCapturePayload,
+  buildPaypalOrderPayload,
+  preparePaypalBreakdown,
+} from "./helper/paypal/paypal.helper.js";
+import { formatCheckoutDetails } from "./helper/formatCheckoutDetails.js";
 dotenv.config();
 
-// const LOCK_TTL_EXTEND = process.env.LOCK_TTL_EXTEND;
+const ordersController = new OrdersController(client);
 
+// Checkout page details
 export const checkoutPageDetails = async (lockId, userId) => {
   const meta = await validateSeatLock(lockId, userId);
   const event = await validateEvent(meta.eventId);
@@ -30,31 +40,61 @@ export const checkoutPageDetails = async (lockId, userId) => {
     );
   }
 
-  const { ticketPrice, orderAmount, baseFee, gst, bookingFee, grandTotal } =
-    checkoutFeeCalculations(meta, sectionTicketDetails);
+  const fee = checkoutFeeCalculations(meta, sectionTicketDetails);
+
+  const { eventDetails, sectionDetails, pricingDetails } =
+    formatCheckoutDetails(meta, event, sectionShape, sectionTicketDetails, fee);
 
   return {
     lockId,
-    event: {
-      _id: event._id,
-      title: event.eventTitle,
-      date: event.matchDate,
-      venue: event.stadiumAddress,
-      time: event.matchTime,
-    },
-    section: {
-      _id: sectionShape.id,
-      name: sectionShape.title,
-      price: sectionTicketDetails,
-      qty: Number(meta.qty),
-    },
-    pricing: {
-      ticketPrice,
-      orderAmount,
-      baseFee,
-      gst,
-      bookingFee,
-      grandTotal,
-    },
+    isValid: true,
+    event: eventDetails,
+    section: sectionDetails,
+    pricing: pricingDetails,
   };
+};
+
+// Paypal Create Order
+export const paypalCreateOrder = async (ticketDetails) => {
+  const { lockId, event, section, pricing } = ticketDetails;
+  const USD_TO_INR_RATE_DECIMAL = await fetchRealTimeRate("INR");
+
+  const breakdown = preparePaypalBreakdown(
+    section,
+    pricing,
+    USD_TO_INR_RATE_DECIMAL
+  );
+
+  const collect = buildPaypalOrderPayload(lockId, event, section, breakdown);
+
+  try {
+    const { result } = await ordersController.createOrder(collect);
+    console.log(result);
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw new AppError(
+      error.response?.status || STATUS_CODE.SERVER_ERROR,
+      error.response?.data?.name || ERRORS.PAYPAL_ORDER_ERROR.CODE,
+      error.response?.data?.message || ERRORS.PAYPAL_ORDER_ERROR.MSG
+    );
+  }
+};
+
+export const paypalCaptureOrder = async (orderID) => {
+  const collect = buildPaypalOrderCapturePayload(orderID);
+
+  try {
+    const { result } = await ordersController.captureOrder(collect);
+
+    console.log(result);
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw new AppError(
+      error.response?.status || STATUS_CODE.SERVER_ERROR,
+      error.response?.data?.name || ERRORS.PAYPAL_ORDER_CAPTURE_ERROR.CODE,
+      error.response?.data?.message || ERRORS.PAYPAL_ORDER_CAPTURE_ERROR.MSG
+    );
+  }
 };

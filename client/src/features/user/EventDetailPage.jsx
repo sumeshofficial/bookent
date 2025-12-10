@@ -30,7 +30,7 @@ const EventDetailPage = () => {
   const event = data?.event;
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col justify-between">
       <Navbar />
 
       {isLoading && (

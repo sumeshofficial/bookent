@@ -1,7 +1,8 @@
 import { sendMail } from "../utility/mailer.js";
 import { redisClient } from "../config/redis.conf.js";
+import { ENV } from "../config/envConfig.js";
 
-const redisExpiresIn = process.env.REDIS_OTP_EXPIRES_IN;
+const redisExpiresIn = ENV.REDIS_OTP_EXPIRES_IN;
 
 // Generate OTP
 export const generateOtp = async ({ email, userData, purpose }) => {

@@ -2,9 +2,10 @@ import { createClient } from "redis";
 import dotenv from "dotenv";
 import logger from "./logger.js";
 import { REDIS_EVENTS } from "../utility/constants.js";
+import { ENV } from "./envConfig.js";
 dotenv.config();
 
-const REDIS_URI = process.env.REDIS_URI;
+const REDIS_URI = ENV.REDIS_URI;
 
 // Redis configuration
 const redisClient = createClient({

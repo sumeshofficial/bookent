@@ -35,8 +35,6 @@ export const finishCreateEvent = async (body) => {
 
   const event = await createEvent(newEvent);
 
-  console.log(event);
-
   if (event.ticketSetup && event.ticketSetup.length > 0) {
     for (const section of event.ticketSetup) {
       const redisKey = `inventory:${event._id}:${section.sectionId}`;

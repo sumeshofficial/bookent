@@ -29,7 +29,13 @@ const SeatSelectPage = () => {
       <SeatSelectNavbar title={event?.eventTitle} />
 
       <div className="min-h-screen px-4 pt-4 pb-10 w-full bg-gray-100">
-        {!isLoading && (
+        {!isLoading && !event ? (
+          <div className="flex items-center justify-center w-full py-10">
+            <p className="text-red-600 text-lg font-semibold">
+              Event not found or unavailable.
+            </p>
+          </div>
+        ) : (
           <div className="flex flex-col lg:flex-row items-start justify-center gap-4 w-full">
             <SeatMap
               shapes={stadiumShapes}
@@ -44,7 +50,7 @@ const SeatSelectPage = () => {
               ticketSetup={event?.ticketSetup || []}
               shapes={stadiumShapes}
               eventSlug={eventSlug}
-              eventId={event._id}
+              eventId={event?._id}
               lockSection={lockSection}
               lockedSections={sections}
             />
@@ -54,7 +60,7 @@ const SeatSelectPage = () => {
               ticketSetup={event?.ticketSetup || []}
               shapes={stadiumShapes}
               eventSlug={eventSlug}
-              eventId={event._id}
+              eventId={event?._id}
               lockSection={lockSection}
               lockedSections={sections}
             />

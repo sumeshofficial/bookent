@@ -4,13 +4,14 @@ import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import dotenv from "dotenv";
 import { findUserById, handleGoogleAuth } from "../../services/auth.service.js";
 import { getObjectURL } from "../../services/s3.service.js";
+import { ENV } from "../../config/envConfig.js";
 dotenv.config();
 
-const googleCallbackUrl = process.env.GOOGLE_CALLBACK_URL;
+const googleCallbackUrl = ENV.GOOGLE_CALLBACK_URL;
 
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
+  secretOrKey: ENV.JWT_SECRET,
 };
 
 passport.use(
@@ -31,8 +32,8 @@ passport.use(
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientID: ENV.GOOGLE_CLIENT_ID,
+      clientSecret: ENV.GOOGLE_CLIENT_SECRET,
       callbackURL: googleCallbackUrl,
       passReqToCallback: true,
     },

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import logger from "./logger.js";
 import dotenv from "dotenv";
 import { DB_EVENTS } from "../utility/constants.js";
+import { ENV } from "./envConfig.js";
 dotenv.config();
 
 // Database configuration
@@ -10,8 +11,8 @@ const connectDB = async () => {
     mongoose.connection.on(DB_EVENTS.CONNECTED, () =>
       logger.info("Database Connected")
     );
-    await mongoose.connect(process.env.MONGODB_ATLAS_URI);
-    // await mongoose.connect(`${process.env.MONGODB_URI}bookent`);
+    await mongoose.connect(ENV.MONGODB_ATLAS_URI);
+    // await mongoose.connect(`${ENV.MONGODB_URI}bookent`);
   } catch (error) {
     logger.error(error.message);
   }

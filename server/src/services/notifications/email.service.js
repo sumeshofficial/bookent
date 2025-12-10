@@ -1,14 +1,15 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import { ENV } from "../../config/envConfig.js";
 dotenv.config();
 
-const logo = process.env.LOGO_URL;
+const logo = ENV.LOGO_URL;
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASSWORD,
+    user: ENV.EMAIL,
+    pass: ENV.PASSWORD,
   },
 });
 
@@ -17,7 +18,7 @@ export const sendEmail = async ({ to, subject, html }) => {
   const companyName = "Bookent";
 
   const mailOptions = {
-    from: `${companyName} <${process.env.EMAIL}>`,
+    from: `${companyName} <${ENV.EMAIL}>`,
     to,
     subject,
     html,

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import logger from "./logger.js";
 import userSocketHandlers from "../sockets/user/user.socket.js";
 import { SOCKET_EVENTS } from "../utility/constants.js";
+import { ENV } from "./envConfig.js";
 
 dotenv.config();
 
@@ -12,7 +13,7 @@ let io;
 export const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: [process.env.FRONTEND_URL],
+      origin: [ENV.FRONTEND_URL],
       credentials: true,
     },
   });

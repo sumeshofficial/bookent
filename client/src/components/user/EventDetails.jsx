@@ -2,6 +2,7 @@ import { Calendar, Clock, MapPin } from "lucide-react";
 import { Hourglass, Users, Languages } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import EventRow from "../home/EventRow";
+import { formatTime } from "../../features/user/checkout/utils/dateTimeFormatter";
 
 const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
   const {
@@ -24,6 +25,9 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
     availableTickets,
   } = event;
 
+  const formattedMatchTime = formatTime(matchTime);
+  const formattedGateTime = formatTime(gateOpenTime);
+
   const formattedDate = new Date(matchDate).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "long",
@@ -33,16 +37,8 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
   const navigate = useNavigate();
 
   const start = new Date(matchDate);
-  const end = new Date(start.getTime() + matchDuration * 60 * 1000);
 
   const formattedStartDate = start.toLocaleDateString("en-IN", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-
-  const formattedEndDate = end.toLocaleDateString("en-IN", {
     weekday: "short",
     day: "2-digit",
     month: "short",
@@ -55,7 +51,6 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
 
   const isFillingFast = soldTickets / totalTickets >= 0.6;
 
-  const isEventOver = new Date(matchDate) < new Date();
   const isSoldOut = availableTickets <= 0;
   const isCancelled = event?.eventStatus === "Cancelled";
   const isPostponed = event?.postponed?.isPostponed;
@@ -66,7 +61,6 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
   const isCutoffPassed = new Date() > bookingCutoff;
 
   const disableBooking =
-    isEventOver ||
     isSoldOut ||
     isCancelled ||
     isPostponed ||
@@ -126,13 +120,13 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
             <div className="mt-4 grid grid-cols-1 gap-5 text-gray-700">
               <div>
                 <p>
-                  <strong>Match Time:</strong> {matchTime}
+                  <strong>Match Time:</strong> {formattedMatchTime}
                 </p>
                 <p>
                   <strong>Date:</strong> {formattedDate}
                 </p>
                 <p>
-                  <strong>Gate Opens At:</strong> {gateOpenTime}
+                  <strong>Gate Opens At:</strong> {formattedGateTime}
                 </p>
                 <p>
                   <strong>Match Duration:</strong> {matchDuration} minutes
@@ -158,13 +152,13 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
               <div className="flex items-start gap-3">
                 <Calendar className="w-5 h-5 text-gray-700" />
                 <span className="text-gray-800 font-medium">
-                  {formattedStartDate} - {formattedEndDate}
+                  {formattedStartDate}
                 </span>
               </div>
 
               <div className="flex items-start gap-3">
                 <Clock className="w-5 h-5 text-gray-700" />
-                <span className="text-gray-800">{matchTime}</span>
+                <span className="text-gray-800">{formattedMatchTime}</span>
               </div>
 
               <div className="flex items-start gap-3">
@@ -213,8 +207,6 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
                     ? "Coming Soon"
                     : isSoldOut
                     ? "Sold Out"
-                    : isEventOver
-                    ? "Event Passed"
                     : isCancelled
                     ? "Cancelled"
                     : isPostponed

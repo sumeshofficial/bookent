@@ -3,16 +3,16 @@ import dotenv from "dotenv";
 import RefreshToken from "../models/refreshToken.model.js";
 import { v4 as uuidv4 } from "uuid";
 import { getRedisData, storeInRedis } from "./redis.service.js";
+import { ENV } from "../config/envConfig.js";
 dotenv.config();
 
-const userRefreshTokenExpiresIn = process.env.JWT_USER_REFRESH_TOKEN_EXPIRES_IN;
-const adminRefreshTokenExpiresIn =
-  process.env.JWT_ADMIN_REFRESH_TOKEN_EXPIRES_IN;
-const accessTokenExpiresIn = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN;
+const userRefreshTokenExpiresIn = ENV.JWT_USER_REFRESH_TOKEN_EXPIRES_IN;
+const adminRefreshTokenExpiresIn = ENV.JWT_ADMIN_REFRESH_TOKEN_EXPIRES_IN;
+const accessTokenExpiresIn = ENV.JWT_ACCESS_TOKEN_EXPIRES_IN;
 
 // Creating JWT access token
 export const generateAccessToken = ({ userId, role }) => {
-  return jwt.sign({ id: userId, role }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: userId, role }, ENV.JWT_SECRET, {
     expiresIn: accessTokenExpiresIn,
   });
 };
@@ -27,15 +27,11 @@ export const generateRefreshToken = async ({ userId, role }) => {
     expiresIn,
     { userId, role, tokenId },
     "expiresIn",
-    process.env.JWT_REFRESH_SECRET
+    ENV.JWT_REFRESH_SECRET
   );
-  const token = jwt.sign(
-    { userId, role, tokenId },
-    process.env.JWT_REFRESH_SECRET,
-    {
-      expiresIn,
-    }
-  );
+  const token = jwt.sign({ userId, role, tokenId }, ENV.JWT_REFRESH_SECRET, {
+    expiresIn,
+  });
   await RefreshToken.create({
     userId,
     tokenId,
@@ -45,7 +41,7 @@ export const generateRefreshToken = async ({ userId, role }) => {
 
 // Verify refresh Token
 export const verifyRefreshToken = async (token) => {
-  const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  const payload = jwt.verify(token, ENV.JWT_REFRESH_SECRET);
   const dbToken = await RefreshToken.findOne({
     tokenId: payload.tokenId,
   });

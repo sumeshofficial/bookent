@@ -6,14 +6,14 @@ import ContinueButton from "./components/footer/ContinueButton";
 import { useCheckoutLogic } from "./hooks/useCheckoutLogic";
 import CheckoutNavbar from "../../../sharedComponents/user/navbar/CheckoutNavbar";
 import { useParams } from "react-router-dom";
-import useReleaseSeatLock from "../../../hooks/useReleaseSeatLock";
+// import useReleaseSeatLock from "../../../hooks/useReleaseSeatLock";
 import { useCheckoutGuard } from "./hooks/useCheckoutGuard";
 
 const CheckoutPage = () => {
   const { tickets, fees, grandTotal, eventId, isLoading } = useCheckoutLogic();
   const { eventSlug } = useParams();
 
-  useReleaseSeatLock(eventId);
+  // useReleaseSeatLock(eventId);
   useCheckoutGuard();
 
   return (
@@ -28,7 +28,7 @@ const CheckoutPage = () => {
 
         <GrandTotal amount={grandTotal} />
 
-        <ContinueButton />
+        <ContinueButton eventSlug={eventSlug} isLoading={isLoading} />
       </div>
     </>
   );

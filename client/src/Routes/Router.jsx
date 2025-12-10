@@ -30,6 +30,7 @@ import StadiumDetails from "../features/organizer/StadiumDetails";
 import SeatSelectPage from "../features/user/seatSelect/SeatSelectPage";
 import CheckoutPage from "../features/user/checkout/CheckoutPage";
 import SessionTimeout from "../sharedComponents/user/error/SessionTimeout";
+import PaymentPage from "../features/user/payment/PaymentPage";
 
 const router = createBrowserRouter([
   {
@@ -94,6 +95,14 @@ const router = createBrowserRouter([
             element: (
               <Protected>
                 <SessionTimeout />
+              </Protected>
+            ),
+          },
+          {
+            path: "event/:eventSlug/payment-method",
+            element: (
+              <Protected>
+                <PaymentPage />
               </Protected>
             ),
           },

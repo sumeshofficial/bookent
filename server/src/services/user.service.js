@@ -2,9 +2,10 @@ import dotenv from "dotenv";
 import User from "../models/user.model.js";
 import axios from "axios";
 import Event from "../models/event.model.js";
+import { ENV } from "../config/envConfig.js";
 dotenv.config();
 
-const GOOGLE_MAP_URI = process.env.GOOGLE_MAP_URI;
+const GOOGLE_MAP_URI = ENV.GOOGLE_MAP_URI;
 
 // Update user
 export const updateUserService = async ({ id, data }) => {
@@ -51,7 +52,7 @@ export const getAllUsers = async ({ limit, skip, search, sort, status }) => {
 
 // Reverse Geocoding
 export const reverseGeocoding = async ({ lat, lng }) => {
-  const LOCATION_API_KEY = process.env.LOCATION_API_KEY;
+  const LOCATION_API_KEY = ENV.LOCATION_API_KEY;
   const response = await axios.get(
     `${GOOGLE_MAP_URI}/geocode/json?latlng=${lat},${lng}&key=${LOCATION_API_KEY}`
   );
@@ -102,7 +103,11 @@ export const filterAndSortService = async ({
 
 // Event details
 export const eventDetails = async (eventSlug) => {
-  return await Event.findOne({ slug: eventSlug })
+  return await Event.findOne({
+    slug: eventSlug,
+    eventStatus: { $nin: ["Draft", "Completed"] },
+    isDeleted: false,
+  })
     .populate("stadium")
     .populate("organizer")
     .lean();

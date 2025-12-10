@@ -6,8 +6,9 @@ import {
   eventDetails,
 } from "../../services/user.service.js";
 import { STATUS_CODE, statusCode } from "../../utility/constants.js";
-import { getHomeEventsService } from "../../services/user/event.service.js";
+import { getHomeEventsService } from "../../services/user/event/event.service.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";
+import { validateEventAvailability } from "../../utility/helpers.js";
 
 // Home Page Events List controller
 export const getHomeEventSectionsController = asyncHandler(async (req, res) => {
@@ -132,9 +133,11 @@ export const filterAndSortEventsController = async (req, res) => {
       limit,
     });
 
+    const timeFilteredEvents = events.filter(validateEventAvailability);
+
     logger.info("Fetch images from S3 bucket");
     const updatedEvents = await Promise.all(
-      events.map(async (event) => {
+      timeFilteredEvents.map(async (event) => {
         const bannerKey = event.bannerImageKey;
         const thumbnailKey = event.thumbnailImageKey;
 
@@ -180,6 +183,42 @@ export const getSingleEventController = async (req, res) => {
 
     logger.info(`Fetching Event by id ${eventSlug}`);
     const event = await eventDetails(eventSlug);
+
+    const buildMatchDateTime = (event) => {
+      if (!event?.matchDate || !event?.matchTime) {
+        return null;
+      }
+
+      const base = new Date(event.matchDate);
+      const [hours, minutes] = event.matchTime.split(":").map(Number);
+
+      base.setHours(hours);
+      base.setMinutes(minutes);
+      base.setSeconds(0);
+      base.setMilliseconds(0);
+
+      return base;
+    };
+
+    const isEventValid = (event, now = new Date(), blockHours = 4) => {
+      const dateTime = buildMatchDateTime(event);
+      if (!dateTime || isNaN(dateTime)) {
+        return false;
+      }
+
+      const diffMs = dateTime.getTime() - now.getTime();
+      const diffHours = diffMs / (1000 * 60 * 60);
+
+      return dateTime >= now && diffHours >= blockHours;
+    };
+
+    if (!isEventValid(event)) {
+      return res.status(statusCode.success).json({
+        success: false,
+        message: "Event is no longer available",
+        event: null,
+      });
+    }
 
     const bannerKey = event.bannerImageKey;
     const thumbnailKey = event.thumbnailImageKey;
@@ -231,12 +270,12 @@ export const searchEventController = async (req, res) => {
     const { searchQuery } = req.query;
 
     logger.http(`${req.method} ${req.originalUrl}`);
-
     logger.info(`Fetch event for query=${searchQuery}`);
+
     const events = await findEventsForUser(searchQuery);
 
-    if (!events) {
-      logger.warn(`No event found for this query=${searchQuery}`);
+    // If null or empty
+    if (!events || events.length === 0) {
       return res.status(statusCode.success).json({
         success: true,
         message: "Events not found",
@@ -244,22 +283,38 @@ export const searchEventController = async (req, res) => {
       });
     }
 
-    const updatedEvents = events.reduce((acc, event) => {
-      acc.push({ title: event.eventTitle, id: event._id, slug: event.slug });
-      return acc;
-    }, []);
+    // Apply correct time filtering
+    const timeFiltered = events.filter((event) =>
+      validateEventAvailability(event)
+    );
+
+    // Still empty after filtering?
+    if (timeFiltered.length === 0) {
+      return res.status(statusCode.success).json({
+        success: true,
+        message: "No available events",
+        events: [],
+      });
+    }
+
+    const updatedEvents = timeFiltered.map((event) => ({
+      title: event.eventTitle,
+      id: event._id,
+      slug: event.slug,
+    }));
 
     logger.info("Event fetched successfully");
+
     res.status(statusCode.success).json({
       success: true,
-      message: "Event fetched succesfully",
+      message: "Event fetched successfully",
       events: updatedEvents.slice(0, 10),
     });
   } catch (error) {
     logger.error(`Error fetch event ${error.stack || error.message}`);
     res.status(statusCode.serverError).json({
       success: false,
-      messgae: "Something went worng",
+      messgae: "Something went wrong",
     });
   }
 };

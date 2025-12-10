@@ -15,11 +15,12 @@ import { initSocket } from "./config/socket.conf.js";
 import http from "http";
 import { initRedisExpiryListener } from "./config/redisExpiry.conf.js";
 import { initSeatPubSub } from "./config/seatPubSub.conf.js";
+import { ENV } from "./config/envConfig.js";
 dotenv.config();
 
 const app = express();
 
-const PORT = process.env.PORT;
+const PORT = ENV.PORT;
 const server = http.createServer(app);
 
 // Database connect
