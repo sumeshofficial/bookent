@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    capturePaypalOrderController,
+  capturePaypalOrderController,
   checkoutDetailsController,
   createPaypalOrderController,
 } from "../../controller/user/checkout.controller.js";

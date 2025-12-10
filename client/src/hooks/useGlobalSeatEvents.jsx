@@ -1,18 +1,14 @@
 import { useContext, useEffect, useCallback } from "react";
 import { SOCKET_EVENTS, SocketContext } from "../utils/constants";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 const useGlobalSeatEvents = () => {
   const socket = useContext(SocketContext);
-  const navigate = useNavigate();
-  const { user } = useSelector((store) => store.user);
 
   const handleSeatUpdate = useCallback(
     (data) => {
       console.log("GLOBAL seat-update:", data);
     },
-    [navigate, user?._id]
+    []
   );
 
   useEffect(() => {

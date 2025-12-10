@@ -26,7 +26,7 @@ export const fetchRealTimeRate = async (targetCurrency = "INR") => {
     throw new Error("API returned invalid rate data.");
   } catch (error) {
     console.error(
-      `🚨 Currency API Failure: Using Fallback Rate of ${FALLBACK_RATE}`
+      `Currency API Failure: Using Fallback Rate of ${FALLBACK_RATE} Error=${error.message}`
     );
     return new Decimal(FALLBACK_RATE);
   }

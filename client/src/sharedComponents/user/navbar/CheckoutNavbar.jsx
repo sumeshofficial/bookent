@@ -49,7 +49,7 @@ const CheckoutNavbar = ({ title, eventId, eventSlug }) => {
     return () => {
       window.removeEventListener("popstate", handlePop);
     };
-  }, []);
+  }, [closeModal, eventSlug, lockId, navigate, openModal, releaseSection]);
 
   const askBackConfirmation = () => {
     openModal("checkout-back-modal", {

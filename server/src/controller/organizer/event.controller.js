@@ -29,8 +29,7 @@ import { ENV } from "../../config/envConfig.js";
 
 dotenv.config();
 
-const eventCreateValidationExpiresIn =
-  ENV.REDIS_EVENT_VALIDATION_EXPIRES_IN;
+const eventCreateValidationExpiresIn = ENV.REDIS_EVENT_VALIDATION_EXPIRES_IN;
 
 // Create Event Validate
 export const validateEventCreateController = async (req, res) => {

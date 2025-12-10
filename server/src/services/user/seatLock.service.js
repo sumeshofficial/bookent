@@ -117,7 +117,7 @@ export const lockSectionQuantity = async ({
 export const confirmBookingByLock = async ({
   lockIds = [],
   userId,
-  bookingMeta = {},
+  // bookingMeta = {},
 }) => {
   const pipeline = redisClient.multi();
 
