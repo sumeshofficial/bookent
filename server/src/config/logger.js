@@ -1,6 +1,6 @@
 import winston from "winston";
 import dotenv from "dotenv";
-import { ENV } from "./envConfig.js";
+import { ENV } from "./env.conf.js";
 
 dotenv.config();
 

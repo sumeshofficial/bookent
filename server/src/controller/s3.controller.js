@@ -1,5 +1,5 @@
 import { getObjectURL, putObject } from "../services/s3.service.js";
-import { statusCode } from "../utility/constants.js";
+import { statusCode } from "../utility/constants/statusCode.js";
 
 // AWS S3 upload files
 export const uploadFiles = async (req, res) => {

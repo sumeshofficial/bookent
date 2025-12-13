@@ -1,5 +1,6 @@
 import { checkSlugExists } from "../repositories/organizer/slug.repository.js";
-import { ERRORS, STATUS_CODE } from "./constants.js";
+import { ERRORS } from "./constants/constants.js";
+import { STATUS_CODE } from "./constants/statusCode.js";
 import { AppError, createSlug } from "./helpers.js";
 
 export const isSlugExists = async (Model, title, excludeId = null) => {

@@ -4,7 +4,7 @@ import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import dotenv from "dotenv";
 import { findUserById, handleGoogleAuth } from "../../services/auth.service.js";
 import { getObjectURL } from "../../services/s3.service.js";
-import { ENV } from "../../config/envConfig.js";
+import { ENV } from "../../config/env.conf.js";
 dotenv.config();
 
 const googleCallbackUrl = ENV.GOOGLE_CALLBACK_URL;

@@ -1,8 +1,8 @@
 import { redisClient } from "../../config/redis.conf.js";
 import dotenv from "dotenv";
-import { SOCKET_EVENTS, ERRORS } from "../../utility/constants.js";
+import { SOCKET_EVENTS, ERRORS } from "../../utility/constants/constants.js";
 import { v4 as uuidv4 } from "uuid";
-import { ENV } from "../../config/envConfig.js";
+import { ENV } from "../../config/env.conf.js";
 
 dotenv.config();
 
@@ -114,18 +114,16 @@ export const lockSectionQuantity = async ({
   throw new Error(ERRORS.LOCK_FAILED.MSG);
 };
 
-export const confirmBookingByLock = async ({
-  lockIds = [],
-  userId,
-  // bookingMeta = {},
-}) => {
+export const finalizeBookingLocks = async ({ lockIds = [], userId }) => {
   const pipeline = redisClient.multi();
 
   for (const lockId of lockIds) {
     pipeline.hGetAll(lockMetaKey(lockId));
   }
 
-  const metas = (await pipeline.exec()).map(([, data]) => data);
+  const metas = await pipeline.exec();
+
+  console.log(metas);
 
   for (const m of metas) {
     if (!m || !m.userId) {
@@ -143,8 +141,8 @@ export const confirmBookingByLock = async ({
     const m = metas[i];
     const lKey = lockKey(m.eventId, m.sectionId, lockId);
 
-    pipeline2.del(lKey); // delete lock key
-    pipeline2.del(lockMetaKey(lockId)); // delete meta
+    pipeline2.del(lKey);
+    pipeline2.del(lockMetaKey(lockId));
     pipeline2.sRem(userLocksKey(m.eventId, m.userId), lKey);
 
     pipeline2.publish(

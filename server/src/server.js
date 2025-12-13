@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.conf.js";
 import userRoutes from "./routes/user/user.routes.js";
+import paypalRoutes from "./routes/paypal.routes.js";
 import passport from "./middlewares/user/passport.js";
 import organizerRoutes from "./routes/organizer/organizer.routes.js";
 import adminRoutes from "./routes/admin/admin.routes.js";
@@ -15,7 +16,8 @@ import { initSocket } from "./config/socket.conf.js";
 import http from "http";
 import { initRedisExpiryListener } from "./config/redisExpiry.conf.js";
 import { initSeatPubSub } from "./config/seatPubSub.conf.js";
-import { ENV } from "./config/envConfig.js";
+import { ENV } from "./config/env.conf.js";
+import { initCronJobs } from "./jobs/index.job.js";
 dotenv.config();
 
 const app = express();
@@ -57,8 +59,11 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/organizer", organizerRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/s3", s3Router);
+app.use("/api/v1/paypal", paypalRoutes);
 
 app.use(errorHandler);
+
+initCronJobs();
 
 // Server listening
 server.listen(PORT, () => {

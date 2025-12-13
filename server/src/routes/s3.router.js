@@ -8,3 +8,4 @@ s3Router.get("/get-upload-signed-url", protect, uploadFiles);
 s3Router.get("/get-image-signed-url", protect, getFiles);
 
 export default s3Router;
+

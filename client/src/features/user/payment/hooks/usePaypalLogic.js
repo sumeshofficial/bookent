@@ -1,8 +1,13 @@
 import toast from "react-hot-toast";
-import { capturePayPalOrder, createPayPalOrder } from "../services/payment.service";
+import {
+  capturePayPalOrder,
+  createPayPalOrder,
+} from "../services/payment.service";
+import { useNavigate } from "react-router-dom";
 
-export const usePaypalLogic = () => {
+export const usePaypalLogic = (eventSlug) => {
   const lockId = sessionStorage.getItem("lockId");
+  const navigate = useNavigate();
 
   const createOrder = async () => {
     try {
@@ -16,9 +21,9 @@ export const usePaypalLogic = () => {
   };
 
   const onApprove = async (data) => {
-    const result = await capturePayPalOrder(data.orderID, lockId);
-    console.log("PayPal payment success:", result);
-    toast.success("Payment successful!");
+    const orderID = data.orderID
+    await capturePayPalOrder(orderID, lockId);
+    navigate(`/payment-processing?orderId=${orderID}&eventSlug=${eventSlug}`);
   };
 
   const onError = (err) => {

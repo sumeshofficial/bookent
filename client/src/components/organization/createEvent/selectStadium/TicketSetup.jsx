@@ -35,7 +35,7 @@ const TicketSetup = ({
             className="text-xs sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md text-gray-500"
           />
         </div>
-        <div className="grid grid-cols-2 gap-2 mb-2 sm:mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2 sm:mb-5">
           <div className="flex flex-col gap-1 sm:gap-2">
             <label className="text-xs sm:text-base">Total Seats</label>
             <input
@@ -44,7 +44,7 @@ const TicketSetup = ({
               {...register(`ticketSetup.${index}.totalTickets`, {
                 valueAsNumber: true,
               })}
-              className="text-xs sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md text-gray-500"
+              className="text-xs sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md "
             />
           </div>
 
@@ -56,7 +56,6 @@ const TicketSetup = ({
                 {...register(`ticketSetup.${index}.availableTickets`, {
                   valueAsNumber: true,
                   validate: (value) => {
-                    console.log(value);
                     value <= capacity ||
                       `Available tickets cannot exceed ${capacity}`;
                   },
@@ -73,7 +72,7 @@ const TicketSetup = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mb-2 sm:mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2 sm:mb-5">
           <div className="flex flex-col gap-1 sm:gap-2">
             <label className="text-xs sm:text-base">Seats Per User</label>
             <input
@@ -94,14 +93,17 @@ const TicketSetup = ({
 
           <div className="flex flex-col gap-1 sm:gap-2">
             <label className="text-xs sm:text-base">Seat Price</label>
-            <input
-              type="text"
-              placeholder="E.g. 150"
-              {...register(`ticketSetup.${index}.seatPrice`, {
-                valueAsNumber: true,
-              })}
-              className="text-xs placeholder:text-gray-400 sm:text-base border-2 border-gray-200 py-1 px-2 sm:px-3 sm:py-2 rounded-sm sm:rounded-md focus:ring-2 focus:ring-violet-500 outline-none"
-            />
+            <div className="relative">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-base">$</span>
+              <input
+                type="number"
+                placeholder="150"
+                {...register(`ticketSetup.${index}.seatPrice`, {
+                  valueAsNumber: true,
+                })}
+                className="text-xs placeholder:text-gray-400 sm:text-base border-2 border-gray-200 py-1 px-6 sm:px-6 sm:py-2 rounded-sm sm:rounded-md focus:ring-2 focus:ring-violet-500 outline-none"
+              />
+            </div>
 
             {errors?.seatPrice && (
               <span className="text-red-500 text-[.6rem] sm:text-[.8rem]">

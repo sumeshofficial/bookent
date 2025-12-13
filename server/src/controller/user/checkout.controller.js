@@ -1,10 +1,12 @@
 import {
   checkoutPageDetails,
+  getTicket,
+  orderStatus,
   paypalCaptureOrder,
   paypalCreateOrder,
 } from "../../services/user/checkout/checkout.service.js";
-import { validateSeatLock } from "../../services/user/checkout/helper/validateSeatLock.helper.js";
-import { STATUS_CODE, ERRORS } from "../../utility/constants.js";
+import { ERRORS } from "../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Checkout page deatails
@@ -39,7 +41,7 @@ export const createPaypalOrderController = asyncHandler(async (req, res) => {
   }
 
   const ticketDetails = await checkoutPageDetails(lockId, user._id);
-  const result = await paypalCreateOrder(ticketDetails);
+  const result = await paypalCreateOrder(ticketDetails, user._id);
 
   sendResponse(res, result, STATUS_CODE.CREATED);
 });
@@ -57,8 +59,40 @@ export const capturePaypalOrderController = asyncHandler(async (req, res) => {
     );
   }
 
-  await validateSeatLock(lockId, user._id);
-  const result = await paypalCaptureOrder(orderID);
+  await paypalCaptureOrder(orderID, lockId, user._id);
 
-  sendResponse(res, result, STATUS_CODE.CREATED);
+  sendResponse(res, { message: "Payment Captured" }, STATUS_CODE.CREATED);
+});
+
+// Check Order Status
+export const getOrderStatusController = asyncHandler(async (req, res) => {
+  const paypalOrderId = req.params.orderId;
+  if (!paypalOrderId) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
+  }
+
+  const status = await orderStatus(paypalOrderId);
+  console.log(status);
+
+  sendResponse(res, { status }, STATUS_CODE.SUCCESS);
+});
+
+export const getTicketController = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+
+  if (!orderId) {
+    throw new Error(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
+  }
+
+  const ticket = await getTicket(orderId);
+
+  sendResponse(res, ticket, STATUS_CODE.SUCCESS);
 });

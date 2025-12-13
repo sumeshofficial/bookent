@@ -5,7 +5,7 @@ import {
   revokeRefreshToken,
   verifyRefreshToken,
 } from "../../services/token.service.js";
-import { statusCode } from "../../utility/constants.js";
+import { statusCode } from "../../utility/constants/statusCode.js";
 import logger from "../../config/logger.js";
 dotenv.config();
 

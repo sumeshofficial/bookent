@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import { ENV } from "../../config/envConfig.js";
+import { ENV } from "../../config/env.conf.js";
 dotenv.config();
 
 const logo = ENV.LOGO_URL;

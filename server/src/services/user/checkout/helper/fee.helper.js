@@ -1,4 +1,4 @@
-import { FEE_CONFIG } from "../../../../utility/constants.js";
+import { FEE_CONFIG } from "../../../../utility/constants/constants.js";
 
 export const calculateBaseFee = (ticketPrice) => {
   const baseFee = ticketPrice * FEE_CONFIG.bookingFeePercent;

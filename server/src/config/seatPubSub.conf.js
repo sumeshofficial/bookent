@@ -2,8 +2,8 @@ import { createClient } from "redis";
 import { getIO } from "./socket.conf.js";
 import logger from "./logger.js";
 import dotenv from "dotenv";
-import { REDIS_EVENTS } from "../utility/constants.js";
-import { ENV } from "./envConfig.js";
+import { REDIS_EVENTS } from "../utility/constants/constants.js";
+import { ENV } from "./env.conf.js";
 dotenv.config();
 
 export const initSeatPubSub = async () => {

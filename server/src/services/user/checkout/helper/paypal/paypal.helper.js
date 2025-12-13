@@ -1,26 +1,28 @@
 import Decimal from "decimal.js";
-import { convertToUSD } from "../../../../../utility/helpers.js";
 import { CheckoutPaymentIntent } from "@paypal/paypal-server-sdk";
+import { CURRENCY_CODE } from "../../../../../utility/constants/constants.js";
 
-export const preparePaypalBreakdown = (section, pricing, rateDecimal) => {
-  const usdGrandTotal = convertToUSD(pricing.grandTotal, rateDecimal);
-  const usdGst = convertToUSD(pricing.gst, rateDecimal);
-  const usdBookingFee = convertToUSD(pricing.bookingFee, rateDecimal);
-  const usdSectionPrice = convertToUSD(section.price, rateDecimal);
+export const preparePaypalBreakdown = (section, pricing) => {
+  const grandTotal = pricing.grandTotal;
+  const gst = pricing.gst;
+  const bookingFee = pricing.bookingFee;
+  const sectionPrice = section.price;
+  const baseBookingPrice = pricing.baseFee;
 
-  const finalUnitAmount = usdSectionPrice.toFixed(2);
+  const finalUnitAmount = sectionPrice.toFixed(2);
   const finalItemTotal = new Decimal(finalUnitAmount)
     .times(section.qty)
     .toFixed(2, Decimal.ROUND_HALF_UP);
 
-  const finalGst = usdGst.toFixed(2, Decimal.ROUND_HALF_UP);
-  const finalBookingFeeRaw = usdBookingFee.toFixed(2, Decimal.ROUND_HALF_UP);
+  const finalGst = gst.toFixed(2, Decimal.ROUND_HALF_UP);
+  const finalBookingFeeRaw = bookingFee.toFixed(2, Decimal.ROUND_HALF_UP);
+  const finalBaseFee = baseBookingPrice.toFixed(2, Decimal.ROUND_HALF_UP);
 
   const validatedSum = new Decimal(finalItemTotal)
     .plus(finalGst)
     .plus(finalBookingFeeRaw);
 
-  const finalGrandTotal = usdGrandTotal.toFixed(2, Decimal.ROUND_DOWN);
+  const finalGrandTotal = grandTotal.toFixed(2, Decimal.ROUND_DOWN);
   const differenceToAbsorb = new Decimal(finalGrandTotal).minus(validatedSum);
 
   const finalBookingFee = new Decimal(finalBookingFeeRaw)
@@ -32,6 +34,7 @@ export const preparePaypalBreakdown = (section, pricing, rateDecimal) => {
     finalItemTotal,
     finalGst,
     finalBookingFee,
+    finalBaseFee,
     finalGrandTotal,
   };
 };
@@ -46,19 +49,19 @@ export const buildPaypalOrderPayload = (lockId, event, section, breakdown) => {
           description: `${event.title} - ${section.name} (${section.qty} tickets)`,
 
           amount: {
-            currencyCode: "USD",
+            currencyCode: CURRENCY_CODE.USD,
             value: breakdown.finalGrandTotal,
             breakdown: {
               itemTotal: {
-                currencyCode: "USD",
+                currencyCode: CURRENCY_CODE.USD,
                 value: breakdown.finalItemTotal,
               },
               taxTotal: {
-                currencyCode: "USD",
+                currencyCode: CURRENCY_CODE.USD,
                 value: breakdown.finalGst,
               },
               handling: {
-                currencyCode: "USD",
+                currencyCode: CURRENCY_CODE.USD,
                 value: breakdown.finalBookingFee,
               },
             },
@@ -70,7 +73,7 @@ export const buildPaypalOrderPayload = (lockId, event, section, breakdown) => {
               description: `${section.name} Section`,
               quantity: `${section.qty}`,
               unitAmount: {
-                currencyCode: "USD",
+                currencyCode: CURRENCY_CODE.USD,
                 value: breakdown.finalUnitAmount,
               },
             },

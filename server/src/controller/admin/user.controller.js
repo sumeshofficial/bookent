@@ -2,7 +2,7 @@ import logger from "../../config/logger.js";
 import { updateUserStatusService } from "../../services/admin/user.service.js";
 import { findUserById } from "../../services/auth.service.js";
 import { getAllUsers } from "../../services/user.service.js";
-import { STATUS_CODE, statusCode } from "../../utility/constants.js";
+import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Get all users controller

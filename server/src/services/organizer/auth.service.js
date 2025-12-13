@@ -2,9 +2,9 @@ import { redisClient } from "../../config/redis.conf.js";
 import { otpTemplate, sendEmail } from "../notifications/email.service.js";
 import dotenv from "dotenv";
 import { AppError } from "../../utility/helpers.js";
-import { STATUS_CODE } from "../../utility/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { checkOrganizer } from "../../repositories/organizer/organizer.repository.js";
-import { ENV } from "../../config/envConfig.js";
+import { ENV } from "../../config/env.conf.js";
 
 dotenv.config();
 

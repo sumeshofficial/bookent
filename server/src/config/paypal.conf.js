@@ -1,6 +1,6 @@
 import { Client, Environment, LogLevel } from "@paypal/paypal-server-sdk";
 import dotenv from "dotenv";
-import { ENV } from "../config/envConfig.js";
+import { ENV } from "./env.conf.js";
 dotenv.config();
 
 const clientId = ENV.PAYPAL_CLIENT_ID;

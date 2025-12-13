@@ -11,7 +11,7 @@ import {
   validateOtpRequest,
   verifyOtp,
 } from "../../services/user/auth.service.js";
-import { ERRORS, STATUS_CODE, RES_MESSAGES } from "../../utility/constants.js";
+import { ERRORS, RES_MESSAGES } from "../../utility/constants/constants.js";
 import { sendPopupResponse } from "../../utility/user/googleAuth.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 import { sendTokens } from "../../utility/sendTokens.js";
@@ -21,7 +21,8 @@ import {
   prepareGoogleResponse,
   validateGoogleLogin,
 } from "./helpers/googleAuth.helper.js";
-import { ENV } from "../../config/envConfig.js";
+import { ENV } from "../../config/env.conf.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 
 // Google Authentication controller
 export const googleAuthController = async (req, res) => {
@@ -117,6 +118,7 @@ export const refreshAccessTokenController = asyncHandler(async (req, res) => {
 
 // Logout controller
 export const logoutUserController = asyncHandler(async (req, res) => {
+  logger.http(`${req.method} ${req.originalUrl}`);
   const token = req.headers.authorization?.split(" ")[1];
   await handleLogout(res, "user_refreshToken", token);
 

@@ -2,12 +2,13 @@ import logger from "../../config/logger.js";
 import { verifyTokenAndGetUser } from "../../repositories/user/user.repository.js";
 import { getObjectURL } from "../../services/s3.service.js";
 import { isTokenBlacklisted } from "../../services/token.service.js";
-import { STATUS_CODE } from "../../utility/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { sanitizeUser } from "../../utility/user/sanitizeUser.js";
 
 // Token verify
 export const protect = async (req, res, next) => {
   try {
+    logger.http(`${req.method} ${req.originalUrl}`);
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

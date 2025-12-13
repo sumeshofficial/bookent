@@ -8,7 +8,7 @@ import {
   revokeRefreshToken,
   verifyRefreshToken,
 } from "./token.service.js";
-import { ENV } from "../config/envConfig.js";
+import { ENV } from "../config/env.conf.js";
 
 // Check user is already exists
 export const isUserExists = async (email) => {

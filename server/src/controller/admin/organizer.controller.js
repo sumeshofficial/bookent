@@ -8,7 +8,7 @@ import {
   getAllOrganizers,
   updateRequest,
 } from "../../services/organizer.service.js";
-import { STATUS_CODE, statusCode } from "../../utility/constants.js";
+import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
 
 // Get all organizers controller
 export const getOrganizersController = async (req, res) => {

@@ -18,7 +18,7 @@ const PaymentDropdown = ({ label, value, items = [] }) => {
             <ChevronDown className="w-4 h-4" />
           )}
         </div>
-        <span>₹ {value}</span>
+        <span>$ {value}</span>
       </div>
 
       {open && (
@@ -26,7 +26,7 @@ const PaymentDropdown = ({ label, value, items = [] }) => {
           {items.map((i, idx) => (
             <div key={idx} className="flex justify-between mt-2">
               <span>{i.label}</span>
-              <span>₹ {i.value}</span>
+              <span>$ {i.value}</span>
             </div>
           ))}
         </div>

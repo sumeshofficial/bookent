@@ -1,4 +1,4 @@
-import { FEE_CONFIG } from "../../../../utility/constants.js";
+import { FEE_CONFIG } from "../../../../utility/constants/constants.js";
 import { calculateBaseFee, calculateGrandTotal } from "./fee.helper.js";
 
 export const checkoutFeeCalculations = (meta, sectionTicketDetails) => {

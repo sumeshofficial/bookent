@@ -1,5 +1,6 @@
 import { fetchStadiumById } from "../../../../repositories/user/stadium.repository.js";
-import { ERRORS, STATUS_CODE } from "../../../../utility/constants.js";
+import { ERRORS } from "../../../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../../../utility/constants/statusCode.js";
 import { AppError } from "../../../../utility/helpers.js";
 
 export const validateStadium = async (stadiumId) => {

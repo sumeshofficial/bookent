@@ -36,7 +36,7 @@ const PaymentPage = () => {
             </div>
 
             <div className="col-span-2">
-              <PaymentMethodDetails method={selected} />
+              <PaymentMethodDetails method={selected} eventSlug={eventSlug} />
             </div>
           </div>
         </div>

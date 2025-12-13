@@ -1,6 +1,6 @@
 import User from "../../models/user.model.js";
 import jwt from "jsonwebtoken";
-import { ENV } from "../../config/envConfig.js";
+import { ENV } from "../../config/env.conf.js";
 
 // Check user is exists
 export const isUserExists = async (email) => {

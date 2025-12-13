@@ -1,7 +1,7 @@
 import { otpTemplate, sendEmail } from "./email.service.js";
 import { redisClient } from "../../config/redis.conf.js";
 import dotenv from "dotenv";
-import { ENV } from "../../config/envConfig.js";
+import { ENV } from "../../config/env.conf.js";
 
 dotenv.config();
 

@@ -4,7 +4,8 @@ import {
   deleteRedisData,
   storeInRedis,
 } from "../../repositories/redis/redis.repository.js";
-import { ERRORS, STATUS_CODE } from "../../utility/constants.js";
+import { ERRORS } from "../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { isSlugExists } from "../../utility/event.utils.js";
 import { AppError } from "../../utility/helpers.js";
 import { getRedisData } from "../redis.service.js";

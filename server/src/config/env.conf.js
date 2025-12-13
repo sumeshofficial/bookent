@@ -69,10 +69,13 @@ const envSchema = z.object({
   // Locking
   LOCK_TTL: z.string().regex(/^\d+$/).transform(Number),
   LOCKMETA_TTL: z.string().regex(/^\d+$/).transform(Number),
+  LOCK_EXTEND_TTL: z.string().regex(/^\d+$/).transform(Number),
+  LOCKMETA_EXTEND_TTL: z.string().regex(/^\d+$/).transform(Number),
 
   // PayPal
   PAYPAL_CLIENT_ID: z.string().min(1),
   PAYPAL_CLIENT_SECRET: z.string().min(1),
+  PAYPAL_WEBHOOK_ID: z.string().min(1),
 
   // Currency API
   CURRENCY_API_KEY: z.string().min(1),
@@ -82,6 +85,13 @@ const envSchema = z.object({
 
   // Open Exchange Rate
   OPEN_EXCHANGES_RATE_URL: z.string().min(1),
+
+  // Create Order
+  CREATE_ORDER_QR_CODE_EXPIRY: z.string().min(1),
+  QR_DATA_JWT_SECRET: z.string().min(10),
+
+  // Clean Order Cron
+  ORDER_CLEANUP_CRON: z.string().min(1),
 });
 
 const result = envSchema.safeParse(process.env);

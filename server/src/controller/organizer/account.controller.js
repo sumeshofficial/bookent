@@ -1,6 +1,6 @@
 import { updateOrganizerService } from "../../services/organizer.service.js";
 import { getObjectURL } from "../../services/s3.service.js";
-import { statusCode } from "../../utility/constants.js";
+import { statusCode } from "../../utility/constants/statusCode.js";
 
 export const updateOrganizerProfile = async (req, res) => {
   const { id, data } = req.body;

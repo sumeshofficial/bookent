@@ -1,5 +1,6 @@
 import { getUser, updateUser } from "../../services/user/account.service.js";
-import { STATUS_CODE, RES_MESSAGES } from "../../utility/constants.js";
+import { RES_MESSAGES } from "../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Get user

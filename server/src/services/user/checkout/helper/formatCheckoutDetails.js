@@ -12,6 +12,8 @@ export const formatCheckoutDetails = (
     venue: event.stadiumAddress,
     time: event.matchTime,
     slug: event.slug,
+    stadiumName: event.stadiumName,
+    thumbnailImage: event.thumbnailImageKey,
   };
 
   const sectionDetails = {

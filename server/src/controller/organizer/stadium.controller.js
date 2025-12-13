@@ -13,12 +13,8 @@ import {
   updateStadium,
 } from "../../services/organizer/stadium.service.js";
 import { getObjectURL } from "../../services/s3.service.js";
-import {
-  ERRORS,
-  RES_MESSAGES,
-  STATUS_CODE,
-  statusCode,
-} from "../../utility/constants.js";
+import { ERRORS, RES_MESSAGES } from "../../utility/constants/constants.js";
+import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
 import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Create Stadium

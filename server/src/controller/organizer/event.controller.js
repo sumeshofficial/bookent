@@ -11,7 +11,7 @@ import {
   getObjectURL,
   putObject,
 } from "../../services/s3.service.js";
-import { ERRORS, STATUS_CODE, statusCode } from "../../utility/constants.js";
+import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
 import {
   checkOrganizer,
   deleteEventService,
@@ -25,7 +25,8 @@ import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 import { findeEventByOrganizerIdAndEventId } from "../../repositories/organizer/event.repository.js";
 import { isSlugExists } from "../../utility/event.utils.js";
 import Event from "../../models/event.model.js";
-import { ENV } from "../../config/envConfig.js";
+import { ENV } from "../../config/env.conf.js";
+import { ERRORS } from "../../utility/constants/constants.js";
 
 dotenv.config();
 
@@ -353,11 +354,11 @@ export const getEventsController = async (req, res) => {
 
     if (priceFilter) {
       if (priceFilter === "low") {
-        query.minPrice = { $lte: 500 };
+        query.minPrice = { $lte: 5 };
       } else if (priceFilter === "medium") {
-        query.minPrice = { $gte: 500, $lte: 1500 };
+        query.minPrice = { $gte: 5, $lte: 15 };
       } else if (priceFilter === "high") {
-        query.minPrice = { $gte: 1500 };
+        query.minPrice = { $gte: 15 };
       }
     }
 

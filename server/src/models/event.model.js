@@ -8,6 +8,7 @@ const ticketSchema = new mongoose.Schema(
     totalTickets: { type: Number, required: true },
     availableTickets: { type: Number, required: true },
     soldTickets: { type: Number, default: 0 },
+    reservedTickets: { type: Number, default: 0 },
   },
   { _id: false }
 );

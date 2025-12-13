@@ -1,4 +1,4 @@
-import { ERRORS, STATUS_CODE } from "../../../utility/constants.js";
+import { ERRORS, ORDER_STATUS } from "../../../utility/constants/constants.js";
 import { AppError } from "../../../utility/helpers.js";
 import dotenv from "dotenv";
 import { validateEvent } from "../../helper/validateEvent.helper.js";
@@ -6,17 +6,31 @@ import { validateSeatLock } from "./helper/validateSeatLock.helper.js";
 import { checkoutFeeCalculations } from "./helper/checkoutFeeCalculations.helper.js";
 import { validateStadium } from "./helper/validateStadium.helper.js";
 import { OrdersController } from "@paypal/paypal-server-sdk";
-import { client } from "../../../utility/paypal.js";
-import { fetchRealTimeRate } from "../../helper/currency.service.js";
+import { client } from "../../../config/paypal.conf.js";
 import {
   buildPaypalOrderCapturePayload,
   buildPaypalOrderPayload,
   preparePaypalBreakdown,
 } from "./helper/paypal/paypal.helper.js";
 import { formatCheckoutDetails } from "./helper/formatCheckoutDetails.js";
+import { extendExpiry } from "../../../repositories/user/redis.repository.js";
+import { ENV } from "../../../config/env.conf.js";
+import jwt from "jsonwebtoken";
+import {
+  createOrder,
+  getOrderForPaypal,
+  updateOrderStatus,
+} from "../../../repositories/user/order.repository.js";
+import { buildDbOrderPayload } from "./helper/buildOrderPayload.js";
+import { STATUS_CODE } from "../../../utility/constants/statusCode.js";
+import { reserveTicket } from "../../../repositories/user/event.repository.js";
+import mongoose from "mongoose";
+import { buildTicket } from "./helper/buildTicket.js";
 dotenv.config();
 
 const ordersController = new OrdersController(client);
+const LOCK_EXTEND_TTL = ENV.LOCK_EXTEND_TTL;
+const LOCKMETA_EXTEND_TTL = ENV.LOCKMETA_EXTEND_TTL;
 
 // Checkout page details
 export const checkoutPageDetails = async (lockId, userId) => {
@@ -55,21 +69,53 @@ export const checkoutPageDetails = async (lockId, userId) => {
 };
 
 // Paypal Create Order
-export const paypalCreateOrder = async (ticketDetails) => {
-  const { lockId, event, section, pricing } = ticketDetails;
-  const USD_TO_INR_RATE_DECIMAL = await fetchRealTimeRate("INR");
-
-  const breakdown = preparePaypalBreakdown(
-    section,
-    pricing,
-    USD_TO_INR_RATE_DECIMAL
-  );
-
-  const collect = buildPaypalOrderPayload(lockId, event, section, breakdown);
-
+export const paypalCreateOrder = async (ticketDetails, userId) => {
+  const session = await mongoose.startSession();
   try {
+    const { lockId, event, section, pricing } = ticketDetails;
+    const breakdown = preparePaypalBreakdown(section, pricing);
+    const collect = buildPaypalOrderPayload(lockId, event, section, breakdown);
+
     const { result } = await ordersController.createOrder(collect);
-    console.log(result);
+
+    const qrData = jwt.sign(
+      {
+        orderId: result.id,
+        eventId: event._id,
+        userId,
+      },
+      ENV.QR_DATA_JWT_SECRET,
+      { expiresIn: ENV.CREATE_ORDER_QR_CODE_EXPIRY }
+    );
+
+    const payload = buildDbOrderPayload({
+      result,
+      userId,
+      lockId,
+      event,
+      section,
+      breakdown,
+      qrData,
+    });
+
+    await session.withTransaction(async () => {
+      const reserveResult = await reserveTicket({
+        event,
+        section,
+        session,
+      });
+
+      if (reserveResult.modifiedCount === 0) {
+        throw new AppError(
+          STATUS_CODE.BAD_REQUEST,
+          ERRORS.SEATS_NOT_AVAILABLE.CODE,
+          ERRORS.SEATS_NOT_AVAILABLE.MSG
+        );
+      }
+
+      await createOrder(payload, session);
+    });
+
     return result;
   } catch (error) {
     console.log(error);
@@ -78,23 +124,89 @@ export const paypalCreateOrder = async (ticketDetails) => {
       error.response?.data?.name || ERRORS.PAYPAL_ORDER_ERROR.CODE,
       error.response?.data?.message || ERRORS.PAYPAL_ORDER_ERROR.MSG
     );
+  } finally {
+    session.endSession();
   }
 };
 
-export const paypalCaptureOrder = async (orderID) => {
+export const paypalCaptureOrder = async (orderID, lockId, userId) => {
+  const meta = await validateSeatLock(lockId, userId);
+
+  const lockKey = `lock:${meta.eventId}:${meta.sectionId}:${lockId}`;
+  const lockMetaKey = `lockmeta:${lockId}`;
+  await extendExpiry(lockKey, LOCK_EXTEND_TTL);
+  await extendExpiry(lockMetaKey, LOCK_EXTEND_TTL + LOCKMETA_EXTEND_TTL);
+
   const collect = buildPaypalOrderCapturePayload(orderID);
 
   try {
     const { result } = await ordersController.captureOrder(collect);
 
     console.log(result);
+
+    if (result?.status !== "COMPLETED") {
+      await updateOrderStatus(orderID, ORDER_STATUS.ABANDONED);
+
+      throw new AppError(
+        STATUS_CODE.SERVER_ERROR,
+        ERRORS.PAYPAL_ORDER_CAPTURE_ERROR.CODE,
+        ERRORS.PAYPAL_ORDER_CAPTURE_ERROR.MSG
+      );
+    }
+
     return result;
   } catch (error) {
     console.log(error);
+    await updateOrderStatus(orderID, ORDER_STATUS.ABANDONED);
     throw new AppError(
       error.response?.status || STATUS_CODE.SERVER_ERROR,
       error.response?.data?.name || ERRORS.PAYPAL_ORDER_CAPTURE_ERROR.CODE,
       error.response?.data?.message || ERRORS.PAYPAL_ORDER_CAPTURE_ERROR.MSG
     );
   }
+};
+
+export const orderStatus = async (paypalOrderId) => {
+  const order = await getOrderForPaypal(paypalOrderId);
+
+  if (!order) {
+    throw new AppError(
+      STATUS_CODE.NOTFOUND,
+      ERRORS.ORDER_NOTFOUND_FOR_PAYPAL_ID.CODE,
+      ERRORS.ORDER_NOTFOUND_FOR_PAYPAL_ID.MSG
+    );
+  }
+
+  let status;
+  switch (order.status) {
+    case ORDER_STATUS.PENDING_PAYPAL_ORDER:
+      status = "pending";
+      break;
+    case ORDER_STATUS.CONFIRMED:
+      status = "success";
+      break;
+    case ORDER_STATUS.ABANDONED:
+      status = "failed";
+      break;
+    default:
+      status = "pending";
+  }
+
+  return status;
+};
+
+export const getTicket = async (orderId) => {
+  const order = await getOrderForPaypal(orderId);
+
+  if (!order) {
+    throw new AppError(
+      STATUS_CODE.NOTFOUND,
+      ERRORS.ORDER_NOTFOUND_FOR_PAYPAL_ID.CODE,
+      ERRORS.ORDER_NOTFOUND_FOR_PAYPAL_ID.MSG
+    );
+  }
+
+  const ticket = await buildTicket(order);
+
+  return ticket;
 };

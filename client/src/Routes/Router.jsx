@@ -31,6 +31,8 @@ import SeatSelectPage from "../features/user/seatSelect/SeatSelectPage";
 import CheckoutPage from "../features/user/checkout/CheckoutPage";
 import SessionTimeout from "../sharedComponents/user/error/SessionTimeout";
 import PaymentPage from "../features/user/payment/PaymentPage";
+import PaymentProcessing from "../features/user/payment/PaymentProcessing";
+import TicketBooked from "../features/user/TicketBooked/TicketBooked";
 
 const router = createBrowserRouter([
   {
@@ -91,7 +93,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: "/session-expired",
+            path: "session-expired",
             element: (
               <Protected>
                 <SessionTimeout />
@@ -103,6 +105,22 @@ const router = createBrowserRouter([
             element: (
               <Protected>
                 <PaymentPage />
+              </Protected>
+            ),
+          },
+          {
+            path: "payment-processing",
+            element: (
+              <Protected>
+                <PaymentProcessing />
+              </Protected>
+            ),
+          },
+          {
+            path: "ticket",
+            element: (
+              <Protected>
+                <TicketBooked />
               </Protected>
             ),
           },

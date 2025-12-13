@@ -78,7 +78,7 @@ const MobileBookingBar = ({
               {adjustedInfo?.totalTickets ?? 0}
             </span>
             <span className="font-semibold text-gray-800">
-              ₹{adjustedInfo?.seatPrice ?? "—"}
+              ${adjustedInfo?.seatPrice ?? "—"}
             </span>
 
             {/* Quantity Selector */}

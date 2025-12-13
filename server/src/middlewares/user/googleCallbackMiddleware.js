@@ -1,4 +1,4 @@
-import { ENV } from "../../config/envConfig.js";
+import { ENV } from "../../config/env.conf.js";
 import { sendPopupResponse } from "../../utility/user/googleAuth.js";
 import passport from "./passport.js";
 

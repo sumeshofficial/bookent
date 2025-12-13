@@ -186,7 +186,7 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
               <hr className="my-4" />
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="font-bold text-lg">₹{minPrice} onwards</p>
+                  <p className="font-bold text-lg">${minPrice} onwards</p>
                   {isFillingFast && (
                     <p className="text-orange-500 text-sm font-medium">
                       Filling Fast

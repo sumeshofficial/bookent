@@ -1,9 +1,9 @@
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { usePaypalLogic } from "../hooks/usePaypalLogic";
 
-const PaymentMethodDetails = ({ method }) => {
+const PaymentMethodDetails = ({ method, eventSlug }) => {
   const { createOrder, onApprove, onError, onCancel, styles } =
-    usePaypalLogic();
+    usePaypalLogic(eventSlug);
 
   return (
     <div className="p-6">

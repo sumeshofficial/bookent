@@ -1,6 +1,7 @@
 import { getIO } from "../../config/socket.conf.js";
 import { updateUserStatus } from "../../repositories/user/user.repository.js";
-import { SOCKET_EVENTS, STATUS_CODE } from "../../utility/constants.js";
+import { SOCKET_EVENTS } from "../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { AppError } from "../../utility/helpers.js";
 
 export const updateUserStatusService = async (data) => {

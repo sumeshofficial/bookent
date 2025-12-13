@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { STATUS_CODE } from "./constants.js";
+import { STATUS_CODE } from "./constants/statusCode.js";
 import slugify from "slugify";
 
 export class AppError extends Error {
@@ -34,10 +34,10 @@ export const createSlug = (text) => {
   });
 };
 
-export const convertToUSD = (amountInINR, rateDecimal) => {
-  const INR_TO_USD_RATE = new Decimal(1).div(rateDecimal);
-  return new Decimal(amountInINR).times(INR_TO_USD_RATE);
-};
+// export const convertToUSD = (amountInINR, rateDecimal) => {
+//   const INR_TO_USD_RATE = new Decimal(1).div(rateDecimal);
+//   return new Decimal(amountInINR).times(INR_TO_USD_RATE);
+// };
 
 export const validateEventAvailability = (event, blockHours = 4) => {
   if (!event.matchDate || !event.matchTime) {

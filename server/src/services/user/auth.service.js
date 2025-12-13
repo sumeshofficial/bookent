@@ -5,7 +5,7 @@ import {
   isUserExists,
   updatePassword,
 } from "../../repositories/user/user.repository.js";
-import { ERRORS, RES_MESSAGES, STATUS_CODE } from "../../utility/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { AppError } from "../../utility/helpers.js";
 import { checkOtp, generateOtp, delOtp } from "../notifications/otp.service.js";
 import { sendTokens } from "../../utility/sendTokens.js";
@@ -16,6 +16,7 @@ import {
 } from "../token.service.js";
 import { sanitizeUser } from "../../utility/user/sanitizeUser.js";
 import jwt from "jsonwebtoken";
+import { ERRORS, RES_MESSAGES } from "../../utility/constants/constants.js";
 
 // Signup user service
 export const signupUser = async (data) => {

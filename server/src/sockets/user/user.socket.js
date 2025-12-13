@@ -1,12 +1,10 @@
-import { STATUS_CODES } from "http";
 import logger from "../../config/logger.js";
 import {
   lockSectionQuantity,
   releaseLockById,
-  confirmBookingByLock,
   getAllCurrentLocks,
 } from "../../services/user/seatLock.service.js";
-import { SOCKET_EVENTS } from "../../utility/constants.js";
+import { SOCKET_EVENTS } from "../../utility/constants/constants.js";
 
 export default function userSocketHandlers(io, socket) {
 
@@ -58,18 +56,18 @@ export default function userSocketHandlers(io, socket) {
   });
 
   // 4. CONFIRM BOOKING
-  socket.on(SOCKET_EVENTS.CONFIRM_BOOKING, async ({ lockIds }, cb) => {
-    try {
-      await confirmBookingByLock({
-        lockIds,
-        userId: socket.user._id,
-      });
+  // socket.on(SOCKET_EVENTS.CONFIRM_BOOKING, async ({ lockIds }, cb) => {
+  //   try {
+  //     await finalizeBookingLocks({
+  //       lockIds,
+  //       userId: socket.user._id,
+  //     });
 
-      cb?.({ success: true });
-    } catch (err) {
-      cb?.({ success: false, error: err.message });
-    }
-  });
+  //     cb?.({ success: true });
+  //   } catch (err) {
+  //     cb?.({ success: false, error: err.message });
+  //   }
+  // });
 
   // 5. ON DISCONNECT RELEASE ALL LOCKS
   socket.on(SOCKET_EVENTS.DISCONNECT, async () => {

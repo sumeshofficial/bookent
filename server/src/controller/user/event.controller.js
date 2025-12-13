@@ -5,7 +5,7 @@ import {
   findEventsForUser,
   eventDetails,
 } from "../../services/user.service.js";
-import { STATUS_CODE, statusCode } from "../../utility/constants.js";
+import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
 import { getHomeEventsService } from "../../services/user/event/event.service.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 import { validateEventAvailability } from "../../utility/helpers.js";

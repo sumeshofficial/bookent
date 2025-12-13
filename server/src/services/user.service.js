@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import User from "../models/user.model.js";
 import axios from "axios";
 import Event from "../models/event.model.js";
-import { ENV } from "../config/envConfig.js";
+import { ENV } from "../config/env.conf.js";
 dotenv.config();
 
 const GOOGLE_MAP_URI = ENV.GOOGLE_MAP_URI;

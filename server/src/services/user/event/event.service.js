@@ -1,4 +1,4 @@
-import { ENV } from "../../../config/envConfig.js";
+import { ENV } from "../../../config/env.conf.js";
 import { findEventsRepo } from "../../../repositories/user/event.repository.js";
 import { isEventValid } from "../../../utility/eventDateHelpers.js";
 import { getObjectURL } from "../../s3.service.js";

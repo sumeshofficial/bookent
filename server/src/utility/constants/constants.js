@@ -1,28 +1,3 @@
-// Status Code
-export const statusCode = {
-  serverError: 500,
-  badRequest: 400,
-  unAuthorized: 401,
-  missingField: 422,
-  success: 200,
-  created: 201,
-  conflict: 409,
-  notFound: 404,
-  permissionDenied: 403,
-};
-export const STATUS_CODE = {
-  SERVER_ERROR: 500,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  MISSING_FIELD: 422,
-  SUCCESS: 200,
-  CREATED: 201,
-  CONFLICT: 409,
-  NOTFOUND: 404,
-  PERMISSION_DENIED: 403,
-  GONE: 410,
-};
-
 // Errors
 export const ERRORS = {
   USER_NOT_FOUND: {
@@ -127,6 +102,18 @@ export const ERRORS = {
     CODE: "ORDER_CAPUTURE_FAILED",
     MSG: "Failed to capture PayPal order",
   },
+  SEATS_NOT_AVAILABLE: {
+    CODE: "SEATS_NOT_AVAILABLE",
+    MSG: "Sorry, selected seats are no longer available",
+  },
+  INVALID_WEBHOOK: {
+    CODE: "INVALID_WEBHOOK",
+    MSG: "Invalid PayPal Webhook attempt",
+  },
+  ORDER_NOTFOUND_FOR_PAYPAL_ID: {
+    CODE: "ORDER_NOTFOUND_FOR_PAYPAL_ID",
+    MSG: "Order not found for PayPal order ID",
+  },
 };
 
 // Response Messages
@@ -175,6 +162,10 @@ export const SOCKET_EVENTS = {
   DISCONNECT: "disconnect",
 };
 
+export const SOCKET_ERROR_TYPE = {
+  SOCKET_AUTH: "socket-auth",
+};
+
 // Redis events
 export const REDIS_EVENTS = {
   EXPIRED: "__keyevent@0__:expired",
@@ -192,4 +183,69 @@ export const DB_EVENTS = {
 export const FEE_CONFIG = {
   bookingFeePercent: 0.08,
   gstPercent: 0.18,
+};
+
+export const CURRENCY_CODE = {
+  USD: "USD",
+};
+
+export const PAYMENT_METHOD = {
+  PAYPAL: "PAYPAL",
+  WALLET: "WALLET",
+};
+
+export const ORDER_STATUS = {
+  PENDING_PAYPAL_ORDER: "PENDING_PAYPAL_ORDER",
+  PAID: "PAID",
+  CONFIRMED: "CONFIRMED",
+  REFUND_REQUIRED: "REFUND_REQUIRED",
+  REFUNDED: "REFUNDED",
+  ABANDONED: "ABANDONED",
+};
+
+export const REFUND_STATUS = {
+  COMPLETED: "COMPLETED",
+  PENDING: "PENDING",
+  FAILED: "FAILED",
+};
+
+export const MONGO_SCHEMA = {
+  USER: "User",
+  EVENT: "Event",
+  TRANACTION: "Transaction",
+  ORGANIZER: "Organizer",
+  STADIUM: "Stadium",
+  ORDER: "Order",
+  REFRESH_TOKEN: "RefreshToken",
+};
+
+export const TRANSACTION_RECIVER_TYPE = {
+  USER: "User",
+  ORGANIZER: "Organizer",
+  PLATFORM: "Platform",
+};
+
+export const TRANSACTION_REASON = {
+  BOOKING_PAYMENT: "BOOKING_PAYMENT",
+  WALLET_REFUND: "WALLET_REFUND",
+  ORGANIZER_PAYOUT: "ORGANIZER_PAYOUT",
+  ADMIN_ADJUSTMENT: "ADMIN_ADJUSTMENT",
+  WALLET_TOPUP: "WALLET_TOPUP",
+};
+
+export const TRANSACTION_TYPE = {
+  SALE: "SALE",
+  REFUND: "REFUND",
+  TRANSFER: "TRANSFER",
+};
+
+export const TRANSACTION_STATUS = {
+  COMPLETED: "COMPLETED",
+  PENDING: "PENDING",
+  FAILED: "FAILED",
+};
+
+export const TRANSACTION_DIRECTION = {
+  CREDIT: "CREDIT",
+  DEBIT: "DEBIT",
 };

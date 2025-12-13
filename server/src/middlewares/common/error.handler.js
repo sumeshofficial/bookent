@@ -1,5 +1,5 @@
 import logger from "../../config/logger.js";
-import { STATUS_CODE } from "../../utility/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 
 export const errorHandler = (err, req, res, _next) => {
   logger.error(err.stack);

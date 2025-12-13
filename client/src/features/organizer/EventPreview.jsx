@@ -64,7 +64,7 @@ const EventPreview = () => {
   const formatCurrency = (amt) =>
     new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "INR",
+      currency: "USD",
       maximumFractionDigits: 0,
     }).format(amt);
 

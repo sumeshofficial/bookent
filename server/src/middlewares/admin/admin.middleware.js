@@ -1,4 +1,4 @@
-import { statusCode } from "../../utility/constants.js";
+import { statusCode } from "../../utility/constants/statusCode.js";
 
 // Admin middleware
 export const adminOnly = (req, res, next) => {

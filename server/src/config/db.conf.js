@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import logger from "./logger.js";
 import dotenv from "dotenv";
-import { DB_EVENTS } from "../utility/constants.js";
-import { ENV } from "./envConfig.js";
+import { DB_EVENTS } from "../utility/constants/constants.js";
+import { ENV } from "./env.conf.js";
 dotenv.config();
 
 // Database configuration

@@ -3,8 +3,8 @@ import socketAuth from "../middlewares/common/socket.middleware.js";
 import dotenv from "dotenv";
 import logger from "./logger.js";
 import userSocketHandlers from "../sockets/user/user.socket.js";
-import { SOCKET_EVENTS } from "../utility/constants.js";
-import { ENV } from "./envConfig.js";
+import { SOCKET_EVENTS } from "../utility/constants/constants.js";
+import { ENV } from "./env.conf.js";
 
 dotenv.config();
 

@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import RefreshToken from "../models/refreshToken.model.js";
 import { v4 as uuidv4 } from "uuid";
 import { getRedisData, storeInRedis } from "./redis.service.js";
-import { ENV } from "../config/envConfig.js";
+import { ENV } from "../config/env.conf.js";
 dotenv.config();
 
 const userRefreshTokenExpiresIn = ENV.JWT_USER_REFRESH_TOKEN_EXPIRES_IN;
@@ -45,7 +45,6 @@ export const verifyRefreshToken = async (token) => {
   const dbToken = await RefreshToken.findOne({
     tokenId: payload.tokenId,
   });
-  console.log("verify", dbToken, payload);
   if (!dbToken) {
     throw new Error("Invalid refresh token");
   }

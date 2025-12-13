@@ -168,7 +168,7 @@ const EventsCard = ({
                   Starting Price
                 </span>
                 <span className="text-gray-900 font-semibold">
-                  ₹{event.minPrice}
+                  ${event.minPrice}
                 </span>
               </div>
 
@@ -193,7 +193,7 @@ const EventsCard = ({
                   Starting Price
                 </span>
                 <p className="text-lg font-bold text-gray-800">
-                  ₹{event.minPrice}
+                  ${event.minPrice}
                 </p>
               </div>
               <div>

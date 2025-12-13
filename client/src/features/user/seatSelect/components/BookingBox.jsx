@@ -84,7 +84,7 @@ const BookingBox = ({
           </p>
 
           <p className="text-gray-800 mb-3 font-semibold">
-            Price: ₹{adjustedInfo?.seatPrice ?? "—"}
+            Price: ${adjustedInfo?.seatPrice ?? "—"}
           </p>
 
           <div className="mb-3 relative">

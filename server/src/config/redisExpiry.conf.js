@@ -1,8 +1,8 @@
 import { createClient } from "redis";
 import logger from "./logger.js";
 import { handleExpiredLockKey } from "../services/user/seatLock.service.js";
-import { REDIS_EVENTS } from "../utility/constants.js";
-import { ENV } from "./envConfig.js";
+import { ENV } from "./env.conf.js";
+import { REDIS_EVENTS } from "../utility/constants/constants.js";
 
 export const initRedisExpiryListener = async () => {
   const sub = createClient({ url: ENV.REDIS_URI });

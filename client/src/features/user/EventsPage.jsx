@@ -66,7 +66,7 @@ const EventsPage = () => {
     "Volleyball",
     "Kabaddi",
   ];
-  const priceFilters = ["0 - 200", "300 - 500", "600 - 1000", "1200 - 5000"];
+  const priceFilters = ["0 - 30", "40 - 80", "100 - 120", "220 - 250"];
 
   const fetchEvents = async () => {
     const params = {

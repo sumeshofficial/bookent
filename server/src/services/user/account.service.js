@@ -1,5 +1,6 @@
 import { updateUserService } from "../../repositories/user/user.repository.js";
-import { ERRORS, STATUS_CODE } from "../../utility/constants.js";
+import { ERRORS } from "../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { AppError } from "../../utility/helpers.js";
 import { sanitizeUser } from "../../utility/user/sanitizeUser.js";
 import { getObjectURL } from "../s3.service.js";

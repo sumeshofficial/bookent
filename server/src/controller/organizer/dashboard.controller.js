@@ -1,7 +1,7 @@
 import logger from "../../config/logger.js";
 import { checkOrganizer } from "../../services/organizer.service.js";
 import { getObjectURL } from "../../services/s3.service.js";
-import { statusCode } from "../../utility/constants.js";
+import { statusCode } from "../../utility/constants/statusCode.js";
 
 // Get organizer
 export const organizerDashboard = async (req, res) => {
