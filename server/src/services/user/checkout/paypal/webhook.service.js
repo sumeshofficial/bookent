@@ -1,5 +1,6 @@
 import {
   getOrderForPaypal,
+  updateOrder,
   updateOrderStatus,
 } from "../../../../repositories/user/order.repository.js";
 import {
@@ -13,7 +14,10 @@ import { AppError } from "../../../../utility/helpers.js";
 import { STATUS_CODE } from "../../../../utility/constants/statusCode.js";
 import { makeTicketSold } from "../../../../repositories/user/event.repository.js";
 import { finalizeBookingLocks } from "../../seatLock.service.js";
-// import { finalizeTicketLogic } from "../ticket/ticket.service.js";
+import { findUserById } from "../../../../repositories/user/user.repository.js";
+import { sendEmailConfirmation } from "./helper/ticketEmailConfirmation.js";
+import { ENV } from "../../../../config/env.conf.js";
+import jwt from "jsonwebtoken";
 
 export const processPaypalCapture = async (capture, event) => {
   const session = await mongoose.startSession();
@@ -38,13 +42,31 @@ export const processPaypalCapture = async (capture, event) => {
 
       await updateOrderStatus(order._id, ORDER_STATUS.PAID, session);
       await makeTicketSold(order.eventId, order.seat, session);
-      await updateOrderStatus(order._id, ORDER_STATUS.CONFIRMED, session);
+      const qrData = jwt.sign(
+        {
+          orderId: order._id,
+          eventId: event._id,
+          userId: order.userId,
+        },
+        ENV.QR_DATA_JWT_SECRET,
+        { expiresIn: ENV.CREATE_ORDER_QR_CODE_EXPIRY }
+      );
+
+      const payloadForUpdate = {
+        status: ORDER_STATUS.CONFIRMED,
+        qrData,
+      };
+      order = await updateOrder(order._id, payloadForUpdate, session);
     });
 
     await finalizeBookingLocks({
       lockIds: [order.lockId],
       userId: order.userId.toString(),
     });
+
+    const user = await findUserById(order.userId);
+
+    await sendEmailConfirmation(user, order);
   } catch (error) {
     if (order && order.status === ORDER_STATUS.PAID) {
       await updateOrderStatus(order._id, ORDER_STATUS.REFUND_REQUIRED);

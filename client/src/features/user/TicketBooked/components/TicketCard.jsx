@@ -1,5 +1,7 @@
+import QRCode from "react-qr-code";
+
 const TicketCard = ({ data }) => {
-  const { event, bookingId, section, qty, totalAmount } = data;
+  const { event, bookingId, section, qty, totalAmount, qrData } = data;
 
   const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
     day: "numeric",
@@ -37,11 +39,7 @@ const TicketCard = ({ data }) => {
       <div className="p-5">
         <div className="bg-gray-100 rounded-lg p-6 flex flex-col sm:flex-row gap-6 items-center justify-center">
           <div className="flex items-center justify-center bg-white p-3 rounded-lg w-[120px] h-[120px]">
-            <img
-              src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=SAMPLE_TICKET_QR"
-              alt="Ticket QR Code"
-              className="w-24 h-24"
-            />
+            <QRCode value={qrData}  />
           </div>
 
           <div className="flex-1 text-sm text-center flex flex-col items-center justify-center">

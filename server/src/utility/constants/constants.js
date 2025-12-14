@@ -114,6 +114,10 @@ export const ERRORS = {
     CODE: "ORDER_NOTFOUND_FOR_PAYPAL_ID",
     MSG: "Order not found for PayPal order ID",
   },
+  ORDER_NOTFOUND: {
+    CODE: "ORDER_NOTFOUND",
+    MSG: "Order not found for order Id or user",
+  },
 };
 
 // Response Messages

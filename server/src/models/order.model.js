@@ -63,7 +63,7 @@ const orderSchema = new mongoose.Schema(
       venue: { type: String, required: true },
       slug: { type: String, required: true },
       stadiumName: { type: String, required: true },
-      thumbnailImage: { type: String, required: true }
+      thumbnailImage: { type: String, required: true },
     },
     seat: {
       sectionId: { type: String, required: true },
@@ -85,7 +85,7 @@ const orderSchema = new mongoose.Schema(
     },
     qrData: {
       type: String,
-      required: true,
+      default: null,
     },
     paymentMethod: {
       type: String,

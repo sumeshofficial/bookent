@@ -1,5 +1,7 @@
 import { useRouteError, Link } from "react-router-dom";
 import { AlertTriangle, Home, RefreshCcw } from "lucide-react";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 const ErrorPage = () => {
   const error = useRouteError();

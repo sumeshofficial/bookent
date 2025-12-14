@@ -33,6 +33,8 @@ import SessionTimeout from "../sharedComponents/user/error/SessionTimeout";
 import PaymentPage from "../features/user/payment/PaymentPage";
 import PaymentProcessing from "../features/user/payment/PaymentProcessing";
 import TicketBooked from "../features/user/TicketBooked/TicketBooked";
+import MyTickets from "../features/user/myTickets/MyTickets";
+import Ticket from "../features/user/ticket/Ticket";
 
 const router = createBrowserRouter([
   {
@@ -121,6 +123,22 @@ const router = createBrowserRouter([
             element: (
               <Protected>
                 <TicketBooked />
+              </Protected>
+            ),
+          },
+          {
+            path: "ticket/:orderId",
+            element: (
+              <Protected>
+                <Ticket />
+              </Protected>
+            ),
+          },
+          {
+            path: "my-tickets",
+            element: (
+              <Protected>
+                <MyTickets />
               </Protected>
             ),
           },

@@ -6,7 +6,9 @@ dotenv.config();
 const logo = ENV.LOGO_URL;
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: ENV.EMAIL,
     pass: ENV.PASSWORD,
@@ -14,7 +16,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Sent OTP to Email
-export const sendEmail = async ({ to, subject, html }) => {
+export const sendEmail = async ({ to, subject, html, attachments = [] }) => {
   const companyName = "Bookent";
 
   const mailOptions = {
@@ -22,12 +24,14 @@ export const sendEmail = async ({ to, subject, html }) => {
     to,
     subject,
     html,
+    attachments,
   };
 
-  await transporter.sendMail(mailOptions);
+  const info = await transporter.sendMail(mailOptions);
+  console.log("Mail sent:", info.response, info.messageId);
 };
 
-// 🟩 OTP Template
+// OTP Template
 export const otpTemplate = (otp, fullname) => {
   return `
     <h2>Hello ${fullname}</h2>
@@ -35,7 +39,7 @@ export const otpTemplate = (otp, fullname) => {
   `;
 };
 
-// 🟩 Rejection Template
+// Rejection Template
 export const rejectionTemplate = (fullname, reason) => {
   return `
 <!DOCTYPE html>
@@ -62,82 +66,68 @@ export const rejectionTemplate = (fullname, reason) => {
 `;
 };
 
-// // html for mail
-// function getEmailTemplate(otp, companyName, logoUrl, fullname) {
-//   return `
-// <!DOCTYPE html>
-// <html lang="en">
-// <head>
-//   <meta charset="UTF-8">
-//   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//   <title>OTP Verification</title>
-// </head>
-// <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #404040 !important;">
-//   <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #404040 !important;">
-//     <tr>
-//       <td style="padding: 20px;">
-//         <!-- Main Container -->
-//         <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #202020 !important; border-radius: 12px; overflow: hidden;">
+// Ticket Booking Confirmation Template
+export const bookingConfirmationTemplate = ({
+  fullname,
+  orderId,
+  eventTitle,
+  eventDate,
+  eventTime,
+  venue,
+  qty,
+  totalAmount,
+}) => {
+  return `
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; background-color:#202020; padding:20px; color:white;">
+  <div style="max-width:600px; margin:auto; background:#2b2b2b; padding:24px; border-radius:10px;">
 
-//           <!-- Header with Logo -->
-//           <tr>
-//             <td style="background-color: #4f4f4f !important; padding: 30px; text-align: left; color: #ffffff !important;">
-//               <img src="${logoUrl}" alt="${companyName} Logo" style="max-width: 150px; height: auto; margin-bottom: 10px;">
-//               <h1 style="margin: 0; font-size: 20px; font-weight: 600;">Email Verification</h1>
-//             </td>
-//           </tr>
+    <!-- Header -->
+    <div style="text-align:center; margin-bottom:20px;">
+      <img src="${logo}" alt="Bookent" style="height:40px; margin-bottom:10px;" />
+      <h2 style="color:#4ade80; margin:0;">Booking Confirmed 🎟️</h2>
+    </div>
 
-//           <!-- Content -->
-//           <tr>
-//             <td style="padding: 30px;">
-//               <h2 style="color: #ffffff !important; margin: 0 0 15px 0; font-size: 16px; font-weight: 600;">Hello ${fullname} !</h2>
+    <p>Hi <strong>${fullname}</strong>,</p>
 
-//               <p style="color: #999999 !important; font-size: 13px; line-height: 1.6; margin: 0 0 20px 0;">
-//                 We received a request to verify your email address. Please use the following One-Time Password (OTP) to complete your verification:
-//               </p>
+    <p>
+      Your booking has been <strong>successfully confirmed</strong>.
+      Below are your ticket details.
+    </p>
 
-//               <!-- OTP Box -->
-//               <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0;">
-//                 <tr>
-//                   <td>
-//                     <div style="display: inline-block; padding: 10px 30px; border-radius: 8px;background-color: #2f2f2f !important; color: #ffffff !important; font-size: 18px; font-weight: bold; letter-spacing: 8px; font-family: 'Courier New', monospace;">
-//                       ${otp}
-//                     </div>
-//                   </td>
-//                 </tr>
-//               </table>
+    <div style="text-align:center;margin-top:24px">
+      <p style="font-size:14px;color:#555">Scan this QR code at the entry gate</p>
+      <img src="cid:ticketqr" width="220" />
+    </div>
 
-//               <!-- Important Notes -->
-//               <div style="background-color: #4f4f4f !important; border-left: 4px solid #1a1a1a !important; padding: 10px 15px; margin: 20px 0; border-radius: 4px;">
-//                 <p style="color: #f1f1f1 !important; font-size: 12px; line-height: 1.6; margin: 0;">
-//                   <strong>Important:</strong><br>
-//                   • This OTP is valid for <strong>5 minutes</strong><br>
-//                   • Do not share this code with anyone<br>
-//                   • If you didn't request this, please ignore this email
-//                 </p>
-//               </div>
-//             </td>
-//           </tr>
+    <!-- Booking Details -->
+    <div style="background:#1f1f1f; padding:16px; border-radius:8px; margin:20px 0;">
+      <p><strong>Order ID:</strong> ${orderId}</p>
+      <p><strong>Event:</strong> ${eventTitle}</p>
+      <p><strong>Date:</strong> ${eventDate}</p>
+      <p><strong>Time:</strong> ${eventTime}</p>
+      <p><strong>Venue:</strong> ${venue}</p>
+      <p><strong>Tickets:</strong> ${qty}</p>
+      <p><strong>Total Paid:</strong> $${totalAmount}</p>
+    </div>
 
-//           <!-- Footer -->
-//           <tr>
-//             <td style="background-color: #4f4f4f !important; padding: 20px; text-align: center; font-size: 12px; color: #f1f1f1 !important;">
-//               <p style="margin: 0 0 5px 0;">
-//                 Best regards,<br>
-//                 <strong style="color: #f1f1f1 !important;">${companyName} Team</strong>
-//               </p>
-//               <p style="margin: 0; line-height: 1.5;">
-//                 This is an automated message, please do not reply.<br>
-//                 © ${new Date().getFullYear()} ${companyName}. All rights reserved.
-//               </p>
-//             </td>
-//           </tr>
+    <p style="margin-top:20px;">
+      Please keep this email for entry verification.  
+      We’re excited to see you at the event!
+    </p>
 
-//         </table>
-//       </td>
-//     </tr>
-//   </table>
-// </body>
-// </html>
-//   `;
-// }
+    <p style="margin-top:30px;">
+      — <strong>Bookent Team</strong>
+    </p>
+
+    <hr style="border:none; border-top:1px solid #444; margin:30px 0;" />
+
+    <p style="font-size:12px; color:#aaa; text-align:center;">
+      © ${new Date().getFullYear()} Bookent. All rights reserved.
+    </p>
+  </div>
+</body>
+</html>
+`;
+};

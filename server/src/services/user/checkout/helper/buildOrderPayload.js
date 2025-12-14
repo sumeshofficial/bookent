@@ -11,7 +11,6 @@ export const buildDbOrderPayload = ({
   event,
   section,
   breakdown,
-  qrData,
 }) => {
   return {
     userId,
@@ -37,7 +36,7 @@ export const buildDbOrderPayload = ({
       bookingFee: breakdown.finalBookingFee,
       grandTotal: breakdown.finalGrandTotal,
     },
-    qrData,
+    qrData: null,
     paymentMethod: PAYMENT_METHOD.PAYPAL,
     paypalOrderId: result.id,
   };

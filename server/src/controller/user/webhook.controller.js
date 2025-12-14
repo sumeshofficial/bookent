@@ -36,7 +36,6 @@ export const paypalWebhookController = asyncHandler(async (req, res) => {
       await processPaypalCapture(capture, event);
       break;
     }
-
     default:
       logger.info(`Unhandled PayPal event: ${event.event_type}`);
   }

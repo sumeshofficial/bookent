@@ -76,13 +76,13 @@ export const getOrderStatusController = asyncHandler(async (req, res) => {
   }
 
   const status = await orderStatus(paypalOrderId);
-  console.log(status);
 
   sendResponse(res, { status }, STATUS_CODE.SUCCESS);
 });
 
 export const getTicketController = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
+  const user = req.user
 
   if (!orderId) {
     throw new Error(

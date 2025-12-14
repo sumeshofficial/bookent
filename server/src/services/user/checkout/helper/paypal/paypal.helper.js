@@ -3,39 +3,35 @@ import { CheckoutPaymentIntent } from "@paypal/paypal-server-sdk";
 import { CURRENCY_CODE } from "../../../../../utility/constants/constants.js";
 
 export const preparePaypalBreakdown = (section, pricing) => {
-  const grandTotal = pricing.grandTotal;
-  const gst = pricing.gst;
-  const bookingFee = pricing.bookingFee;
-  const sectionPrice = section.price;
-  const baseBookingPrice = pricing.baseFee;
+  const qty = section.qty;
 
-  const finalUnitAmount = sectionPrice.toFixed(2);
-  const finalItemTotal = new Decimal(finalUnitAmount)
-    .times(section.qty)
-    .toFixed(2, Decimal.ROUND_HALF_UP);
+  const unitAmount = new Decimal(section.price).toFixed(2);
+  const itemTotal = new Decimal(unitAmount).times(qty).toFixed(2);
 
-  const finalGst = gst.toFixed(2, Decimal.ROUND_HALF_UP);
-  const finalBookingFeeRaw = bookingFee.toFixed(2, Decimal.ROUND_HALF_UP);
-  const finalBaseFee = baseBookingPrice.toFixed(2, Decimal.ROUND_HALF_UP);
+  const baseFee = new Decimal(pricing.baseFee).toFixed(2);
+  const gst = new Decimal(pricing.gst).toFixed(2);
 
-  const validatedSum = new Decimal(finalItemTotal)
-    .plus(finalGst)
-    .plus(finalBookingFeeRaw);
+  const bookingFee = new Decimal(pricing.bookingFee).toFixed(2);
 
-  const finalGrandTotal = grandTotal.toFixed(2, Decimal.ROUND_DOWN);
-  const differenceToAbsorb = new Decimal(finalGrandTotal).minus(validatedSum);
+  const grandTotal = new Decimal(pricing.grandTotal).toFixed(2);
 
-  const finalBookingFee = new Decimal(finalBookingFeeRaw)
-    .plus(differenceToAbsorb)
-    .toFixed(2);
+  const expectedTotal = new Decimal(itemTotal).plus(bookingFee);
+
+  if (!expectedTotal.equals(grandTotal)) {
+    throw new Error(
+      `PayPal amount mismatch: expected ${expectedTotal.toFixed(
+        2
+      )}, got ${grandTotal}`
+    );
+  }
 
   return {
-    finalUnitAmount,
-    finalItemTotal,
-    finalGst,
-    finalBookingFee,
-    finalBaseFee,
-    finalGrandTotal,
+    finalUnitAmount: unitAmount,
+    finalItemTotal: itemTotal,
+    finalBaseFee: baseFee,
+    finalGst: gst,
+    finalBookingFee: bookingFee,
+    finalGrandTotal: grandTotal,
   };
 };
 
@@ -62,7 +58,7 @@ export const buildPaypalOrderPayload = (lockId, event, section, breakdown) => {
               },
               handling: {
                 currencyCode: CURRENCY_CODE.USD,
-                value: breakdown.finalBookingFee,
+                value: breakdown.finalBaseFee,
               },
             },
           },

@@ -78,16 +78,6 @@ export const paypalCreateOrder = async (ticketDetails, userId) => {
 
     const { result } = await ordersController.createOrder(collect);
 
-    const qrData = jwt.sign(
-      {
-        orderId: result.id,
-        eventId: event._id,
-        userId,
-      },
-      ENV.QR_DATA_JWT_SECRET,
-      { expiresIn: ENV.CREATE_ORDER_QR_CODE_EXPIRY }
-    );
-
     const payload = buildDbOrderPayload({
       result,
       userId,
@@ -95,7 +85,6 @@ export const paypalCreateOrder = async (ticketDetails, userId) => {
       event,
       section,
       breakdown,
-      qrData,
     });
 
     await session.withTransaction(async () => {
