@@ -18,6 +18,7 @@ import { findUserById } from "../../../../repositories/user/user.repository.js";
 import { sendEmailConfirmation } from "./helper/ticketEmailConfirmation.js";
 import { ENV } from "../../../../config/env.conf.js";
 import jwt from "jsonwebtoken";
+import { updateAdminWallet } from "../../../../repositories/admin/updateAdminWallet.js";
 
 export const processPaypalCapture = async (capture, event) => {
   const session = await mongoose.startSession();
@@ -39,6 +40,7 @@ export const processPaypalCapture = async (capture, event) => {
 
       const payload = buildTransactionPayload(order, capture, event);
       await createMoneyTransaction(payload, session);
+      await updateAdminWallet(payload.net_amount, session);
 
       await updateOrderStatus(order._id, ORDER_STATUS.PAID, session);
       await makeTicketSold(order.eventId, order.seat, session);

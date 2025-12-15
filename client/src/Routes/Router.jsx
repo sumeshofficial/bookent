@@ -35,6 +35,7 @@ import PaymentProcessing from "../features/user/payment/PaymentProcessing";
 import TicketBooked from "../features/user/TicketBooked/TicketBooked";
 import MyTickets from "../features/user/myTickets/MyTickets";
 import Ticket from "../features/user/ticket/Ticket";
+import AdminWallet from "../features/admin/wallet/AdminWallet";
 
 const router = createBrowserRouter([
   {
@@ -231,6 +232,10 @@ const router = createBrowserRouter([
                   {
                     path: "organizers/:id",
                     element: <OrganizerDetailsPage />,
+                  },
+                  {
+                    path: "wallet",
+                    element: <AdminWallet />,
                   },
                 ],
               },

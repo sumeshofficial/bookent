@@ -11,7 +11,7 @@ export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
   const [socket, setSocket] = useState(null);
 
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem("accessToken") || localStorage.getItem("adminAccessToken");
 
   const handleLogout = useCallback(async () => {
     try {

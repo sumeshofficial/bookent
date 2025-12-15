@@ -9,6 +9,7 @@ import {
   Ticket,
   UserCircle,
   Users,
+  Wallet,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -36,6 +37,7 @@ const AdminSidebar = ({ setSidebarOpen, sidebarOpen }) => {
     { id: "sales", label: "Sales", icon: CreditCard, path: "/admin/sales" },
     { id: "coupons", label: "Coupons", icon: Ticket, path: "/admin/coupons" },
     { id: "banner", label: "Banner", icon: Image, path: "/admin/banner" },
+    { id: "wallet", label: "Wallet", icon: Wallet, path: "/admin/wallet" },
   ];
 
   return (
