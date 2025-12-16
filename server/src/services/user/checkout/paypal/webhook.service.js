@@ -44,7 +44,7 @@ export const processPaypalCapture = async (capture, event) => {
 
       await updateOrderStatus(order._id, ORDER_STATUS.PAID, session);
       await makeTicketSold(order.eventId, order.seat, session);
-      const qrData = jwt.sign(
+      const qrToken = jwt.sign(
         {
           orderId: order._id,
           eventId: event._id,
@@ -56,7 +56,11 @@ export const processPaypalCapture = async (capture, event) => {
 
       const payloadForUpdate = {
         status: ORDER_STATUS.CONFIRMED,
-        qrData,
+        qrData: {
+          data: qrToken,
+          isUsed: false,
+          usedAt: null,
+        },
       };
       order = await updateOrder(order._id, payloadForUpdate, session);
     });

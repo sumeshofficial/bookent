@@ -12,7 +12,7 @@ import { generateQRCode } from "../../../../helper/generateQrCode.js";
 export const sendEmailConfirmation = async (user, order) => {
   const subject = "🎟️ Booking Confirmed – Your Tickets Are Ready";
   const invoicePdfBuffer = await generateInvoicePDF({ order, user });
-  const qrImageBuffer = await generateQRCode(order.qrData);
+  const qrImageBuffer = await generateQRCode(order.qrData.data);
 
   await sendEmail({
     to: user.email,

@@ -22,7 +22,7 @@ export const buildTicketDetails = async (order) => {
     currency: order.total_amount?.currency,
     pricing: order.pricingBreakDown,
 
-    qrData: order.qrData,
+    qrData: order.qrData.data && order.qrData.isUsed ? null : order.qrData.data,
 
     paymentMethod: order.paymentMethod,
     status: order.status,

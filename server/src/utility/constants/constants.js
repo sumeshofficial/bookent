@@ -118,6 +118,25 @@ export const ERRORS = {
     CODE: "ORDER_NOTFOUND",
     MSG: "Order not found for order Id or user",
   },
+  JWT_EXPIRED: {
+    CODE: "JWT_EXPIRED",
+    MSG: "Your session has expired. Please log in again.",
+  },
+
+  JWT_PAYLOAD_NOT_FOUND: {
+    CODE: "JWT_EXPIRED_OR_INVALID",
+    MSG: "Invalid or expired authentication token. Please log in again.",
+  },
+
+  ORDER_NOT_CONFIRMED: {
+    CODE: "ORDER_NOT_CONFIRMED",
+    MSG: "This ticket has not been confirmed yet.",
+  },
+
+  TICKET_ALREADY_USED: {
+    CODE: "TICKET_ALREADY_USED",
+    MSG: "This ticket has already been used and is no longer valid.",
+  },
 };
 
 // Response Messages

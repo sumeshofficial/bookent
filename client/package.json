@@ -24,6 +24,7 @@
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
     "framer-motion": "^12.23.26",
+    "html5-qrcode": "^2.3.8",
     "konva": "^10.0.8",
     "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",

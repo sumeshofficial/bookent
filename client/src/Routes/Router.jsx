@@ -36,6 +36,7 @@ import TicketBooked from "../features/user/TicketBooked/TicketBooked";
 import MyTickets from "../features/user/myTickets/MyTickets";
 import Ticket from "../features/user/ticket/Ticket";
 import AdminWallet from "../features/admin/wallet/AdminWallet";
+import VerifyTicket from "../features/organizer/verifyTicket/VerifyTicket";
 
 const router = createBrowserRouter([
   {
@@ -199,6 +200,10 @@ const router = createBrowserRouter([
                   {
                     path: "stadium/:stadiumSlug/edit",
                     element: <CreateStadium />,
+                  },
+                  {
+                    path: "verify-ticket",
+                    element: <VerifyTicket />,
                   },
                 ],
               },

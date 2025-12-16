@@ -84,8 +84,9 @@ const orderSchema = new mongoose.Schema(
       grandTotal: Number,
     },
     qrData: {
-      type: String,
-      default: null,
+      data: { type: String, default: null },
+      isUsed: { type: Boolean, default: false },
+      usedAt: { type: Date, default: null },
     },
     paymentMethod: {
       type: String,

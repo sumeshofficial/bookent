@@ -15,7 +15,6 @@ import {
 import { formatCheckoutDetails } from "./helper/formatCheckoutDetails.js";
 import { extendExpiry } from "../../../repositories/user/redis.repository.js";
 import { ENV } from "../../../config/env.conf.js";
-import jwt from "jsonwebtoken";
 import {
   createOrder,
   getOrderForPaypal,
@@ -118,6 +117,7 @@ export const paypalCreateOrder = async (ticketDetails, userId) => {
   }
 };
 
+// Capture Paypal Order
 export const paypalCaptureOrder = async (orderID, lockId, userId) => {
   const meta = await validateSeatLock(lockId, userId);
 
@@ -155,6 +155,7 @@ export const paypalCaptureOrder = async (orderID, lockId, userId) => {
   }
 };
 
+// Get Order Status
 export const orderStatus = async (paypalOrderId) => {
   const order = await getOrderForPaypal(paypalOrderId);
 
@@ -184,6 +185,7 @@ export const orderStatus = async (paypalOrderId) => {
   return status;
 };
 
+// Get Ticket
 export const getTicket = async (orderId) => {
   const order = await getOrderForPaypal(orderId);
 

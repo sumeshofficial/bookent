@@ -5,6 +5,7 @@ import {
   Grid,
   List,
   Package,
+  Verified,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
@@ -23,12 +24,13 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
     { id: "events", label: "Events", icon: Package, hasDropdown: true },
     { id: "orderList", label: "Order List", icon: List, path: "/listmyshow/orders" },
     { id: "sales", label: "Sales", icon: CreditCard, path: "/listmyshow/sales" },
+    { id: "verify", label: "Verify Ticket", icon: Verified, path: "/listmyshow/verify-ticket" },
   ];
 
   return (
     <div>
       <div
-        className={`fixed md:static inset-y-0 left-0 transform ${
+        className={`fixed md:static inset-y-0 left-0 transform min-h-screen ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-300 ease-in-out z-50 w-64 bg-white border-r border-gray-200`}
       >

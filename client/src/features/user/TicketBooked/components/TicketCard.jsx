@@ -39,7 +39,7 @@ const TicketCard = ({ data }) => {
       <div className="p-5">
         <div className="bg-gray-100 rounded-lg p-6 flex flex-col sm:flex-row gap-6 items-center justify-center">
           <div className="flex items-center justify-center bg-white p-3 rounded-lg w-[120px] h-[120px]">
-            <QRCode value={qrData}  />
+            {qrData.data && <QRCode value={qrData?.data}  />}
           </div>
 
           <div className="flex-1 text-sm text-center flex flex-col items-center justify-center">
