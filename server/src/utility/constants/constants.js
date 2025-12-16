@@ -122,20 +122,21 @@ export const ERRORS = {
     CODE: "JWT_EXPIRED",
     MSG: "Your session has expired. Please log in again.",
   },
-
   JWT_PAYLOAD_NOT_FOUND: {
     CODE: "JWT_EXPIRED_OR_INVALID",
     MSG: "Invalid or expired authentication token. Please log in again.",
   },
-
   ORDER_NOT_CONFIRMED: {
     CODE: "ORDER_NOT_CONFIRMED",
     MSG: "This ticket has not been confirmed yet.",
   },
-
   TICKET_ALREADY_USED: {
     CODE: "TICKET_ALREADY_USED",
     MSG: "This ticket has already been used and is no longer valid.",
+  },
+  DAILY_EVENT_LIMIT_REACHED: {
+    CODE: "DAILY_EVENT_LIMIT_REACHED",
+    MSG: "Daily event creation limit reached. Maximum 2 events per day allowed.",
   },
 };
 

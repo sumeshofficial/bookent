@@ -15,3 +15,19 @@ export const findeEventByOrganizerIdAndEventId = async (
 ) => {
   return await Event.findOne({ organizer: organizerId, _id: eventId }).lean();
 };
+
+// Count Events
+export const countEventsByOrganizerForDate = async ({
+  organizerId,
+  startDate,
+  endDate,
+}) => {
+  return Event.countDocuments({
+    organizer: organizerId,
+    createdAt: {
+      $gte: startDate,
+      $lte: endDate,
+    },
+    isDeleted: false,
+  });
+};

@@ -27,6 +27,7 @@ import { isSlugExists } from "../../utility/event.utils.js";
 import Event from "../../models/event.model.js";
 import { ENV } from "../../config/env.conf.js";
 import { ERRORS } from "../../utility/constants/constants.js";
+import { validateDailyEventLimit } from "../../services/organizer/event-limit.service.js";
 
 dotenv.config();
 
@@ -35,9 +36,22 @@ const eventCreateValidationExpiresIn = ENV.REDIS_EVENT_VALIDATION_EXPIRES_IN;
 // Create Event Validate
 export const validateEventCreateController = async (req, res) => {
   try {
+    const userId = req.user._id;
     const data = req.body;
 
     logger.http(`${req.method} ${req.originalUrl}`);
+
+    const organizer = await checkOrganizer({ userId });
+    if (!organizer) {
+      throw new AppError(
+        STATUS_CODE.NOTFOUND,
+        ERRORS.ORGANIZER_NOT_FOUND.CODE,
+        ERRORS.ORGANIZER_NOT_FOUND.MSG
+      );
+    }
+
+    // Daily limit check
+    await validateDailyEventLimit(organizer._id);
 
     logger.info("Validating event data");
     await eventSchema.validate(data, { abortEarly: false });
