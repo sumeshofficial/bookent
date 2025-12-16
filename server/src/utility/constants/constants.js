@@ -150,6 +150,10 @@ export const ERRORS = {
     CODE: "EVENT_INVALID",
     MSG: "Event details are incomplete or invalid",
   },
+  INVALID_QR: {
+    CODE: "INVALID_QR",
+    MSG: "Invalid or unsupported QR code",
+  },
 };
 
 // Response Messages
