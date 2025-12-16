@@ -202,7 +202,7 @@ const router = createBrowserRouter([
                     element: <CreateStadium />,
                   },
                   {
-                    path: "verify-ticket",
+                    path: "event/:eventId/tickets/verify",
                     element: <VerifyTicket />,
                   },
                 ],

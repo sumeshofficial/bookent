@@ -5,7 +5,6 @@ import {
   Grid,
   List,
   Package,
-  Verified,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
@@ -24,7 +23,6 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
     { id: "events", label: "Events", icon: Package, hasDropdown: true },
     { id: "orderList", label: "Order List", icon: List, path: "/listmyshow/orders" },
     { id: "sales", label: "Sales", icon: CreditCard, path: "/listmyshow/sales" },
-    { id: "verify", label: "Verify Ticket", icon: Verified, path: "/listmyshow/verify-ticket" },
   ];
 
   return (

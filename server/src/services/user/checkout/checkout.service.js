@@ -157,6 +157,7 @@ export const paypalCaptureOrder = async (orderID, lockId, userId) => {
 
 // Get Order Status
 export const orderStatus = async (paypalOrderId) => {
+  console.log(paypalOrderId)
   const order = await getOrderForPaypal(paypalOrderId);
 
   if (!order) {

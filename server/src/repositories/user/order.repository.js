@@ -1,7 +1,7 @@
 import Order from "../../models/order.model.js";
 
 export const getOrderForPaypal = async (paypalOrderId, session = null) => {
-  return Order.findOne({ paypalOrderId, "qrData.isUsed": false }, null, {
+  return Order.findOne({ paypalOrderId }, null, {
     session,
   });
 };

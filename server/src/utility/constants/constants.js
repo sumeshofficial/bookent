@@ -138,6 +138,18 @@ export const ERRORS = {
     CODE: "DAILY_EVENT_LIMIT_REACHED",
     MSG: "Daily event creation limit reached. Maximum 2 events per day allowed.",
   },
+  EVENT_NOT_ONGOING: {
+    CODE: "EVENT_NOT_ONGOING",
+    MSG: "Ticket verification is not allowed because the event is not currently ongoing.",
+  },
+  EVENT_MISMATCH: {
+    CODE: "EVENT_MISMATCH",
+    MSG: "This ticket does not belong to the selected event.",
+  },
+  EVENT_INVALID: {
+    CODE: "EVENT_INVALID",
+    MSG: "Event details are incomplete or invalid",
+  },
 };
 
 // Response Messages

@@ -7,6 +7,8 @@ import { ERRORS } from "../../../../utility/constants/constants.js";
 export const verifyJWT = async (qrData) => {
   const payload = jwt.verify(qrData, ENV.QR_DATA_JWT_SECRET);
 
+  console.log(payload)
+
   if (!payload) {
     throw new AppError(
       STATUS_CODE.NOTFOUND,

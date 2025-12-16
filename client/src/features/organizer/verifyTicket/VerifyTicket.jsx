@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import VerifyHeader from "./components/VerifyHeader";
 import QRReader from "./components/QRReader";
 import VerifyResult from "./components/VerifyResult";
@@ -11,10 +12,12 @@ const VerifyTicket = () => {
   const [status, setStatus] = useState(VERIFY_STATUS.IDLE);
   const [message, setMessage] = useState("");
   const [ticketData, setTicketData] = useState(null);
+  const { eventId } = useParams();
 
   const { mutate: verifyTicket } = useVerifyTicket();
 
   const { scanAgain } = useTicketScanner({
+    eventId,
     verifyTicket,
     onLoading: () => {
       setStatus(VERIFY_STATUS.LOADING);

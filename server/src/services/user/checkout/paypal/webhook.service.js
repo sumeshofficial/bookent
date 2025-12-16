@@ -47,7 +47,7 @@ export const processPaypalCapture = async (capture, event) => {
       const qrToken = jwt.sign(
         {
           orderId: order._id,
-          eventId: event._id,
+          eventId: order.eventId,
           userId: order.userId,
         },
         ENV.QR_DATA_JWT_SECRET,

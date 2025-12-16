@@ -102,6 +102,15 @@ const EventPreview = () => {
           </div>
         ) : (
           <div className="flex items-center gap-3 transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]">
+            <button
+              onClick={() =>
+                navigate(`/listmyshow/event/${eventData._id}/tickets/verify`)
+              }
+              className="px-4 py-2 rounded-md bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition"
+            >
+              Verify Tickets
+            </button>
+
             <div className="relative z-9999">
               <button
                 className="p-2 rounded-full hover:bg-gray-200 transition"

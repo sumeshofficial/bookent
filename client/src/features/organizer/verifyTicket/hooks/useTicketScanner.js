@@ -7,6 +7,7 @@ export const useTicketScanner = ({
   onSuccess,
   onError,
   verifyTicket,
+  eventId,
 }) => {
   const scannerRef = useRef(null);
   const hasScannedRef = useRef(false);
@@ -35,18 +36,23 @@ export const useTicketScanner = ({
 
         onLoading();
 
-        verifyTicket(decodedText, {
-          onSuccess: (data) => {
-            onSuccess(data);
-          },
-          onError: (err) => {
-            onError(err?.response?.data?.error?.message || "Verification failed");
-          },
-          onSettled: () => {
-            scannerRef.current?.clear().catch(() => {});
-            scannerRef.current = null;
-          },
-        });
+        verifyTicket(
+          { qrData: decodedText, eventId },
+          {
+            onSuccess: (data) => {
+              onSuccess(data);
+            },
+            onError: (err) => {
+              onError(
+                err?.response?.data?.error?.message || "Verification failed"
+              );
+            },
+            onSettled: () => {
+              scannerRef.current?.clear().catch(() => {});
+              scannerRef.current = null;
+            },
+          }
+        );
       },
       (error) => {
         if (

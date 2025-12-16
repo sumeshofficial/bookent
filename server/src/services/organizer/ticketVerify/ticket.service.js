@@ -1,42 +1,34 @@
 import { verifyUserTicket } from "../../../repositories/organizer/order.repository.js";
 import { getOrder } from "../../../repositories/user/order.repository.js";
 import { findUserById } from "../../../repositories/user/user.repository.js";
-import { ERRORS, ORDER_STATUS } from "../../../utility/constants/constants.js";
-import { STATUS_CODE } from "../../../utility/constants/statusCode.js";
-import { AppError } from "../../../utility/helpers.js";
+import { validateEventMatch } from "./helper/validateEventMatch.js";
+import { validateEventOngoing } from "./helper/validateEventOnGoing.js";
+import { validateOrderAndTicket } from "./helper/validateOrderAndTicket.js";
+import { validateOrganizerAndEvent } from "./helper/validateOrganizerAndEvent.js";
 import { verifyJWT } from "./helper/verifyJWT.js";
 
-export const verifyTicket = async (qrData) => {
-  const { orderId, eventId, userId } = await verifyJWT(qrData);
+export const verifyTicket = async ({ qrData, eventId, userId }) => {
+  const {
+    orderId,
+    eventId: qrEventId,
+    userId: qrUserId,
+  } = await verifyJWT(qrData);
 
-  const order = await getOrder(orderId, userId);
-  const user = await findUserById(userId);
+  validateEventMatch({ qrEventId, eventId });
 
-  if (!order) {
-    throw new AppError(
-      STATUS_CODE.NOTFOUND,
-      ERRORS.ORDER_NOTFOUND.CODE,
-      ERRORS.ORDER_NOTFOUND.MSG
-    );
-  }
+  const event = await validateOrganizerAndEvent({
+    userId,
+    eventId,
+  });
 
-  if (order.status !== ORDER_STATUS.CONFIRMED) {
-    throw new AppError(
-      STATUS_CODE.BAD_REQUEST,
-      ERRORS.ORDER_NOT_CONFIRMED.CODE,
-      ERRORS.ORDER_NOT_CONFIRMED.MSG
-    );
-  }
+  validateEventOngoing(event);
 
-  if (order.qrData?.isUsed) {
-    throw new AppError(
-      STATUS_CODE.CONFLICT,
-      ERRORS.TICKET_ALREADY_USED.CODE,
-      ERRORS.TICKET_ALREADY_USED.MSG
-    );
-  }
+  const order = await getOrder(orderId, qrUserId);
+  const user = await findUserById(qrUserId);
 
-  const updatedOrder = await verifyUserTicket(orderId, userId)
+  validateOrderAndTicket(order);
+
+  const updatedOrder = await verifyUserTicket(orderId, qrUserId);
 
   return {
     eventTitle: updatedOrder.eventDetails?.title,
