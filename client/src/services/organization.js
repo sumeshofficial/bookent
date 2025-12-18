@@ -1,5 +1,6 @@
 import axios from "axios";
 import { api } from "./api/apiSetup";
+import { ENV } from "../config/env";
 
 // Organizer Registration Form
 export const registerOrganizationAccount = async ({
@@ -163,10 +164,10 @@ export const deleteEvent = async (eventId) => {
 
 // Get all Indian States
 export const getState = async () => {
-  const url = import.meta.env.VITE_STATE_API_URL;
+  const url = ENV.VITE_STATE_API_URL;
   const response = await axios.get(url, {
     headers: {
-      "X-RapidAPI-Key": import.meta.env.VITE_RAPIDAPI_KEY,
+      "X-RapidAPI-Key": ENV.VITE_RAPIDAPI_KEY,
       "X-RapidAPI-Host": "country-state-city-search-rest-api.p.rapidapi.com",
     },
   });
@@ -175,10 +176,10 @@ export const getState = async () => {
 
 // Get all City
 export const getCity = async (stateCode) => {
-  const url = `${import.meta.env.VITE_CITY_API_URL}${stateCode}`;
+  const url = `${ENV.VITE_CITY_API_URL}${stateCode}`;
   const response = await axios.get(url, {
     headers: {
-      "X-RapidAPI-Key": import.meta.env.VITE_RAPIDAPI_KEY,
+      "X-RapidAPI-Key": ENV.VITE_RAPIDAPI_KEY,
       "X-RapidAPI-Host": "country-state-city-search-rest-api.p.rapidapi.com",
     },
   });

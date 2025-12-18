@@ -54,7 +54,6 @@ const CreateEventForm = () => {
 
   useEffect(() => {
     if (error) {
-      console.log(error);
       toast.dismiss();
       toast.error("Something went wrong");
       navigate("/error");
@@ -107,7 +106,6 @@ const CreateEventForm = () => {
       queryClient.invalidateQueries(["event"]);
     },
     onError: (err) => {
-      console.log(err);
       toast.dismiss();
       toast.error(err.response.data.error.message || "Something went wrong");
     },
@@ -144,8 +142,6 @@ const CreateEventForm = () => {
 
         dirtyPayload.tags = data.tags;
         dirtyPayload.ticketSetup = dataWithoutImage.ticketSetup;
-
-        console.log(dirtyPayload);
 
         const { bannerImage, thumbnailImage, ...newData } = dirtyPayload;
 
@@ -191,7 +187,6 @@ const CreateEventForm = () => {
             images,
           });
 
-          console.log(res);
           setUpdatedEventSlug(res.event.slug);
         }
       } else {
@@ -216,14 +211,12 @@ const CreateEventForm = () => {
           thumbnailImageKey: uploadUrls.thumbnailImage.key,
         });
 
-        console.log(event);
         setUpdatedEventSlug(event.slug);
       }
 
       setIsModified(false);
       setIsSubmitted(true);
     } catch (error) {
-      console.log(error);
       toast.error("Something went wrong");
     }
   };

@@ -47,7 +47,7 @@ export const useProfileLogic = () => {
     toast.success("Preferences updated successfully!");
 
     try {
-      await dispatch(updateUserProfile({ id: user._id, data }));
+      dispatch(updateUserProfile({ id: user._id, data }));
     } catch (err) {
       toast.error(err?.message || "Failed to save preferences");
     }

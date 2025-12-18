@@ -1,6 +1,7 @@
 import { useDispatch } from "react-redux";
 import { addError, addUser, clearError } from "../../../app/userSlice";
 import { useModal } from "../../../utils/constants";
+import { ENV } from "../../../config/env";
 
 const GoogleButton = ({ role = "user" }) => {
   const { closeModal } = useModal();
@@ -9,7 +10,7 @@ const GoogleButton = ({ role = "user" }) => {
   const handleGoogleLogin = () => {
     dispatch(clearError());
     const popup = window.open(
-      `${import.meta.env.VITE_API_URL}/user/auth/google?state=` +
+      `${ENV.VITE_API_URL}/user/auth/google?state=` +
         encodeURIComponent(JSON.stringify({ role })),
       "googleLogin",
       "width=500,height=600"

@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import FormInput from "./FormInput";
+import { useModal } from "../../../../../utils/constants";
 
 const ProfileForm = ({
   form,
@@ -15,6 +16,7 @@ const ProfileForm = ({
     formState,
   } = form;
   const { user } = useSelector((store) => store.user);
+  const { closeModal } = useModal();
 
   return (
     <form
@@ -51,6 +53,7 @@ const ProfileForm = ({
       <div className="pt-4 flex justify-end gap-3">
         <button
           type="button"
+          onClick={() => closeModal()}
           className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100"
         >
           Cancel

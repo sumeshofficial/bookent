@@ -1,7 +1,8 @@
 import axios from "axios";
 import { adminLogout, logout } from "../auth";
+import { ENV } from "../../config/env";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = ENV.VITE_API_URL;
 
 let isRefreshing = false;
 let failedQueue = [];

@@ -18,7 +18,7 @@ export const validateDailyEventLimit = async (organizerId) => {
 
   if (count >= 2) {
     throw new AppError(
-      STATUS_CODE.CONFLICT,
+      STATUS_CODE.PERMISSION_DENIED,
       ERRORS.DAILY_EVENT_LIMIT_REACHED.CODE,
       ERRORS.DAILY_EVENT_LIMIT_REACHED.MSG
     );

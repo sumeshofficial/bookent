@@ -154,6 +154,18 @@ export const ERRORS = {
     CODE: "INVALID_QR",
     MSG: "Invalid or unsupported QR code",
   },
+  PASSWORD_COMPARISON_ERROR: {
+    CODE: "PASSWORD_COMPARISON_FAILED",
+    MSG: "Password comparison failed",
+  },
+  PASSWORD_NOT_MATCH: {
+    CODE: "PASSWORD_NOT_MATCH",
+    MSG: "Current Password not match",
+  },
+  NEW_PASSWORD_SAME_AS_OLD: {
+    CODE: "NEW_PASSWORD_SAME_AS_OLD",
+    MSG: "New password must be different from the current password",
+  },
 };
 
 // Response Messages

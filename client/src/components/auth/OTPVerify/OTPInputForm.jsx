@@ -124,7 +124,7 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
             id: updatedData?.user._id,
             data: updatedData?.updatedFields,
           })
-        ).unwarp();
+        );
         return;
       }
       openModal(purpose, { response });

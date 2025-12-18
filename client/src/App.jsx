@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import useOfflineTracker from "./hooks/useOfflineTracker";
 import useGlobalSeatEvents from "./hooks/useGlobalSeatEvents";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { ENV } from "./config/env";
 
 function App() {
   useOfflineTracker();
@@ -19,7 +20,7 @@ function App() {
         <ModalManager />
         <ErrorBoundary>
           <PayPalScriptProvider
-            options={{ clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID }}
+            options={{ clientId: ENV.VITE_PAYPAL_CLIENT_ID }}
           >
             <Outlet />
           </PayPalScriptProvider>

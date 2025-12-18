@@ -13,9 +13,10 @@ import UserBlockModal from "../../components/modal/UserBlockModal";
 import EmailInputFormModal from "../../components/auth/emailAuth/EmailInputModal";
 import ConfirmBackModal from "../../components/modal/ConfirmBackModal";
 import SeatLockErrorModal from "../../components/modal/SeatLockErrorModal";
+import ChangePassword from "../../features/user/profile/components/modal/changePassword/ChangePassword";
 
 const ModalManager = () => {
-  const { modalType, modalData } = useModal();
+  const { modalType, modalData, closeModal } = useModal();
 
   if (!modalType) return null;
 
@@ -63,12 +64,15 @@ const ModalManager = () => {
     case "seat-lock-error":
       content = <SeatLockErrorModal {...modalData} />;
       break;
+    case "change-password":
+      content = <ChangePassword {...modalData} />;
+      break;
     default:
       return null;
   }
 
   return (
-    <Modal isOpen={!!modalType}>
+    <Modal isOpen={!!modalType} onClose={() => closeModal()}>
       {content}
     </Modal>
   );

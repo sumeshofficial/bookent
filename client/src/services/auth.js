@@ -1,7 +1,8 @@
 import axios from "axios";
 import { adminApi, api } from "./api/apiSetup";
+import { ENV } from "../config/env";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = ENV.VITE_API_URL;
 
 export const sendOTPForSignup = async (data) => {
   const { fullname, email, password, role } = data;

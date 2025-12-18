@@ -1,10 +1,15 @@
-import { updateUserService } from "../../repositories/user/user.repository.js";
+import {
+  updateUserPassword,
+  updateUserService,
+  validatePassword,
+} from "../../repositories/user/user.repository.js";
 import { ERRORS } from "../../utility/constants/constants.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { AppError } from "../../utility/helpers.js";
 import { sanitizeUser } from "../../utility/user/sanitizeUser.js";
 import { getObjectURL } from "../s3.service.js";
 import { reverseGeocoding } from "../user.service.js";
+import bcrypt from "bcrypt";
 
 // Get user service
 export const getUser = async (user) => {
@@ -74,4 +79,20 @@ export const updateUser = async (body) => {
   }
 
   return updatedUser;
+};
+
+export const updatePassword = async (userId, currentPassword, newPassword) => {
+  const user = await validatePassword(userId, currentPassword);
+
+  const isSame = await bcrypt.compare(newPassword, user.password);
+
+  if (isSame) {
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.NEW_PASSWORD_SAME_AS_OLD.CODE,
+      ERRORS.NEW_PASSWORD_SAME_AS_OLD.MSG
+    );
+  }
+
+  await updateUserPassword(userId, newPassword);
 };

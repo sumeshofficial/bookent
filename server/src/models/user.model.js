@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import { AppError } from "../utility/helpers.js";
+import { STATUS_CODE } from "../utility/constants/statusCode.js";
+import { ERRORS } from "../utility/constants/constants.js";
 
 // User Schema
 const userSchema = new mongoose.Schema(
@@ -97,7 +100,11 @@ userSchema.methods.isValidPassword = async function (password) {
     }
     return await bcrypt.compare(password, this.password);
   } catch (error) {
-    throw new Error(error.message || "Password comparison failed");
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.PASSWORD_COMPARISON_ERROR.CODE,
+      error.message || ERRORS.PASSWORD_COMPARISON_ERROR.MSG
+    );
   }
 };
 

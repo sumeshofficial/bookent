@@ -1,6 +1,9 @@
 import User from "../../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { ENV } from "../../config/env.conf.js";
+import { AppError } from "../../utility/helpers.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
+import { ERRORS } from "../../utility/constants/constants.js";
 
 // Check user is exists
 export const isUserExists = async (email) => {
@@ -26,6 +29,7 @@ export const findUserByEmail = async (email) => {
 // Find user
 export const finduser = async (email) => {
   const user = await User.findOne({ email }).select("+password");
+  console.log(user);
   return user;
 };
 
@@ -62,6 +66,24 @@ export const updateUserService = async ({ id, data }) => {
   return updatedUser;
 };
 
+// Update user Password
+export const updateUserPassword = async (userId, newPassword) => {
+  const user = await User.findById(userId).select("+password");
+
+  if (!user) {
+    throw new AppError(
+      STATUS_CODE.NOTFOUND,
+      ERRORS.USER_NOT_FOUND.CODE,
+      ERRORS.USER_NOT_FOUND.MSG
+    );
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  return true;
+};
+
 // Update user status
 export const updateUserStatus = async (userId, newStatus) => {
   await User.updateOne(
@@ -70,4 +92,23 @@ export const updateUserStatus = async (userId, newStatus) => {
       status: newStatus,
     }
   );
+};
+
+export const validatePassword = async (userId, currentPassword) => {
+  const user = await User.findById(userId).select("+password");
+
+  if (!user || !user.password) {
+    return false;
+  }
+
+  const isMatch = await user.isValidPassword(currentPassword);
+  if (!isMatch) {
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.PASSWORD_NOT_MATCH.CODE,
+      ERRORS.PASSWORD_NOT_MATCH.MSG
+    );
+  }
+
+  return user;
 };

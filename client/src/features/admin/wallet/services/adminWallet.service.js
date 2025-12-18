@@ -30,7 +30,6 @@ const downloadFile = async (url, filename) => {
 
     window.URL.revokeObjectURL(downloadUrl);
   } catch (error) {
-    console.log(error);
     toast.error(`Export failed ${error.message}`);
   }
 };

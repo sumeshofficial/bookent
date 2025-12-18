@@ -1,18 +1,25 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
-const Modal = ({ isOpen, children }) => {
+const Modal = ({ isOpen, onClose, children }) => {
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    if (!isOpen) return;
+
+    document.body.style.overflow = "hidden";
+
+    window.history.pushState({ modal: true }, "");
+
+    const handlePopState = () => {
+      onClose?.();
+    };
+
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
       document.body.style.overflow = "auto";
+      window.removeEventListener("popstate", handlePopState);
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
