@@ -37,6 +37,7 @@ import MyTickets from "../features/user/myTickets/MyTickets";
 import Ticket from "../features/user/ticket/Ticket";
 import AdminWallet from "../features/admin/wallet/AdminWallet";
 import VerifyTicket from "../features/organizer/verifyTicket/VerifyTicket";
+import Coupons from "../features/admin/coupons/Coupons";
 
 const router = createBrowserRouter([
   {
@@ -241,6 +242,10 @@ const router = createBrowserRouter([
                   {
                     path: "wallet",
                     element: <AdminWallet />,
+                  },
+                  {
+                    path: "coupons",
+                    element: <Coupons />,
                   },
                 ],
               },

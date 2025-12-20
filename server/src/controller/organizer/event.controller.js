@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import logger from "../../config/logger.js";
-import { eventSchema } from "../../utility/validation.js";
+import { eventSchema } from "../../../validation/event.validation.js";
 import {
   deleteRedisData,
   getRedisData,

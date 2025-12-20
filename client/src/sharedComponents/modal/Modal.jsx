@@ -6,13 +6,9 @@ const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return;
 
     document.body.style.overflow = "hidden";
-
     window.history.pushState({ modal: true }, "");
 
-    const handlePopState = () => {
-      onClose?.();
-    };
-
+    const handlePopState = () => onClose?.();
     window.addEventListener("popstate", handlePopState);
 
     return () => {
@@ -24,9 +20,20 @@ const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-600/20">
+    <div
+      className="
+        fixed inset-0 z-50 bg-black/30
+        flex items-center justify-center
+        overflow-y-auto
+      "
+    >
       <div
-        className="bg-white rounded-2xl p-6 w-11/12 max-w-md relative"
+        className="
+          bg-white w-full sm:max-w-lg
+          rounded-t-2xl sm:rounded-2xl
+          max-h-[90vh] overflow-y-auto
+          p-4 sm:p-6
+        "
         onClick={(e) => e.stopPropagation()}
       >
         {children}

@@ -166,6 +166,10 @@ export const ERRORS = {
     CODE: "NEW_PASSWORD_SAME_AS_OLD",
     MSG: "New password must be different from the current password",
   },
+  VALIDATION_ERROR: {
+    CODE: "VALIDATION_ERROR",
+    MSG: "Validation error",
+  },
 };
 
 // Response Messages

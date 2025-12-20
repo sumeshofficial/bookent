@@ -14,6 +14,7 @@ import EmailInputFormModal from "../../components/auth/emailAuth/EmailInputModal
 import ConfirmBackModal from "../../components/modal/ConfirmBackModal";
 import SeatLockErrorModal from "../../components/modal/SeatLockErrorModal";
 import ChangePassword from "../../features/user/profile/components/modal/changePassword/ChangePassword";
+import CreateCoupon from "../../features/admin/coupons/components/modal/CreateCoupon";
 
 const ModalManager = () => {
   const { modalType, modalData, closeModal } = useModal();
@@ -66,6 +67,9 @@ const ModalManager = () => {
       break;
     case "change-password":
       content = <ChangePassword {...modalData} />;
+      break;
+    case "create-coupon":
+      content = <CreateCoupon {...modalData} />;
       break;
     default:
       return null;
