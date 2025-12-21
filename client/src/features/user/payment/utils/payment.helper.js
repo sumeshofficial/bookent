@@ -1,3 +1,3 @@
 export const formatDisplayAmount = (amount) => {
-  return `₹${amount.toLocaleString("en-IN")}`;
+  return `$${amount.toLocaleString("en-IN")}`;
 };

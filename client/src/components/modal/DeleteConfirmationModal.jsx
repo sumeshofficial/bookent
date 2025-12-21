@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { X, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 const DeleteConfirmationModal = ({
   title = "Delete Confirmation",

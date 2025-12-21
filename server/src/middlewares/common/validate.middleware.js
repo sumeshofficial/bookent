@@ -14,7 +14,7 @@ export const validate = (schema) => (req, res, next) => {
     throw new AppError(
       STATUS_CODE.BAD_REQUEST,
       ERRORS.VALIDATION_ERROR.CODE,
-      errors
+      errors[0]?.message
     );
   }
 

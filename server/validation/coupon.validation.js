@@ -17,10 +17,10 @@ export const createCouponSchema = z
 
     discountValue: z.number().positive("Discount value must be greater than 0"),
 
-    maxDiscountAmount: z
-      .number()
-      .positive("Max discount must be positive")
-      .optional(),
+    maxDiscountAmount: z.preprocess(
+      (val) => (val === null || val === "" ? undefined : val),
+      z.number().positive("Max discount must be positive").optional()
+    ),
 
     minOrderAmount: z
       .number()
@@ -56,5 +56,15 @@ export const createCouponSchema = z
     {
       message: "Percentage discount cannot exceed 100%",
       path: ["discountValue"],
+    }
+  )
+  .refine(
+    (data) =>
+      data.discountType === "PERCENTAGE"
+        ? typeof data.maxDiscountAmount === "number"
+        : data.maxDiscountAmount === undefined,
+    {
+      message: "Max discount amount is required only for percentage coupons",
+      path: ["maxDiscountAmount"],
     }
   );

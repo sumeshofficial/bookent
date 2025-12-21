@@ -8,8 +8,7 @@ export const useCreateCoupon = () => {
   return useMutation({
     mutationFn: createCouponService,
 
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["coupons"] });
 
       toast.success("Coupon created successfully");

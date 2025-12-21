@@ -57,3 +57,11 @@ export const SOCKET_EVENTS = {
   CONFIRM_BOOKING: "confirm-booking",
   PAYMENT_STATUS: "payment-status",
 };
+
+export const formatDate = (date) => {
+  return new Date(date).toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};

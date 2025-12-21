@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
-import { useModal } from "../../../../utils/constants";
-import { useCreateCoupon } from "../hooks/useCreateCoupon";
+import { useModal } from "../../../../../utils/constants";
+import { useCreateCoupon } from "../../hooks/useCreateCoupon";
 
 const CouponHeader = () => {
   const { openModal, closeModal } = useModal();
@@ -29,7 +29,7 @@ const CouponHeader = () => {
         className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition btn-primary"
       >
         <Plus size={18} />
-        Create Coupon
+        <span className="hidden sm:block">Create Coupon</span>
       </button>
     </div>
   );

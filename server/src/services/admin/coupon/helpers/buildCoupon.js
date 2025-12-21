@@ -1,5 +1,6 @@
-export const buildCoupon = async (data) => {
+export const buildCoupon = (data) => {
   const coupon = {
+    _id: data._id,
     code: data.code,
     description: data.description,
     discountType: data.discountType,

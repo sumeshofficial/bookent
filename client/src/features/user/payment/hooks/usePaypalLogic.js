@@ -32,7 +32,6 @@ export const usePaypalLogic = (eventSlug) => {
   };
 
   const onCancel = () => {
-    console.log("Payment cancelled");
     toast.error("Payment cancelled by user");
   };
 

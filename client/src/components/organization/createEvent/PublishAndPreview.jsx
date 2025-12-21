@@ -140,7 +140,7 @@ const PublishAndPreview = ({ register, errors, watch }) => {
               label: "Ticket Price Range",
               value:
                 watch("minPrice") && watch("maxPrice")
-                  ? `₹${watch("minPrice")} - ₹${watch("maxPrice")}`
+                  ? `$${watch("minPrice")} - $${watch("maxPrice")}`
                   : null,
             },
             { label: "Age Restriction", value: watch("ageRestriction") },

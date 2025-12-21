@@ -39,3 +39,30 @@ export const DUMMY_COUPONS = [
     isActive: false,
   },
 ];
+
+export const PAGE_SIZE = 10;
+
+export const STATUS_FILTERS = [
+  { label: "All Status", value: "ALL" },
+  { label: "Active", value: "ACTIVE" },
+  { label: "Inactive", value: "INACTIVE" },
+];
+
+export const TYPE_FILTERS = [
+  { label: "All Types", value: "ALL" },
+  { label: "Percentage", value: "PERCENTAGE" },
+  { label: "Flat", value: "FLAT" },
+];
+
+export const DATE_FILTERS = [
+  { label: "All Dates", value: "ALL" },
+  { label: "Active Now", value: "ACTIVE" },
+  { label: "Upcoming", value: "UPCOMING" },
+  { label: "Expired", value: "EXPIRED" },
+];
+
+export const SORT_OPTIONS = [
+  { label: "Newest", value: "NEWEST" },
+  { label: "Expiry Date", value: "EXPIRY" },
+  { label: "Most Used", value: "USAGE" },
+];

@@ -39,14 +39,14 @@ export const validationSchema = [
       .number()
       .typeError("Min price must be a number")
       .required("Min price is required")
-      .min(1, "Min price must be at least ₹1")
+      .min(1, "Min price must be at least $0.5")
       .max(5000, "Min price is too high"),
 
     maxPrice: yup
       .number()
       .typeError("Max price must be a number")
       .required("Max price is required")
-      .min(1, "Max price must be at least ₹1")
+      .min(1, "Max price must be at least $0.5")
       .max(5000, "Max price is too high")
       .when("minPrice", (minPrice, schema) =>
         schema.test({

@@ -5,7 +5,6 @@ const couponSchema = new mongoose.Schema(
     code: {
       type: String,
       required: true,
-      unique: true,
       uppercase: true,
       trim: true,
     },
@@ -66,6 +65,14 @@ const couponSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -74,6 +81,10 @@ const couponSchema = new mongoose.Schema(
 );
 
 couponSchema.index({ expiryDate: 1, isActive: 1 });
+couponSchema.index(
+  { code: 1 },
+  { unique: true, partialFilterExpression: { isDeleted: false } }
+);
 
 couponSchema.virtual("isExpired").get(function () {
   return this.expiryDate < new Date();

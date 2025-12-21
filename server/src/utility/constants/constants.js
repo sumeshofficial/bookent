@@ -170,6 +170,10 @@ export const ERRORS = {
     CODE: "VALIDATION_ERROR",
     MSG: "Validation error",
   },
+  COUPON_NOTFOUND: {
+    CODE: "COUPON_NOTFOUND",
+    MSG: "Coupon not found or already deleted"
+  }
 };
 
 // Response Messages

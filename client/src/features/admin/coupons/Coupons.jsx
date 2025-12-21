@@ -1,10 +1,10 @@
-import CouponHeader from "./components/CouponHeader";
-import CouponTable from "./components/CouponTable";
-import CouponMobileCard from "./components/CouponMobileCard";
+import CouponHeader from "./components/CouponList/CouponHeader";
+import CouponTable from "./components/CouponList/desktop/CouponTable";
+import { CouponMobileCard } from "./components/CouponList/mobile";
 import { useCoupons } from "./hooks/useCoupons";
 
 const Coupons = () => {
-  const { coupons, toggleStatus, deleteCoupon } = useCoupons();
+  const { coupons, meta, loading } = useCoupons();
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -13,13 +13,12 @@ const Coupons = () => {
       <div className="bg-white rounded-lg shadow">
         <CouponTable
           coupons={coupons}
-          onToggle={toggleStatus}
-          onDelete={deleteCoupon}
+          meta={meta}
+          isLoading={loading}
         />
         <CouponMobileCard
           coupons={coupons}
-          onToggle={toggleStatus}
-          onDelete={deleteCoupon}
+          isLoading={loading}
         />
       </div>
     </div>
