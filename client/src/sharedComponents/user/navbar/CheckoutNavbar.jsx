@@ -33,6 +33,7 @@ const CheckoutNavbar = ({ title, eventId, eventSlug }) => {
         onConfirm: () => {
           releaseSection(lockId);
           sessionStorage.removeItem("lockId");
+          sessionStorage.removeItem("appliedCoupon");
           blockBack.current = false;
           closeModal();
           navigate(`/event/${eventSlug}/seat-layout`);
@@ -57,6 +58,7 @@ const CheckoutNavbar = ({ title, eventId, eventSlug }) => {
       onConfirm: () => {
         releaseSection(lockId);
         sessionStorage.removeItem("lockId");
+        sessionStorage.removeItem("appliedCoupon");
         blockBack.current = false;
         closeModal();
         navigate(`/event/${eventSlug}/seat-layout`);

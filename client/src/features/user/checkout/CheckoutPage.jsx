@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { useCheckoutGuard } from "./hooks/useCheckoutGuard";
 
 const CheckoutPage = () => {
-  const { tickets, fees, grandTotal, eventId, isLoading } = useCheckoutLogic();
+  const { tickets, fees, grandTotal, eventId, isLoading, onCouponApplied, onCouponRemoved } = useCheckoutLogic();
   const { eventSlug } = useParams();
 
   // useReleaseSeatLock(eventId);
@@ -22,7 +22,7 @@ const CheckoutPage = () => {
       <div className="my-10 max-w-3xl mx-auto px-5 py-6 space-y-6 border-2 rounded-xl border-gray-200 select-none">
         <TicketCard data={tickets} isLoading={isLoading} />
 
-        <OffersSection />
+        <OffersSection onCouponApplied={onCouponApplied} onCouponRemoved={onCouponRemoved} grandTotal={grandTotal} />
 
         <PaymentSummary fees={fees} />
 

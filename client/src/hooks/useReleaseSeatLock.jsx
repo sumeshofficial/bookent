@@ -18,6 +18,7 @@ const useReleaseSeatLock = (eventId) => {
       if (lockId) {
         releaseSection(lockId);
         sessionStorage.removeItem("lockId");
+        sessionStorage.removeItem("appliedCoupon");
       }
     };
   }, []);

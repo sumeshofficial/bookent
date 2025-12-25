@@ -11,6 +11,13 @@ const TicketPricing = ({ pricing }) => {
         <span>$ {pricing.orderAmount}</span>
       </div>
 
+      {pricing.discount > 0 && (
+        <div className="flex justify-between text-sm text-green-600 mt-1">
+          <span>Coupon Discount</span>
+          <span>- $ {pricing.discount}</span>
+        </div>
+      )}
+
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between text-sm mt-2 font-medium"
@@ -46,7 +53,7 @@ const TicketPricing = ({ pricing }) => {
       )}
 
       <div className="border-t border-dashed mt-4 pt-3 flex justify-between font-semibold">
-        <span>Amount Paid</span>
+        <span>{`Amount Paid ${pricing.discount > 0 ? "(After Discount)" : ""}`}</span>
         <span>$ {pricing.grandTotal}</span>
       </div>
     </div>

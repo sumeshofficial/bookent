@@ -96,11 +96,16 @@ export const generateInvoicePDF = async ({ order, user }) => {
     let y = breakdownTop + 20;
     drawAmountRow("Ticket Total", breakdown.ticketPrice, y);
     y += 18;
-    drawAmountRow("Base Fee", breakdown.baseFee, y);
+
+    const bookingFeeTotal = (breakdown.baseFee || 0) + (breakdown.gst || 0);
+
+    drawAmountRow("Booking Fee (Base + GST)", bookingFeeTotal, y);
     y += 18;
-    drawAmountRow("GST", breakdown.gst, y);
-    y += 18;
-    drawAmountRow("Booking Fee", breakdown.bookingFee, y);
+
+    if (breakdown.discount && breakdown.discount > 0) {
+      drawAmountRow("Coupon Discount", -breakdown.discount, y);
+      y += 18;
+    }
 
     doc
       .moveTo(350, y + 15)

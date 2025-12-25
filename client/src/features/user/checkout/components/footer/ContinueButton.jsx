@@ -22,6 +22,7 @@ const ContinueButton = ({ eventSlug, isLoading }) => {
         toast.dismiss();
         toast.error("Seat lock expired! Please reselect your seats.");
         sessionStorage.removeItem("lockId");
+        sessionStorage.removeItem("appliedCoupon");
         return;
       }
 
@@ -31,6 +32,7 @@ const ContinueButton = ({ eventSlug, isLoading }) => {
       toast.dismiss();
       toast.error("Seat lock expired or invalid. Please reselect your seats.");
       sessionStorage.removeItem("lockId");
+      sessionStorage.removeItem("appliedCoupon");
       return navigate("/session-expired", { replace: true });
     }
   };

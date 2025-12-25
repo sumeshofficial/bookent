@@ -29,7 +29,7 @@ export const checkoutDetailsController = asyncHandler(async (req, res) => {
 
 // Paypal create order controller
 export const createPaypalOrderController = asyncHandler(async (req, res) => {
-  const { lockId } = req.body;
+  const { lockId, couponCode } = req.body;
   const user = req.user;
 
   if (!lockId) {
@@ -41,14 +41,14 @@ export const createPaypalOrderController = asyncHandler(async (req, res) => {
   }
 
   const ticketDetails = await checkoutPageDetails(lockId, user._id);
-  const result = await paypalCreateOrder(ticketDetails, user._id);
+  const result = await paypalCreateOrder(ticketDetails, user._id, couponCode);
 
   sendResponse(res, result, STATUS_CODE.CREATED);
 });
 
 // Capture Paypal order controller
 export const capturePaypalOrderController = asyncHandler(async (req, res) => {
-  const { lockId, orderID } = req.body;
+  const { lockId, orderID, couponCode = "" } = req.body;
   const user = req.user;
 
   if (!lockId || !orderID) {
@@ -59,7 +59,7 @@ export const capturePaypalOrderController = asyncHandler(async (req, res) => {
     );
   }
 
-  await paypalCaptureOrder(orderID, lockId, user._id);
+  await paypalCaptureOrder(orderID, lockId, user._id, couponCode);
 
   sendResponse(res, { message: "Payment Captured" }, STATUS_CODE.CREATED);
 });
@@ -82,7 +82,6 @@ export const getOrderStatusController = asyncHandler(async (req, res) => {
 
 export const getTicketController = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
-  const user = req.user
 
   if (!orderId) {
     throw new Error(

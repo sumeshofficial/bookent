@@ -81,7 +81,12 @@ const orderSchema = new mongoose.Schema(
       baseFee: Number,
       gst: Number,
       bookingFee: Number,
+      discount: { type: Number, default: 0 },
       grandTotal: Number,
+    },
+    appliedCoupon: {
+      code: { type: String, default: null },
+      discount: { type: Number, default: 0 },
     },
     qrData: {
       data: { type: String, default: null },

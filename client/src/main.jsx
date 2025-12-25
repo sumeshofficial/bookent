@@ -6,7 +6,7 @@ import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import Loader from "./components/Loader.jsx";
-import router from "./routes/Router.jsx";
+import router from "./routes/index.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SocketProvider } from "./context/SocketProvider.jsx";

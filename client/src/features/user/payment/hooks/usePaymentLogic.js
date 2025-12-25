@@ -15,6 +15,7 @@ export const usePaymentLogic = (eventSlug) => {
 
   if (error) {
     sessionStorage.removeItem("lockId");
+    sessionStorage.removeItem("appliedCoupon");
     toast.error(error.message || "Something went wrong");
     navigate("/session-expired");
   }

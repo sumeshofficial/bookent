@@ -21,7 +21,6 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
       path: "/listmyshow/dashboard",
     },
     { id: "events", label: "Events", icon: Package, hasDropdown: true },
-    { id: "orderList", label: "Order List", icon: List, path: "/listmyshow/orders" },
     { id: "sales", label: "Sales", icon: CreditCard, path: "/listmyshow/sales" },
   ];
 

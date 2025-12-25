@@ -9,6 +9,8 @@ import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
 import { getHomeEventsService } from "../../services/user/event/event.service.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 import { validateEventAvailability } from "../../utility/helpers.js";
+import { checkOrganizer } from "../../repositories/organizer/organizer.repository.js";
+import { getEventBookings } from "../../services/organizer/event.service.js";
 
 // Home Page Events List controller
 export const getHomeEventSectionsController = asyncHandler(async (req, res) => {
@@ -318,3 +320,15 @@ export const searchEventController = async (req, res) => {
     });
   }
 };
+
+// get event bookings (organizer)
+export const getBookingsController = asyncHandler(async (req, res) => {
+  const { eventSlug } = req.params;
+  const userId = req.user._id;
+
+  const organizer = await checkOrganizer(userId);
+
+  const result = await getEventBookings(eventSlug, organizer._id, req.query);
+
+  sendResponse(res, result, STATUS_CODE.SUCCESS);
+});

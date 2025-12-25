@@ -15,15 +15,22 @@ export const preparePaypalBreakdown = (section, pricing) => {
 
   const grandTotal = new Decimal(pricing.grandTotal).toFixed(2);
 
-  const expectedTotal = new Decimal(itemTotal).plus(bookingFee);
+  const discount = new Decimal(pricing.discount || 0);
 
-  if (!expectedTotal.equals(grandTotal)) {
+  const expectedTotal = new Decimal(itemTotal)
+    .plus(bookingFee)
+    .minus(discount)
+    .toFixed(2);
+
+  const actualTotal = new Decimal(grandTotal).toFixed(2);
+
+  if (expectedTotal !== actualTotal) {
     throw new Error(
-      `PayPal amount mismatch: expected ${expectedTotal.toFixed(
-        2
-      )}, got ${grandTotal}`
+      `PayPal amount mismatch: expected ${expectedTotal}, got ${actualTotal}`
     );
   }
+
+  const discountAmount = discount.toFixed(2);
 
   return {
     finalUnitAmount: unitAmount,
@@ -32,6 +39,7 @@ export const preparePaypalBreakdown = (section, pricing) => {
     finalGst: gst,
     finalBookingFee: bookingFee,
     finalGrandTotal: grandTotal,
+    discountAmount,
   };
 };
 
@@ -59,6 +67,10 @@ export const buildPaypalOrderPayload = (lockId, event, section, breakdown) => {
               handling: {
                 currencyCode: CURRENCY_CODE.USD,
                 value: breakdown.finalBaseFee,
+              },
+              shippingDiscount: {
+                currencyCode: CURRENCY_CODE.USD,
+                value: breakdown.discountAmount || "0.00",
               },
             },
           },

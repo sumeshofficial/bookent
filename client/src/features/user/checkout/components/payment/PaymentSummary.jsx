@@ -16,6 +16,14 @@ const PaymentSummary = ({ fees }) => {
           { label: "GST (18%)", value: fees.gst },
         ]}
       />
+
+      {fees?.discount > 0 && (
+        <PriceRow
+          label="Discount"
+          value={-fees.discount}
+          className="text-green-600 font-medium"
+        />
+      )}
     </div>
   );
 };

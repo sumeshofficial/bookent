@@ -16,6 +16,26 @@ export const findeEventByOrganizerIdAndEventId = async (
   return await Event.findOne({ organizer: organizerId, _id: eventId }).lean();
 };
 
+/**
+ * Find event
+ * @param {String} eventSorganizerIdlug
+ * @param {String} eventSlug
+ */
+export const findeEventByOrganizerIdAndEventSlug = async (
+  organizerId,
+  eventSlug
+) => {
+  return await Event.findOne({
+    organizer: organizerId,
+    slug: eventSlug,
+  })
+    .populate({
+      path: "stadium",
+      select: "shapes stadiumDetails.stadiumName",
+    })
+    .lean();
+};
+
 // Count Events
 export const countEventsByOrganizerForDate = async ({
   organizerId,

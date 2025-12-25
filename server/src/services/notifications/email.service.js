@@ -75,6 +75,8 @@ export const bookingConfirmationTemplate = ({
   eventTime,
   venue,
   qty,
+  orderAmount = null,
+  discount = 0,
   totalAmount,
 }) => {
   return `
@@ -109,6 +111,8 @@ export const bookingConfirmationTemplate = ({
       <p><strong>Time:</strong> ${eventTime}</p>
       <p><strong>Venue:</strong> ${venue}</p>
       <p><strong>Tickets:</strong> ${qty}</p>
+      ${orderAmount !== null ? `<p><strong>Order Amount:</strong> $${orderAmount}</p>` : ``}
+      ${discount > 0 ? `<p style="color:#4ade80;"><strong>Coupon Discount:</strong> - $${discount}</p>` : ``}
       <p><strong>Total Paid:</strong> $${totalAmount}</p>
     </div>
 

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { COUPON_TYPES } from "../utility/constants/constants.js";
 
 const couponSchema = new mongoose.Schema(
   {
@@ -16,7 +17,7 @@ const couponSchema = new mongoose.Schema(
 
     discountType: {
       type: String,
-      enum: ["PERCENTAGE", "FLAT"],
+      enum: [COUPON_TYPES.PERCENTAGE, COUPON_TYPES.FLAT],
       required: true,
     },
 

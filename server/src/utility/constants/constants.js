@@ -172,8 +172,24 @@ export const ERRORS = {
   },
   COUPON_NOTFOUND: {
     CODE: "COUPON_NOTFOUND",
-    MSG: "Coupon not found or already deleted"
-  }
+    MSG: "Coupon not found or already deleted",
+  },
+  COUPON_EXPIRED: {
+    CODE: "COUPON_EXPIRED",
+    MSG: "This coupon has expired and is no longer valid.",
+  },
+  COUPON_CANNOT_BE_USED: {
+    CODE: "COUPON_CANNOT_BE_USED",
+    MSG: "This coupon is not eligible for use at the moment.",
+  },
+  MINIMUM_ORDER_AMOUNT_NOT_MET: {
+    CODE: "MINIMUM_ORDER_AMOUNT_NOT_MET",
+    MSG: "Order amount does not meet the minimum required to apply this coupon.",
+  },
+  COUPON_USAGE_LIMIT: {
+    CODE: "COUPON_CANNOT_BE_USED",
+    MSG: "Coupon usage limit reached for this user",
+  },
 };
 
 // Response Messages
@@ -309,3 +325,8 @@ export const TRANSACTION_DIRECTION = {
   CREDIT: "CREDIT",
   DEBIT: "DEBIT",
 };
+
+export const COUPON_TYPES = {
+  FLAT: "FLAT",
+  PERCENTAGE: "PERCENTAGE",
+}

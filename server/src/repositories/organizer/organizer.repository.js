@@ -2,6 +2,5 @@ import Organizer from "../../models/organizer.model.js";
 
 // Check organizer exists
 export const checkOrganizer = async (userId) => {
-  const organizer = await Organizer.findOne({ userId });
-  return organizer;
+  return Organizer.findOne({ userId });
 };

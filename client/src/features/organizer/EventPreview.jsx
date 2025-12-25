@@ -110,6 +110,14 @@ const EventPreview = () => {
             >
               Verify Tickets
             </button>
+            <button
+              onClick={() =>
+                navigate(`/listmyshow/event/${eventData.slug}/bookings`)
+              }
+              className="px-4 py-2 rounded-md bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition"
+            >
+              Bookings
+            </button>
 
             <div className="relative z-9999">
               <button

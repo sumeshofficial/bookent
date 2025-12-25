@@ -25,6 +25,8 @@ export const sendEmailConfirmation = async (user, order) => {
       eventTime: formatTime(order.eventDetails.time),
       venue: order.eventDetails.venue,
       qty: order.seat.qty,
+      orderAmount: order.pricingBreakDown.orderAmount,
+      discount: order.pricingBreakDown.discount || 0,
       totalAmount: order.pricingBreakDown.grandTotal,
     }),
     attachments: [

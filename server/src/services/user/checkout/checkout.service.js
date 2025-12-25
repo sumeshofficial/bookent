@@ -25,6 +25,15 @@ import { STATUS_CODE } from "../../../utility/constants/statusCode.js";
 import { reserveTicket } from "../../../repositories/user/event.repository.js";
 import mongoose from "mongoose";
 import { buildTicket } from "./helper/buildTicket.js";
+import { applyCouopn } from "../coupon/coupon.service.js";
+import {
+  getCoupon,
+  updateCoupon,
+} from "../../../repositories/user/coupon.repository.js";
+import {
+  getUserCouponUsage,
+  updateCouponUsage,
+} from "../../../repositories/user/couponUsage.repository.js";
 dotenv.config();
 
 const ordersController = new OrdersController(client);
@@ -68,12 +77,42 @@ export const checkoutPageDetails = async (lockId, userId) => {
 };
 
 // Paypal Create Order
-export const paypalCreateOrder = async (ticketDetails, userId) => {
+export const paypalCreateOrder = async (ticketDetails, userId, couponCode) => {
   const session = await mongoose.startSession();
   try {
     const { lockId, event, section, pricing } = ticketDetails;
-    const breakdown = preparePaypalBreakdown(section, pricing);
+    let finalPricing = pricing;
+
+    if (couponCode) {
+      finalPricing = await applyCouopn(couponCode, pricing);
+    }
+
+    const breakdown = preparePaypalBreakdown(section, finalPricing);
     const collect = buildPaypalOrderPayload(lockId, event, section, breakdown);
+
+    // 👉 PREVENT coupon overuse BEFORE PayPal order creation
+    if (couponCode) {
+      const coupon = await getCoupon(couponCode);
+
+      // per-user limit
+      const userUsage = await getUserCouponUsage(coupon._id, userId);
+      if (userUsage && userUsage.usedCount >= coupon.perUserLimit) {
+        throw new AppError(
+          STATUS_CODE.BAD_REQUEST,
+          ERRORS.COUPON_USAGE_LIMIT.CODE,
+          ERRORS.COUPON_USAGE_LIMIT.MSG
+        );
+      }
+
+      // global usage limit (soft check)
+      if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+        throw new AppError(
+          STATUS_CODE.BAD_REQUEST,
+          ERRORS.COUPON_CANNOT_BE_USED.CODE,
+          ERRORS.COUPON_CANNOT_BE_USED.MSG
+        );
+      }
+    }
 
     const { result } = await ordersController.createOrder(collect);
 
@@ -84,6 +123,7 @@ export const paypalCreateOrder = async (ticketDetails, userId) => {
       event,
       section,
       breakdown,
+      couponCode,
     });
 
     await session.withTransaction(async () => {
@@ -108,9 +148,9 @@ export const paypalCreateOrder = async (ticketDetails, userId) => {
   } catch (error) {
     console.log(error);
     throw new AppError(
-      error.response?.status || STATUS_CODE.SERVER_ERROR,
-      error.response?.data?.name || ERRORS.PAYPAL_ORDER_ERROR.CODE,
-      error.response?.data?.message || ERRORS.PAYPAL_ORDER_ERROR.MSG
+      error?.status || STATUS_CODE.SERVER_ERROR,
+      error?.code || ERRORS.PAYPAL_ORDER_ERROR.CODE,
+      error?.code || ERRORS.PAYPAL_ORDER_ERROR.MSG
     );
   } finally {
     session.endSession();
@@ -118,7 +158,12 @@ export const paypalCreateOrder = async (ticketDetails, userId) => {
 };
 
 // Capture Paypal Order
-export const paypalCaptureOrder = async (orderID, lockId, userId) => {
+export const paypalCaptureOrder = async (
+  orderID,
+  lockId,
+  userId,
+  couponCode
+) => {
   const meta = await validateSeatLock(lockId, userId);
 
   const lockKey = `lock:${meta.eventId}:${meta.sectionId}:${lockId}`;
@@ -131,8 +176,6 @@ export const paypalCaptureOrder = async (orderID, lockId, userId) => {
   try {
     const { result } = await ordersController.captureOrder(collect);
 
-    console.log(result);
-
     if (result?.status !== "COMPLETED") {
       await updateOrderStatus(orderID, ORDER_STATUS.ABANDONED);
 
@@ -141,6 +184,20 @@ export const paypalCaptureOrder = async (orderID, lockId, userId) => {
         ERRORS.PAYPAL_ORDER_CAPTURE_ERROR.CODE,
         ERRORS.PAYPAL_ORDER_CAPTURE_ERROR.MSG
       );
+    }
+
+    const session = await mongoose.startSession();
+
+    try {
+      await session.withTransaction(async () => {
+        if (couponCode) {
+          const coupon = await getCoupon(couponCode, session);
+          await updateCoupon(coupon._id, session);
+          await updateCouponUsage(coupon._id, userId, session);
+        }
+      });
+    } finally {
+      session.endSession();
     }
 
     return result;
@@ -157,7 +214,7 @@ export const paypalCaptureOrder = async (orderID, lockId, userId) => {
 
 // Get Order Status
 export const orderStatus = async (paypalOrderId) => {
-  console.log(paypalOrderId)
+  console.log(paypalOrderId);
   const order = await getOrderForPaypal(paypalOrderId);
 
   if (!order) {

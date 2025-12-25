@@ -7,22 +7,30 @@ import { useNavigate } from "react-router-dom";
 
 export const usePaypalLogic = (eventSlug) => {
   const lockId = sessionStorage.getItem("lockId");
+  const couponCode = sessionStorage.getItem("appliedCoupon");
   const navigate = useNavigate();
 
   const createOrder = async () => {
     try {
-      const order = await createPayPalOrder(lockId);
+      const order = await createPayPalOrder({
+        lockId,
+        couponCode, 
+      });
       return order.id;
     } catch (error) {
-      console.log(error);
       toast.dismiss();
-      toast.error(error.message);
+      toast.error(error.response?.data?.error?.message);
     }
   };
 
   const onApprove = async (data) => {
     const orderID = data.orderID
-    await capturePayPalOrder(orderID, lockId);
+    await capturePayPalOrder({
+      orderID,
+      lockId,
+      couponCode, 
+    });
+    sessionStorage.removeItem("appliedCoupon");
     navigate(`/payment-processing?orderId=${orderID}&eventSlug=${eventSlug}`);
   };
 

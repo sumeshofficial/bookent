@@ -1,5 +1,9 @@
 import Event from "../../models/event.model.js";
-import { createEvent } from "../../repositories/organizer/event.repository.js";
+import {
+  createEvent,
+  findeEventByOrganizerIdAndEventSlug,
+} from "../../repositories/organizer/event.repository.js";
+import { getAllOrdersForEvent } from "../../repositories/organizer/order.repository.js";
 import {
   deleteRedisData,
   storeInRedis,
@@ -46,4 +50,54 @@ export const finishCreateEvent = async (body) => {
   await deleteRedisData(sessionId);
 
   return event;
+};
+
+/**
+ * Fetch all bookings for a specific organizer-owned event
+ *
+ * @param {string} eventSlug
+ * @param {string} organizerId
+ * @param {Object} filters - pagination & filter params
+ * @returns {Promise<{data: Array, meta: Object}>}
+ * @throws {AppError}
+ */
+export const getEventBookings = async (
+  eventSlug,
+  organizerId,
+  filters = {}
+) => {
+  const event = await findeEventByOrganizerIdAndEventSlug(
+    organizerId,
+    eventSlug
+  );
+
+  if (!event) {
+    throw new AppError(
+      STATUS_CODE.NOTFOUND,
+      ERRORS.EVENT_NOT_FOUND.CODE,
+      ERRORS.EVENT_NOT_FOUND.MSG
+    );
+  }
+
+  const result = await getAllOrdersForEvent(event._id, filters);
+
+  const sections =
+    event.stadium?.shapes
+      ?.filter((shape) => shape.type !== "image" && shape.title)
+      .map((shape) => ({
+        name: shape.title,
+        capacity: shape.capacity,
+      })) || [];
+
+  return {
+    event: {
+      _id: event._id,
+      title: event.eventTitle,
+      date: event.matchDate,
+      venue: event.venue,
+      slug: event.slug,
+      sections,
+    },
+    ...result,
+  };
 };
