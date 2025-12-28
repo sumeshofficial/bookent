@@ -1,0 +1,11 @@
+export const WALLET_SORT = {
+  LATEST: "LATEST",
+  OLDEST: "OLDEST",
+  AMOUNT_HIGH: "AMOUNT_HIGH",
+  AMOUNT_LOW: "AMOUNT_LOW",
+};
+
+export const WALLET_DIRECTION = {
+  CREDIT: "CREDIT",
+  DEBIT: "DEBIT",
+};

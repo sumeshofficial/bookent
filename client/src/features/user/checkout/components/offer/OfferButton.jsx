@@ -5,6 +5,8 @@ import { toast } from "react-hot-toast";
 
 const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
   const [isApplied, setIsApplied] = useState(false);
+  const [appliedCouponData, setAppliedCouponData] = useState(null);
+  const [activeCoupon, setActiveCoupon] = useState(null);
 
   const {
     register,
@@ -16,39 +18,51 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
 
   const couponCode = watch("coupon");
 
+  const lockId = sessionStorage.getItem("lockId");
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+  } = useCoupon(activeCoupon, lockId);
+
   useEffect(() => {
     const savedCoupon = sessionStorage.getItem("appliedCoupon");
     if (savedCoupon) {
       setValue("coupon", savedCoupon);
-      setIsApplied(true);
+      setActiveCoupon(savedCoupon);
     }
   }, [setValue]);
 
-  const { mutate: applyCoupon, isPending, error, data } = useCoupon();
+  useEffect(() => {
+    if (!data) return;
+
+    setIsApplied(true);
+    setAppliedCouponData(data);
+    onCouponApplied(data);
+  }, [data, onCouponApplied]);
 
   const onSubmit = () => {
-    const lockId = sessionStorage.getItem("lockId");
     if (!lockId) {
       return toast.error("LockId not found");
     }
-    applyCoupon(
-      { couponCode, lockId },
-      {
-        onSuccess: (data) => {
-          if (data) {
-            setIsApplied(true);
-            onCouponApplied(data);
-            sessionStorage.setItem("appliedCoupon", couponCode);
-          }
-        },
-      }
-    );
+
+    if (!couponCode) {
+      return toast.error("Coupon code is required");
+    }
+
+    sessionStorage.setItem("appliedCoupon", couponCode);
+    setActiveCoupon(couponCode);
   };
 
   const handleRemoveCoupon = () => {
     setIsApplied(false);
+    setAppliedCouponData(null);
+    setActiveCoupon(null);
     onCouponRemoved();
     sessionStorage.removeItem("appliedCoupon");
+    setValue("coupon", "");
   };
 
   return (
@@ -58,7 +72,7 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
           <div className="relative flex-1">
             <input
               type="text"
-              disabled={isApplied || isPending}
+              disabled={isApplied || isLoading}
               {...register("coupon", {
                 required: "Coupon code is required",
                 minLength: {
@@ -93,10 +107,10 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
 
           <button
             type="submit"
-            disabled={isApplied || isPending}
+            disabled={isApplied || isLoading}
             className="bg-black text-white px-4 py-2 rounded-lg disabled:opacity-50"
           >
-            {isPending ? "Applying..." : isApplied ? "Applied" : "Apply"}
+            {isLoading ? "Applying..." : isApplied ? "Applied" : "Apply"}
           </button>
         </div>
       </form>
@@ -105,15 +119,15 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
         <p className="text-red-500 text-sm mt-1">{errors.coupon.message}</p>
       )}
 
-      {error && (
+      {isError && (
         <p className="text-red-500 text-sm mt-1">
           {error?.response?.data?.error?.message || "Invalid coupon"}
         </p>
       )}
 
-      {data && isApplied && (
+      {appliedCouponData && isApplied && (
         <p className="text-green-600 text-sm mt-1">
-          Coupon applied! You saved ${data.discount?.toFixed(2)}
+          Coupon applied! You saved ${appliedCouponData.discount?.toFixed(2)}
         </p>
       )}
     </div>

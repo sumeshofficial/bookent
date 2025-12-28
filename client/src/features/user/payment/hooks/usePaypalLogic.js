@@ -25,13 +25,13 @@ export const usePaypalLogic = (eventSlug) => {
 
   const onApprove = async (data) => {
     const orderID = data.orderID
-    await capturePayPalOrder({
+    const order = await capturePayPalOrder({
       orderID,
       lockId,
       couponCode, 
     });
     sessionStorage.removeItem("appliedCoupon");
-    navigate(`/payment-processing?orderId=${orderID}&eventSlug=${eventSlug}`);
+    navigate(`/payment-processing?orderId=${order.orderId}&eventSlug=${eventSlug}`);
   };
 
   const onError = (err) => {

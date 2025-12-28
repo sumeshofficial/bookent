@@ -2,21 +2,26 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { verifySeatLock } from "../../../../services/user.js";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 export const useCheckoutLogic = () => {
   const lockId = sessionStorage.getItem("lockId");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [pricing, setPricing] = useState(null);
-  const [basePricing, setBasePricing] = useState(null);
+  const [couponPricing, setCouponPricing] = useState(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["ticket", lockId],
     queryFn: () => verifySeatLock(lockId),
     enabled: !!lockId,
   });
+
+  const basePricing = data?.pricing ?? null;
+
+  const pricing = useMemo(() => {
+    return couponPricing || basePricing;
+  }, [couponPricing, basePricing]);
 
   useEffect(() => {
     if (error) {
@@ -26,15 +31,6 @@ export const useCheckoutLogic = () => {
       navigate("/session-expired");
     }
   }, [error, navigate]);
-
-  useEffect(() => {
-    if (data?.pricing) {
-      setPricing(data.pricing);
-      if (!basePricing) {
-        setBasePricing(data.pricing);
-      }
-    }
-  }, [data, basePricing]);
 
   const recheckLock = async () => {
     const result = await queryClient.fetchQuery({
@@ -70,11 +66,11 @@ export const useCheckoutLogic = () => {
    * @param {object} updatedPricing - backend calculated pricing
    */
   const onCouponApplied = (updatedPricing) => {
-    setPricing(updatedPricing);
+    setCouponPricing(updatedPricing);
   };
 
   const onCouponRemoved = () => {
-    setPricing(basePricing);
+    setCouponPricing(null);
   };
 
   return {

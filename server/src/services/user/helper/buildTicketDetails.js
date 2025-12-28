@@ -4,7 +4,7 @@ export const buildTicketDetails = async (order) => {
   const poster = await getObjectURL(order.eventDetails.thumbnailImage);
 
   return {
-    bookingId: order._id.toString(),
+    bookingId: order.orderId.toString(),
 
     event: {
       id: order.eventDetails?._id,

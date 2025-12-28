@@ -17,12 +17,17 @@ import { extendExpiry } from "../../../repositories/user/redis.repository.js";
 import { ENV } from "../../../config/env.conf.js";
 import {
   createOrder,
+  getOrder,
   getOrderForPaypal,
+  updateOrder,
   updateOrderStatus,
 } from "../../../repositories/user/order.repository.js";
 import { buildDbOrderPayload } from "./helper/buildOrderPayload.js";
 import { STATUS_CODE } from "../../../utility/constants/statusCode.js";
-import { reserveTicket } from "../../../repositories/user/event.repository.js";
+import {
+  makeTicketSold,
+  reserveTicket,
+} from "../../../repositories/user/event.repository.js";
 import mongoose from "mongoose";
 import { buildTicket } from "./helper/buildTicket.js";
 import { applyCouopn } from "../coupon/coupon.service.js";
@@ -34,6 +39,21 @@ import {
   getUserCouponUsage,
   updateCouponUsage,
 } from "../../../repositories/user/couponUsage.repository.js";
+import { buildDbOrderPayloadForWallet } from "./helper/buildOrderPayloadForWallet.js";
+import { sendEmailConfirmation } from "./paypal/helper/ticketEmailConfirmation.js";
+import {
+  findUserById,
+  updateUserWalletBalance,
+} from "../../../repositories/user/user.repository.js";
+import { finalizeBookingLocks } from "../seatLock.service.js";
+import { updateAdminWallet } from "../../../repositories/admin/updateAdminWallet.js";
+import { createMoneyTransaction } from "../../../repositories/user/transaction.repository.js";
+import { buildWalletTransactionPayload } from "./helper/buildWalletTransactionPayload.js";
+import jwt from "jsonwebtoken";
+import { validateWalletCoupon } from "./helper/validateWalletCoupon.helper.js";
+import { reserveSeatOrFail } from "./helper/reserveSeat.helper.js";
+import { processWalletPayment } from "./helper/processWalletPayment.helper.js";
+import { finalizeWalletOrder } from "./helper/finalizeWalletOrder.helper.js";
 dotenv.config();
 
 const ordersController = new OrdersController(client);
@@ -41,7 +61,7 @@ const LOCK_EXTEND_TTL = ENV.LOCK_EXTEND_TTL;
 const LOCKMETA_EXTEND_TTL = ENV.LOCKMETA_EXTEND_TTL;
 
 // Checkout page details
-export const checkoutPageDetails = async (lockId, userId) => {
+export const checkoutPageDetails = async (lockId, userId, appliedCoupon) => {
   const meta = await validateSeatLock(lockId, userId);
   const event = await validateEvent(meta.eventId);
   const stadium = await validateStadium(event.stadium);
@@ -67,12 +87,18 @@ export const checkoutPageDetails = async (lockId, userId) => {
   const { eventDetails, sectionDetails, pricingDetails } =
     formatCheckoutDetails(meta, event, sectionShape, sectionTicketDetails, fee);
 
+  let finalPricing = pricingDetails;
+
+  if (appliedCoupon) {
+    finalPricing = await applyCouopn(appliedCoupon, pricingDetails, userId);
+  }
+
   return {
     lockId,
     isValid: true,
     event: eventDetails,
     section: sectionDetails,
-    pricing: pricingDetails,
+    pricing: finalPricing,
   };
 };
 
@@ -186,6 +212,8 @@ export const paypalCaptureOrder = async (
       );
     }
 
+    const order = await getOrderForPaypal(result.id);
+
     const session = await mongoose.startSession();
 
     try {
@@ -200,7 +228,7 @@ export const paypalCaptureOrder = async (
       session.endSession();
     }
 
-    return result;
+    return order;
   } catch (error) {
     console.log(error);
     await updateOrderStatus(orderID, ORDER_STATUS.ABANDONED);
@@ -213,9 +241,8 @@ export const paypalCaptureOrder = async (
 };
 
 // Get Order Status
-export const orderStatus = async (paypalOrderId) => {
-  console.log(paypalOrderId);
-  const order = await getOrderForPaypal(paypalOrderId);
+export const orderStatus = async (orderId, userId) => {
+  const order = await getOrder(orderId, userId);
 
   if (!order) {
     throw new AppError(
@@ -244,8 +271,8 @@ export const orderStatus = async (paypalOrderId) => {
 };
 
 // Get Ticket
-export const getTicket = async (orderId) => {
-  const order = await getOrderForPaypal(orderId);
+export const getTicket = async (orderId, userId) => {
+  const order = await getOrder(orderId, userId);
 
   if (!order) {
     throw new AppError(
@@ -258,4 +285,68 @@ export const getTicket = async (orderId) => {
   const ticket = await buildTicket(order);
 
   return ticket;
+};
+
+export const walletCreateOrder = async (ticketDetails, user, couponCode) => {
+  const session = await mongoose.startSession();
+  let order;
+
+  try {
+    const { lockId, event, section, pricing } = ticketDetails;
+    const userId = user._id;
+    const finalPricing = couponCode
+      ? await applyCouopn(couponCode, pricing)
+      : pricing;
+
+    await validateWalletCoupon(couponCode, userId);
+
+    const breakdown = preparePaypalBreakdown(section, finalPricing);
+
+    await session.withTransaction(async () => {
+      await reserveSeatOrFail({ event, section, session });
+
+      const orderPayload = buildDbOrderPayloadForWallet({
+        userId,
+        event,
+        section,
+        breakdown,
+        couponCode,
+      });
+
+      order = await createOrder(orderPayload, session);
+
+      await processWalletPayment({
+        userId,
+        amount: finalPricing.grandTotal,
+        order,
+        session,
+      });
+
+      order = await finalizeWalletOrder({
+        order,
+        couponCode,
+        userId,
+        session,
+      });
+    });
+
+    await finalizeBookingLocks({
+      lockIds: [lockId],
+      userId: order.userId.toString(),
+    });
+
+    const freshUser = await findUserById(order.userId);
+    await sendEmailConfirmation(freshUser, order);
+
+    return order;
+  } catch (error) {
+    console.log(error);
+    throw new AppError(
+      error?.status || STATUS_CODE.SERVER_ERROR,
+      error?.code || ERRORS.WALLET_TRANSACTION_FAILED.CODE,
+      error?.message || ERRORS.WALLET_TRANSACTION_FAILED.MSG
+    );
+  } finally {
+    session.endSession();
+  }
 };

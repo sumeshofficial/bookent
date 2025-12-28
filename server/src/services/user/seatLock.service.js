@@ -115,6 +115,7 @@ export const lockSectionQuantity = async ({
 };
 
 export const finalizeBookingLocks = async ({ lockIds = [], userId }) => {
+  console.log(lockIds, userId);
   const pipeline = redisClient.multi();
 
   for (const lockId of lockIds) {

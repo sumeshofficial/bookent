@@ -14,13 +14,13 @@ const PaymentSectionNavbar = ({ tickets }) => {
 
           <div>
             <h1 className="text-base lg:text-md font-semibold truncate max-w-[140px] sm:max-w-full">
-              {tickets.title}
+              {tickets?.title}
             </h1>
             <p className="text-xs lg:text-sm truncate max-w-[140px] sm:max-w-full">
-              {tickets.venue}
+              {tickets?.venue}
             </p>
             <p className="text-xs lg:text-xs truncate max-w-[140px] sm:max-w-full">
-              {tickets.section} ( {tickets.count} tickets )
+              {tickets?.section} ( {tickets?.count} tickets )
             </p>
           </div>
         </div>

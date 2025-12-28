@@ -2,6 +2,7 @@ import express from "express";
 import {
   capturePaypalOrderController,
   checkoutDetailsController,
+  createOrderWithWallet,
   createPaypalOrderController,
   getOrderStatusController,
   getTicketController,
@@ -15,5 +16,6 @@ router.get("/:orderId/ticket", getTicketController);
 router.post("/verify-lock", checkoutDetailsController);
 router.post("/payment/paypal/create-order", createPaypalOrderController);
 router.post("/payment/paypal/capture", capturePaypalOrderController);
+router.post("/payment/wallet", createOrderWithWallet);
 
 export default router;

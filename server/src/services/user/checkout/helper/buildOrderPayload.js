@@ -3,6 +3,7 @@ import {
   ORDER_STATUS,
   PAYMENT_METHOD,
 } from "../../../../utility/constants/constants.js";
+import { generatePublicOrderId } from "../../helper/generateOrderId.js";
 
 export const buildDbOrderPayload = ({
   result,
@@ -13,8 +14,10 @@ export const buildDbOrderPayload = ({
   breakdown,
   couponCode,
 }) => {
+  const orderId = generatePublicOrderId();
   return {
     userId,
+    orderId,
     status: ORDER_STATUS.PENDING_PAYPAL_ORDER,
     lockId,
     eventId: event._id,

@@ -5,11 +5,12 @@ import { useNavigate } from "react-router-dom";
 
 export const usePaymentLogic = (eventSlug) => {
   const lockId = sessionStorage.getItem("lockId");
+  const appliedCoupon = sessionStorage.getItem("appliedCoupon");
   const navigate = useNavigate();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["ticket", lockId],
-    queryFn: () => verifySeatLock(lockId),
+    queryKey: ["ticket", lockId, appliedCoupon],
+    queryFn: () => verifySeatLock(lockId, appliedCoupon),
     enabled: !!lockId,
   });
 
@@ -24,7 +25,7 @@ export const usePaymentLogic = (eventSlug) => {
   const section = data?.section;
   const pricing = data?.pricing;
 
-  if (!isLoading && eventSlug !== event.slug) {
+  if (!isLoading && eventSlug !== event?.slug) {
     return navigate("/error");
   }
 

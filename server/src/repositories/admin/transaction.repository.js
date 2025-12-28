@@ -6,7 +6,7 @@ import {
 import {
   buildWalletTransactionQuery,
   buildWalletTransactionSort,
-} from "./transaction.query.js";
+} from "../helper/transaction.query.js";
 
 export const walletSummary = async () => {
   const summary = await Transaction.aggregate([
@@ -37,8 +37,8 @@ export const walletSummary = async () => {
   }
 
   return {
-    totalCredit: totalCredit,
-    totalDebit: totalDebit,
+    totalCredit,
+    totalDebit,
   };
 };
 

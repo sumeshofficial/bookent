@@ -190,6 +190,18 @@ export const ERRORS = {
     CODE: "COUPON_CANNOT_BE_USED",
     MSG: "Coupon usage limit reached for this user",
   },
+  INSUFFICIENT_WALLET_BALANCE: {
+    CODE: "INSUFFICIENT_WALLET_BALANCE",
+    MSG: "You do not have enough wallet balance to complete this payment.",
+  },
+  WALLET_ERROR: {
+    CODE: "WALLET_ERROR",
+    MSG: "Something went wrong with your wallet. Please try again later.",
+  },
+  WALLET_TRANSACTION_FAILED: {
+    CODE: "WALLET_TRANSACTION_FAILED",
+    MSG: "Wallet transaction failed. Amount has not been deducted.",
+  },
 };
 
 // Response Messages
@@ -329,4 +341,4 @@ export const TRANSACTION_DIRECTION = {
 export const COUPON_TYPES = {
   FLAT: "FLAT",
   PERCENTAGE: "PERCENTAGE",
-}
+};

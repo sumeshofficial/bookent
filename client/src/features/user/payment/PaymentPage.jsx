@@ -13,7 +13,7 @@ const PaymentPage = () => {
   const [selected, setSelected] = useState(methods[0]);
   const { eventSlug } = useParams();
 
-  const { tickets } = usePaymentLogic(eventSlug);
+  const { tickets, grandTotal } = usePaymentLogic(eventSlug);
   useCheckoutGuard();
 
   return (
@@ -36,7 +36,7 @@ const PaymentPage = () => {
             </div>
 
             <div className="col-span-2">
-              <PaymentMethodDetails method={selected} eventSlug={eventSlug} />
+              <PaymentMethodDetails method={selected} eventSlug={eventSlug} grandTotal={grandTotal} />
             </div>
           </div>
         </div>

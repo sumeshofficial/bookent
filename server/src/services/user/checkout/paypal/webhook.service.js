@@ -16,9 +16,8 @@ import { makeTicketSold } from "../../../../repositories/user/event.repository.j
 import { finalizeBookingLocks } from "../../seatLock.service.js";
 import { findUserById } from "../../../../repositories/user/user.repository.js";
 import { sendEmailConfirmation } from "./helper/ticketEmailConfirmation.js";
-import { ENV } from "../../../../config/env.conf.js";
-import jwt from "jsonwebtoken";
 import { updateAdminWallet } from "../../../../repositories/admin/updateAdminWallet.js";
+import { generateOrderQr } from "../helper/generateQr.helper.js";
 
 export const processPaypalCapture = async (capture, event) => {
   const session = await mongoose.startSession();
@@ -44,15 +43,7 @@ export const processPaypalCapture = async (capture, event) => {
 
       await updateOrderStatus(order._id, ORDER_STATUS.PAID, session);
       await makeTicketSold(order.eventId, order.seat, session);
-      const qrToken = jwt.sign(
-        {
-          orderId: order._id,
-          eventId: order.eventId,
-          userId: order.userId,
-        },
-        ENV.QR_DATA_JWT_SECRET,
-        { expiresIn: ENV.CREATE_ORDER_QR_CODE_EXPIRY }
-      );
+      const qrToken = generateOrderQr(order);
 
       const payloadForUpdate = {
         status: ORDER_STATUS.CONFIRMED,

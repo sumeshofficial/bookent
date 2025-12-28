@@ -22,7 +22,7 @@ export const generateInvoicePDF = async ({ order, user }) => {
 
     doc
       .fontSize(10)
-      .text(`Invoice ID: ${order._id}`)
+      .text(`Invoice ID: ${order.orderId}`)
       .text(`Invoice Date: ${formatDate(new Date())}`)
       .text(`Customer: ${user.fullname}`)
       .text(`Email: ${user.email}`);

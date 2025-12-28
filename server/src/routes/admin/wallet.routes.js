@@ -4,7 +4,7 @@ import {
   exportAdminWalletExcel,
   getWalletSummary,
   getWalletTransactions,
-} from "../../controller/admin/walllet.controller.js";
+} from "../../controller/admin/wallet.controller.js";
 const router = express.Router();
 
 router.get("/summary", getWalletSummary);

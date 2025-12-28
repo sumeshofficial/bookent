@@ -8,10 +8,11 @@ import SeatSelectPage from "../features/user/seatSelect/SeatSelectPage";
 import CheckoutPage from "../features/user/checkout/CheckoutPage";
 import PaymentPage from "../features/user/payment/PaymentPage";
 import PaymentProcessing from "../features/user/payment/PaymentProcessing";
-import TicketBooked from "../features/user/TicketBooked/TicketBooked";
+import TicketBooked from "../features/user/ticketBooked/TicketBooked";
 import MyTickets from "../features/user/myTickets/MyTickets";
 import Ticket from "../features/user/ticket/Ticket";
 import SessionTimeout from "../sharedComponents/user/error/SessionTimeout";
+import Wallet from "../features/user/wallet/Wallet";
 
 const userRoutes = [
   {
@@ -107,6 +108,14 @@ const userRoutes = [
     element: (
       <Protected>
         <SessionTimeout />
+      </Protected>
+    ),
+  },
+  {
+    path: "wallet",
+    element: (
+      <Protected>
+        <Wallet />
       </Protected>
     ),
   },

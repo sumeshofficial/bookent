@@ -1,4 +1,7 @@
+import { PAYMENT_METHOD } from "../../utility/constants/constants.js";
+
 export const buildWalletTransactionQuery = ({
+  userId,
   transaction_direction,
   status,
   reason,
@@ -10,6 +13,11 @@ export const buildWalletTransactionQuery = ({
     ...(status ? { status } : {}),
     ...(reason ? { reason } : {}),
   };
+
+  if (userId) {
+    query.initiated_by = userId;
+    query.paymentMethod = PAYMENT_METHOD.WALLET;
+  }
 
   if (fromDate || toDate) {
     query.createdAt = {};

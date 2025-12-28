@@ -112,3 +112,23 @@ export const validatePassword = async (userId, currentPassword) => {
 
   return user;
 };
+
+export const updateUserWalletBalance = async (userId, amount, session) => {
+  const result = await User.updateOne(
+    {
+      _id: userId,
+      wallet: { $gte: amount },
+    },
+    {
+      $inc: { wallet: -amount },
+    }
+  ).session(session);
+
+  if (result.modifiedCount === 0) {
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.INSUFFICIENT_WALLET_BALANCE.CODE,
+      ERRORS.INSUFFICIENT_WALLET_BALANCE.MSG
+    );
+  }
+};

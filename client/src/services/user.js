@@ -36,9 +36,10 @@ export const eventBySlug = async (eventSlug) => {
 };
 
 // Checkout verify lock
-export const verifySeatLock = async (lockId) => {
+export const verifySeatLock = async (lockId, appliedCoupon) => {
   const res = await api.post("/user/checkout/verify-lock", {
     lockId,
+    appliedCoupon
   });
 
   return res.data;

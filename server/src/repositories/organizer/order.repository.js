@@ -3,7 +3,7 @@ import { orderQueryBuilder } from "./helper/order.query.js";
 
 export const verifyUserTicket = async (orderId, userId) => {
   return Order.findOneAndUpdate(
-    { _id: orderId, userId: userId },
+    { orderId, userId: userId },
     {
       $set: {
         "qrData.isUsed": true,

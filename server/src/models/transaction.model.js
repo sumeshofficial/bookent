@@ -70,12 +70,6 @@ const transactionSchema = new mongoose.Schema(
       currency: { type: String, default: CURRENCY_CODE.USD },
     },
 
-    // wallet_id: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: MONGO_SCHEMA.WALLET,
-    //   default: null,
-    // },
-
     receiver_model: {
       type: String,
       enum: [MONGO_SCHEMA.USER, MONGO_SCHEMA.ORGANIZER],

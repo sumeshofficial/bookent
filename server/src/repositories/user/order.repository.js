@@ -7,7 +7,8 @@ export const getOrderForPaypal = async (paypalOrderId, session = null) => {
 };
 
 export const createOrder = async (data, session) => {
-  await Order.create([data], { session });
+  const order = await Order.create([data], { session });
+  return order[0];
 };
 
 export const updateOrderStatus = async (orderId, status, session) => {
@@ -58,5 +59,5 @@ export const getOrdersWithUserId = async (
 };
 
 export const getOrder = async (orderId, userId) => {
-  return Order.findOne({ _id: orderId, userId });
+  return Order.findOne({ orderId, userId });
 };

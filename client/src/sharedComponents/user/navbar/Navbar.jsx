@@ -11,6 +11,8 @@ import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 import { searchEvent } from "../../../services/user";
+import Lottie from "lottie-react";
+import walletAnimation from "../../../assets/lottie/Wallet_Animation.json";
 import BookentLogo from "../../BookentLogo";
 
 const Navbar = () => {
@@ -91,8 +93,13 @@ const Navbar = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="hidden sm:flex items-center gap-1">
+                  <div className="hidden sm:flex items-center gap-2">
+                    <Link to="/wallet" className="w-16 h-16">
+                      <Lottie animationData={walletAnimation} loop autoplay />
+                    </Link>
+
                     <Ticket className="w-5 h-5 text-gray-600" />
+
                     <Link
                       to="/listmyshow"
                       className="text-base font-medium text-gray-700 hover:text-gray-900"

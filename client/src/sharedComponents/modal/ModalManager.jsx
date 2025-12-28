@@ -15,6 +15,7 @@ import ConfirmBackModal from "../../components/modal/ConfirmBackModal";
 import SeatLockErrorModal from "../../components/modal/SeatLockErrorModal";
 import ChangePassword from "../../features/user/profile/components/modal/changePassword/ChangePassword";
 import CreateCoupon from "../../features/admin/coupons/components/modal/CreateCoupon";
+import WalletPaymentConfirmation from "../../features/user/payment/components/modal/WalletPaymentConfirmation";
 
 const ModalManager = () => {
   const { modalType, modalData, closeModal } = useModal();
@@ -70,6 +71,9 @@ const ModalManager = () => {
       break;
     case "create-coupon":
       content = <CreateCoupon {...modalData} />;
+      break;
+    case "wallet-payment":
+      content = <WalletPaymentConfirmation {...modalData} />;
       break;
     default:
       return null;

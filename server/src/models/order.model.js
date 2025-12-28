@@ -38,6 +38,7 @@ const orderSchema = new mongoose.Schema(
       ref: MONGO_SCHEMA.USER,
       required: true,
     },
+    orderId: { type: String, unique: true, required: true },
     status: {
       type: String,
       required: true,

@@ -32,7 +32,6 @@ const AdminSidebar = ({ setSidebarOpen, sidebarOpen }) => {
       icon: Users,
       path: "/admin/organizers",
     },
-    { id: "orderList", label: "Order List", icon: List, path: "/admin/orders" },
     { id: "users", label: "Users", icon: UserCircle, path: "/admin/users" },
     { id: "sales", label: "Sales", icon: CreditCard, path: "/admin/sales" },
     { id: "coupons", label: "Coupons", icon: Ticket, path: "/admin/coupons" },

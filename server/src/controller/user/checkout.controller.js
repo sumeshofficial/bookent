@@ -4,6 +4,7 @@ import {
   orderStatus,
   paypalCaptureOrder,
   paypalCreateOrder,
+  walletCreateOrder,
 } from "../../services/user/checkout/checkout.service.js";
 import { ERRORS } from "../../utility/constants/constants.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";
@@ -11,7 +12,7 @@ import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Checkout page deatails
 export const checkoutDetailsController = asyncHandler(async (req, res) => {
-  const { lockId } = req.body;
+  const { lockId, appliedCoupon } = req.body;
   const user = req.user;
 
   if (!lockId) {
@@ -22,7 +23,11 @@ export const checkoutDetailsController = asyncHandler(async (req, res) => {
     );
   }
 
-  const ticketDetails = await checkoutPageDetails(lockId, user._id);
+  const ticketDetails = await checkoutPageDetails(
+    lockId,
+    user._id,
+    appliedCoupon
+  );
 
   sendResponse(res, ticketDetails, STATUS_CODE.SUCCESS);
 });
@@ -59,15 +64,16 @@ export const capturePaypalOrderController = asyncHandler(async (req, res) => {
     );
   }
 
-  await paypalCaptureOrder(orderID, lockId, user._id, couponCode);
+  const order = await paypalCaptureOrder(orderID, lockId, user._id, couponCode);
 
-  sendResponse(res, { message: "Payment Captured" }, STATUS_CODE.CREATED);
+  sendResponse(res, order, STATUS_CODE.CREATED);
 });
 
 // Check Order Status
 export const getOrderStatusController = asyncHandler(async (req, res) => {
-  const paypalOrderId = req.params.orderId;
-  if (!paypalOrderId) {
+  const orderId = req.params.orderId;
+  const userId = req.user._id;
+  if (!orderId) {
     throw new AppError(
       STATUS_CODE.MISSING_FIELD,
       ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
@@ -75,13 +81,14 @@ export const getOrderStatusController = asyncHandler(async (req, res) => {
     );
   }
 
-  const status = await orderStatus(paypalOrderId);
+  const status = await orderStatus(orderId, userId);
 
   sendResponse(res, { status }, STATUS_CODE.SUCCESS);
 });
 
 export const getTicketController = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
+  const userId = req.user._id;
 
   if (!orderId) {
     throw new Error(
@@ -91,7 +98,25 @@ export const getTicketController = asyncHandler(async (req, res) => {
     );
   }
 
-  const ticket = await getTicket(orderId);
+  const ticket = await getTicket(orderId, userId);
 
   sendResponse(res, ticket, STATUS_CODE.SUCCESS);
+});
+
+export const createOrderWithWallet = asyncHandler(async (req, res) => {
+  const { lockId, couponCode } = req.body;
+  const user = req.user;
+
+  if (!lockId) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
+  }
+
+  const ticketDetails = await checkoutPageDetails(lockId, user._id);
+  const result = await walletCreateOrder(ticketDetails, user, couponCode);
+
+  sendResponse(res, result, STATUS_CODE.CREATED);
 });

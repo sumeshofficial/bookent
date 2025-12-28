@@ -7,4 +7,5 @@ export const sanitizeUser = (user) => ({
   authProvider: user.authProvider,
   location: user.location,
   preferences: user.preferences,
+  wallet: user.wallet,
 });

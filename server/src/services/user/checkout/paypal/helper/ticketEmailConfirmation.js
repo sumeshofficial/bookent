@@ -19,7 +19,7 @@ export const sendEmailConfirmation = async (user, order) => {
     subject,
     html: bookingConfirmationTemplate({
       fullname: user.fullname,
-      orderId: order._id,
+      orderId: order.orderId,
       eventTitle: order.eventDetails.title,
       eventDate: formatDate(order.eventDetails.date),
       eventTime: formatTime(order.eventDetails.time),

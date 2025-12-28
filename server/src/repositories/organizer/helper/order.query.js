@@ -24,9 +24,9 @@ export const orderQueryBuilder = (eventId, filters = {}) => {
 
     const orConditions = [];
 
-    if (search.match(/^[0-9a-fA-F]{24}$/)) {
-      orConditions.push({ _id: search });
-    }
+    orConditions.push({
+      orderId: { $regex: `^${search}$`, $options: "i" },
+    });
 
     orConditions.push(
       { paypalOrderId: { $regex: search, $options: "i" } },

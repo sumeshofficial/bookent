@@ -5,7 +5,7 @@ import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 export const applyCouponController = asyncHandler(async (req, res) => {
-  const { lockId, couponCode } = req.body;
+  const { lockId, couponCode } = req.params;
   const userId = req.user._id;
 
   if (!lockId || !couponCode) {

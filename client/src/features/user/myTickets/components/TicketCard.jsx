@@ -13,12 +13,12 @@ const TicketCard = ({ ticket }) => {
               event={ticket.eventDetails}
               seat={ticket.seat}
               status={ticket.status}
-              ticketId={ticket._id}
+              ticketId={ticket.orderId}
             />
-            <Link to={`/ticket/${ticket._id}`} className="block">
+            <Link to={`/ticket/${ticket.orderId}`} className="block">
               <TicketMeta
                 meta={{
-                  bookingId: ticket._id,
+                  bookingId: ticket.orderId,
                   paymentMethod: ticket.paymentMethod,
                   bookingDate: ticket.createdAt,
                 }}

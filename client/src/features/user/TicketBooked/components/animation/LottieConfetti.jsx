@@ -1,5 +1,5 @@
 import Lottie from "lottie-react";
-import confettiJson from "../../../../../assets/Confetti.json";
+import confettiJson from "../../../../../assets/lottie/Confetti.json";
 
 const LottieConfetti = () => (
   <div className="absolute inset-0 z-50 pointer-events-none">

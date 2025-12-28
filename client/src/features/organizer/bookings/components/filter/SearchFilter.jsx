@@ -5,7 +5,7 @@ const SearchFilter = ({ value, onChange }) => (
     </label>
     <input
       type="text"
-      placeholder="Order ID / Payment"
+      placeholder="Order ID"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className="w-full border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
