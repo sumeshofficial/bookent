@@ -2,8 +2,9 @@ import logger from "../../config/logger.js";
 import { updateUserStatusService } from "../../services/admin/user.service.js";
 import { findUserById } from "../../services/auth.service.js";
 import { getAllUsers } from "../../services/user.service.js";
+import { ERRORS } from "../../utility/constants/constants.js";
 import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
-import { asyncHandler, sendResponse } from "../../utility/helpers.js";
+import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Get all users controller
 export const getUsersController = async (req, res) => {
@@ -54,7 +55,18 @@ export const getUsersController = async (req, res) => {
 
 // Update user status controller
 export const updateStatusController = asyncHandler(async (req, res) => {
-  await updateUserStatusService(req.params);
+  const { userId } = req.params;
+  const { status } = req.body;
+
+  if (!userId || !status) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG,
+    );
+  }
+
+  await updateUserStatusService(userId, status);
 
   sendResponse(
     res,
@@ -65,7 +77,7 @@ export const updateStatusController = asyncHandler(async (req, res) => {
 
 // Get user detalis controller
 export const getUserDetailsController = async (req, res) => {
-  const id = req.params.id;
+  const id = req.params.userId;
   try {
     logger.http(`${req.method} ${req.originalUrl}`);
 

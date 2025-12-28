@@ -1,7 +1,7 @@
 import { Eye } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
-import { useModal } from "../../utils/constants";
+import { useModal } from "../../../../utils/constants";
 
 const UserRow = React.memo(({ user, handleToggleStatus }) => {
   const { openModal, closeModal } = useModal();

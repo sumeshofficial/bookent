@@ -1,11 +1,5 @@
 import { adminApi } from "./api/apiSetup";
 
-export const getAllUsers = async ({ page, limit, search, sort, status }) => {
-  return await adminApi.get(
-    `/admin/users?page=${page}&limit=${limit}&search=${search}&sort=${sort}&status=${status}`
-  );
-};
-
 export const getAllOrganizers = async ({
   page,
   limit,
@@ -16,12 +10,6 @@ export const getAllOrganizers = async ({
   return await adminApi.get(
     `/admin/organizers?&page=${page}&limit=${limit}&search=${search}&sort=${sort}&status=${status}`
   );
-};
-
-export const toggleUserStatusAPI = async ({ userId, newStatus }) => {
-  const res = await adminApi.patch(`/admin/users/${userId}/${newStatus}`);
-
-  return res.data;
 };
 
 export const handleOrganizerRequest = async ({ id, status, reason }) => {

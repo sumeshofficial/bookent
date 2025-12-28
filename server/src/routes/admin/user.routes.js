@@ -7,8 +7,8 @@ import {
 const router = express.Router();
 
 router.get("/", getUsersController);
-router.get("/:id", getUserDetailsController);
+router.get("/:userId", getUserDetailsController);
 
-router.patch("/:id/:status", updateStatusController);
+router.patch("/:userId/status", updateStatusController);
 
 export default router;
