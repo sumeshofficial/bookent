@@ -10,6 +10,8 @@ import UserDetailsPage from "../features/admin/UserDetailsPage";
 import OrganizerDetailsPage from "../features/admin/OrganizerDetailsPage";
 import AdminWallet from "../features/admin/wallet/AdminWallet";
 import Coupons from "../features/admin/coupons/Coupons";
+import Events from "../features/admin/events/Events";
+import Event from "../features/admin/event/Event";
 
 const adminRoutes = [
   {
@@ -26,6 +28,8 @@ const adminRoutes = [
           { path: "organizers/:id", element: <OrganizerDetailsPage /> },
           { path: "wallet", element: <AdminWallet /> },
           { path: "coupons", element: <Coupons /> },
+          { path: "events", element: <Events /> },
+          { path: "events/:slug", element: <Event /> },
         ],
       },
       { path: "login", element: <AdminLogin /> },

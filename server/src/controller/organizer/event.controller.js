@@ -314,7 +314,7 @@ export const getEventsController = async (req, res) => {
       page = 1,
       limit = 5,
       status = "All",
-      sort = "lastest",
+      sort = "latest",
       search = "",
       startDate,
       endDate,
