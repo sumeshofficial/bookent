@@ -6,7 +6,7 @@ import {
   updateCouponController,
 } from "../../controller/admin/counpon.controller.js";
 import { validate } from "../../middlewares/common/validate.middleware.js";
-import { createCouponSchema } from "../../../validation/coupon.validation.js";
+import { createCouponSchema } from "../../validation/coupon.validation.js";
 const router = express.Router();
 
 router.get("/", getCouponsController);

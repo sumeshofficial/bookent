@@ -1,5 +1,9 @@
 import Coupon from "../../models/coupons.model.js";
 
+export const isCouponExists = async (couponCode) => {
+  return Coupon.exists({ code: couponCode });
+};
+
 export const createCouponRepo = async (payload) => {
   return Coupon.create(payload);
 };

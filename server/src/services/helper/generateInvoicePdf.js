@@ -1,5 +1,6 @@
 import PDFDocument from "pdfkit";
-import { formatDate, formatTime } from "../../utility/formatDateAndTime.js";
+import { formatDate } from "../../utility/formatDateAndTime.js";
+import { ENV } from "../../config/env.conf.js";
 
 export const generateInvoicePDF = async ({ order, user }) => {
   return new Promise((resolve, reject) => {
@@ -10,122 +11,181 @@ export const generateInvoicePDF = async ({ order, user }) => {
     doc.on("end", () => resolve(Buffer.concat(buffers)));
     doc.on("error", reject);
 
-    doc
-      .fontSize(20)
-      .text("BOOKENT", { align: "left" })
-      .fontSize(10)
-      .text("Ticket Booking Invoice", { align: "left" });
+    doc.fontSize(26).font("Helvetica-Bold").text("INVOICE", 50, 50);
 
-    doc.moveDown();
-    doc.fontSize(12).text("Invoice Details", { underline: true });
+    doc
+      .fontSize(10)
+      .font("Helvetica")
+      .text("BOOKENT Pvt Ltd\nKochi, Kerala\nsupport@bookent.com", 50, 95);
+
+    const logoUrl = ENV.LOGO_URL;
+
+    try {
+      doc.image(logoUrl, 400, 50, {
+        fit: [120, 60],
+        align: "right",
+      });
+    } catch (err) {
+      console.log(err)
+      doc
+        .fontSize(14)
+        .font("Helvetica-Bold")
+        .text("BOOKENT", 400, 60, { align: "right" });
+    }
+
+    const billingTop = 95;
+
+    doc.fontSize(10).font("Helvetica-Bold").text("Billed To", 350, billingTop);
+
+    doc.font("Helvetica").text(user.fullname, 350).text(user.email, 350);
+
+    doc.moveDown(1);
+
+    doc.font("Helvetica-Bold").text("Invoice Number", 350);
+
+    doc.font("Helvetica").text(order.orderId, 350, doc.y);
+
     doc.moveDown(0.5);
 
-    doc
-      .fontSize(10)
-      .text(`Invoice ID: ${order.orderId}`)
-      .text(`Invoice Date: ${formatDate(new Date())}`)
-      .text(`Customer: ${user.fullname}`)
-      .text(`Email: ${user.email}`);
+    doc.font("Helvetica-Bold").text("Date of Issue", 350);
 
-    doc.moveDown();
+    doc.font("Helvetica").text(formatDate(new Date()), 350);
 
-    doc.fontSize(12).text("Event Details", { underline: true });
-    doc.moveDown(0.5);
+    doc.moveDown(2);
 
-    doc
-      .fontSize(10)
-      .text(`Event: ${order.eventDetails.title}`)
-      .text(
-        `Date & Time: ${formatDate(order.eventDetails.date)} • ${formatTime(
-          order.eventDetails.time
-        )}`
-      )
-      .text(`Venue: ${order.eventDetails.venue}`);
-
-    doc.moveDown();
-
-    const tableTop = doc.y + 10;
-
-    const columnX = {
-      description: 50,
-      qty: 300,
-      price: 360,
-      total: 440,
+    const tableTop = doc.y;
+    const col = {
+      desc: 50,
+      qty: 320,
+      price: 390,
+      total: 470,
     };
+
+    const colWidth = {
+      desc: 240,
+      qty: 40,
+      price: 60,
+      total: 70,
+    };
+
+    const tableEndX = col.total + colWidth.total;
+    const rightEdgeX = doc.page.width - doc.page.margins.right;
+    const totalsStartX = col.qty; // align totals with Qty/Price/Amount block
 
     doc
       .fontSize(11)
-      .text("Description", columnX.description, tableTop)
-      .text("Qty", columnX.qty, tableTop)
-      .text("Price", columnX.price, tableTop)
-      .text("Total", columnX.total, tableTop);
+      .font("Helvetica-Bold")
+      .text("Description", col.desc, tableTop, { width: colWidth.desc })
+      .text("Qty", col.qty, tableTop, { width: colWidth.qty, align: "right" })
+      .text("Price", col.price, tableTop, {
+        width: colWidth.price,
+        align: "right",
+      })
+      .text("Amount", col.total, tableTop, {
+        width: colWidth.total,
+        align: "right",
+      });
 
     doc
       .moveTo(50, tableTop + 15)
-      .lineTo(550, tableTop + 15)
+      .lineTo(tableEndX, tableTop + 15)
       .stroke();
 
-    const rowY = tableTop + 25;
+    const rowY = tableTop + 30;
     const seatTotal = order.seat.qty * order.seat.price;
 
-    doc
-      .fontSize(10)
-      .text(order.seat.category || "Event Ticket", columnX.description, rowY)
-      .text(order.seat.qty.toString(), columnX.qty, rowY)
-      .text(`$${order.seat.price.toFixed(2)}`, columnX.price, rowY)
-      .text(`$${seatTotal.toFixed(2)}`, columnX.total, rowY);
+    const descriptionText = `${order.eventId.eventTitle} (${order.seat.category})`;
 
-    doc.moveDown(3);
-
-    const breakdownTop = doc.y;
-
-    doc.fontSize(12).text("Price Breakdown", 350, breakdownTop, {
-      align: "left",
-      underline: true,
+    doc.fontSize(10).font("Helvetica").text(descriptionText, col.desc, rowY, {
+      width: colWidth.desc,
     });
 
-    const breakdown = order.pricingBreakDown;
+    const descHeight = doc.heightOfString(descriptionText, {
+      width: colWidth.desc,
+    });
 
-    const drawAmountRow = (label, value, y) => {
-      doc
-        .fontSize(10)
-        .text(label, 350, y)
-        .text(`$${value.toFixed(2)}`, 0, y, { align: "right" });
+    doc
+      .text(order.seat.qty.toString(), col.qty, rowY, {
+        width: colWidth.qty,
+        align: "right",
+      })
+      .text(`$${order.seat.price.toFixed(2)}`, col.price, rowY, {
+        width: colWidth.price,
+        align: "right",
+      })
+      .text(`$${seatTotal.toFixed(2)}`, col.total, rowY, {
+        width: colWidth.total,
+        align: "right",
+      });
+
+    doc.y = rowY + descHeight + 20;
+
+    const breakdown = order.pricingBreakDown;
+    let y = doc.y;
+
+    const amountRow = (label, value) => {
+      doc.fontSize(10).text(label, totalsStartX, y);
+      doc.text(`$${value.toFixed(2)}`, 0, y, { align: "right" });
+      y += 18;
     };
 
-    let y = breakdownTop + 20;
-    drawAmountRow("Ticket Total", breakdown.ticketPrice, y);
-    y += 18;
+    doc
+      .moveTo(totalsStartX, y - 5)
+      .lineTo(rightEdgeX, y - 5)
+      .stroke();
 
-    const bookingFeeTotal = (breakdown.baseFee || 0) + (breakdown.gst || 0);
+    amountRow("Subtotal", breakdown.ticketPrice);
 
-    drawAmountRow("Booking Fee (Base + GST)", bookingFeeTotal, y);
-    y += 18;
+    const fees = (breakdown.baseFee || 0) + (breakdown.gst || 0);
+    amountRow("Fees & Taxes", fees);
 
     if (breakdown.discount && breakdown.discount > 0) {
-      drawAmountRow("Coupon Discount", -breakdown.discount, y);
-      y += 18;
+      amountRow("Discount", -breakdown.discount);
     }
 
     doc
-      .moveTo(350, y + 15)
-      .lineTo(550, y + 15)
+      .moveTo(totalsStartX, y + 5)
+      .lineTo(rightEdgeX, y + 5)
       .stroke();
 
-    doc.fontSize(11).text("Grand Total", 350, y + 25);
-    doc.fontSize(11).text(`$${breakdown.grandTotal.toFixed(2)}`, 0, y + 25, {
-      align: "right",
-    });
+    doc
+      .fontSize(12)
+      .font("Helvetica-Bold")
+      .text("Total", totalsStartX, y + 12);
+    doc
+      .fontSize(12)
+      .font("Helvetica-Bold")
+      .text(`$${breakdown.grandTotal.toFixed(2)}`, 0, y + 12, {
+        align: "right",
+      });
 
-    doc.moveDown(4);
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .text("Terms", 50, y + 20);
+
+    doc
+      .font("Helvetica")
+      .text("Net 30 days. Payment is due within 30 days of invoice date.", 50);
+
+    doc.moveDown(5);
+    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+
+    doc.moveDown(1);
 
     doc
       .fontSize(9)
+      .fillColor("gray")
+      .text("BOOKENT Pvt Ltd • support@bookent.com • www.bookent.com", {
+        align: "center",
+      })
+      .moveDown(0.5)
       .text(
-        "This is a system-generated invoice. Please present the QR code at the entry gate.",
-        { align: "center", color: "gray" }
+        "This is a system-generated invoice and does not require a signature.",
+        { align: "center" }
       );
 
+    doc.fillColor("black");
     doc.end();
   });
 };

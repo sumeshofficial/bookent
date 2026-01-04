@@ -15,19 +15,17 @@ export const buildExcel = (data) => {
 
   worksheet.columns = [
     { key: "createdAt", width: 20 },
-    { key: "order_id", width: 25 },
+    { key: "_id", width: 20 },
     { key: "amount", width: 15 },
-    { key: "net_amount", width: 15 },
-    { key: "currency", width: 10 },
+    { key: "currency", width: 15 },
     { key: "paymentMethod", width: 15 },
     { key: "transaction_direction", width: 15 },
   ];
 
   worksheet.getRow(2).values = [
     "Date",
-    "Order ID",
+    "Transaction ID",
     "Amount",
-    "Net Amount",
     "Currency",
     "Payment Method",
     "Type",
@@ -38,9 +36,8 @@ export const buildExcel = (data) => {
   data.forEach((tx) => {
     worksheet.addRow({
       createdAt: formatDate(tx.createdAt),
-      order_id: tx.order_id,
+      _id: tx._id,
       amount: tx.amount?.value,
-      net_amount: tx.net_amount?.value,
       currency: tx.amount?.currency,
       paymentMethod: tx.paymentMethod,
       transaction_direction: tx.display_direction,

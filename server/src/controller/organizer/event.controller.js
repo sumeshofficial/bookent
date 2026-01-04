@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import logger from "../../config/logger.js";
-import { eventSchema } from "../../../validation/event.validation.js";
+import { eventSchema } from "../../validation/event.validation.js";
 import {
   deleteRedisData,
   getRedisData,
@@ -20,9 +20,12 @@ import {
   updateEvent,
 } from "../../services/organizer.service.js";
 import { redisClient } from "../../config/redis.conf.js";
-import { finishCreateEvent } from "../../services/organizer/event.service.js";
+import {
+  cancelEvent,
+  finishCreateEvent,
+} from "../../services/organizer/event.service.js";
 import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
-import { findeEventByOrganizerIdAndEventId } from "../../repositories/organizer/event.repository.js";
+import { findEventByOrganizerIdAndEventId } from "../../repositories/organizer/event.repository.js";
 import { isSlugExists } from "../../utility/event.utils.js";
 import Event from "../../models/event.model.js";
 import { ENV } from "../../config/env.conf.js";
@@ -127,122 +130,126 @@ export const finishEventCreateController = asyncHandler(async (req, res) => {
 });
 
 // Edit Event Validate
-export const editEventController = async (req, res) => {
-  try {
-    const { eventSlug } = req.params;
-    const userId = req.user._id;
-    const data = req.body;
+export const editEventController = asyncHandler(async (req, res) => {
+  const { eventSlug } = req.params;
+  const userId = req.user._id;
+  const data = req.body;
 
-    logger.http(`${req.method} ${req.originalUrl}`);
+  logger.http(`${req.method} ${req.originalUrl}`);
 
-    if (!data || !eventSlug || !userId) {
-      logger.warn("Required fields are missing");
-      return res.status(statusCode.missingField).json({
-        error: "Required fields are missing",
-      });
-    }
-
-    logger.info("Check ownership");
-    const organizer = await checkOrganizer({ userId });
-    if (!organizer) {
-      logger.warn(`Organizer not found for ${userId}`);
-      return res.status(statusCode.notFound).json({
-        success: false,
-        error: "Organizer not found",
-      });
-    }
-
-    logger.info(
-      `Check event is exixts for organizerId=${organizer._id}, eventId=${eventSlug}`
-    );
-    const event = await findEvent(organizer._id, eventSlug);
-    if (!event) {
-      logger.warn("Event not found or unauthorized");
-      return res.status(statusCode.notFound).json({
-        success: false,
-        error: "Event not found or unauthorized",
-      });
-    }
-
-    if (data?.eventTitle) {
-      const slug = await isSlugExists(Event, data.eventTitle, event._id);
-      data.slug = slug;
-    }
-
-    if (!data?.bannerImage && !data?.thumbnailImage) {
-      logger.info("Update event without images");
-      const updatedEvent = await updateEvent(event._id, data);
-
-      if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
-        for (const section of updatedEvent.ticketSetup) {
-          const redisKey = `inventory:${updatedEvent._id}:${section.sectionId}`;
-          await redisClient.set(redisKey, section.availableTickets);
-        }
-      }
-
-      logger.info("Event updated succssfully");
-      return res.status(statusCode.success).json({
-        success: true,
-        message: "Event updated successfully",
-        event: updatedEvent,
-      });
-    }
-
-    logger.info("Create a sessionId for redis");
-    const sessionId = `event:create:${crypto.randomUUID()}`;
-
-    logger.info("Store Event data in redis with expires time for 10m");
-    await storeInRedis(
-      sessionId,
-      eventCreateValidationExpiresIn,
-      JSON.stringify({
-        ...data,
-        event,
-      })
-    );
-
-    const uploadUrls = {};
-    if (data?.bannerImage) {
-      logger.info("Generate signed url for banner image");
-      const bannerImage = await putObject({
-        fileName: `banner-${Date.now()}.jpg`,
-        contentType: "image/jpeg",
-        folderName: "events/banner_images",
-      });
-
-      uploadUrls.bannerImage = {
-        bannerURL: bannerImage.signedUrl,
-        key: bannerImage.key,
-      };
-    }
-
-    if (data?.thumbnailImage) {
-      logger.info("Generate signed url for thumbnail image");
-      const thumbnailImage = await putObject({
-        fileName: `thumbnail-${Date.now()}.jpg`,
-        contentType: "image/jpeg",
-        folderName: "events/thumbnail_images",
-      });
-
-      uploadUrls.thumbnailImage = {
-        thumbnailURL: thumbnailImage.signedUrl,
-        key: thumbnailImage.key,
-      };
-    }
-
-    logger.info("Event Edit Verify and Create signed Urls successfully");
-    res.status(statusCode.created).json({
-      success: true,
-      sessionId,
-      uploadUrls,
+  if (!data || !eventSlug || !userId) {
+    logger.warn("Required fields are missing");
+    return res.status(statusCode.missingField).json({
+      error: "Required fields are missing",
     });
-  } catch (error) {
-    logger.error(`Error edit event: ${error.stack || error.message}`);
-    res
-      .status(statusCode.serverError)
-      .json({ success: false, error: "Server error" });
   }
-};
+
+  logger.info("Check ownership");
+  const organizer = await checkOrganizer({ userId });
+  if (!organizer) {
+    logger.warn(`Organizer not found for ${userId}`);
+    return res.status(statusCode.notFound).json({
+      success: false,
+      error: "Organizer not found",
+    });
+  }
+
+  logger.info(
+    `Check event is exixts for organizerId=${organizer._id}, eventId=${eventSlug}`
+  );
+  const event = await findEvent(organizer._id, eventSlug);
+  if (!event) {
+    logger.warn("Event not found or unauthorized");
+    return res.status(statusCode.notFound).json({
+      success: false,
+      error: "Event not found or unauthorized",
+    });
+  }
+
+  if (
+    event.eventStatus === "Cancelled" ||
+    event.cancelDetails?.isCancelled === true
+  ) {
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.EVENT_ALREADY_CANCELLED.CODE,
+      ERRORS.EVENT_ALREADY_CANCELLED.MSG
+    );
+  }
+
+  if (data?.eventTitle) {
+    const slug = await isSlugExists(Event, data.eventTitle, event._id);
+    data.slug = slug;
+  }
+
+  if (!data?.bannerImage && !data?.thumbnailImage) {
+    logger.info("Update event without images");
+    const updatedEvent = await updateEvent(event._id, data);
+
+    if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
+      for (const section of updatedEvent.ticketSetup) {
+        const redisKey = `inventory:${updatedEvent._id}:${section.sectionId}`;
+        await redisClient.set(redisKey, section.availableTickets);
+      }
+    }
+
+    logger.info("Event updated succssfully");
+    return res.status(statusCode.success).json({
+      success: true,
+      message: "Event updated successfully",
+      event: updatedEvent,
+    });
+  }
+
+  logger.info("Create a sessionId for redis");
+  const sessionId = `event:create:${crypto.randomUUID()}`;
+
+  logger.info("Store Event data in redis with expires time for 10m");
+  await storeInRedis(
+    sessionId,
+    eventCreateValidationExpiresIn,
+    JSON.stringify({
+      ...data,
+      event,
+    })
+  );
+
+  const uploadUrls = {};
+  if (data?.bannerImage) {
+    logger.info("Generate signed url for banner image");
+    const bannerImage = await putObject({
+      fileName: `banner-${Date.now()}.jpg`,
+      contentType: "image/jpeg",
+      folderName: "events/banner_images",
+    });
+
+    uploadUrls.bannerImage = {
+      bannerURL: bannerImage.signedUrl,
+      key: bannerImage.key,
+    };
+  }
+
+  if (data?.thumbnailImage) {
+    logger.info("Generate signed url for thumbnail image");
+    const thumbnailImage = await putObject({
+      fileName: `thumbnail-${Date.now()}.jpg`,
+      contentType: "image/jpeg",
+      folderName: "events/thumbnail_images",
+    });
+
+    uploadUrls.thumbnailImage = {
+      thumbnailURL: thumbnailImage.signedUrl,
+      key: thumbnailImage.key,
+    };
+  }
+
+  logger.info("Event Edit Verify and Create signed Urls successfully");
+  res.status(statusCode.created).json({
+    success: true,
+    sessionId,
+    uploadUrls,
+  });
+});
 
 // Finish Event Edit
 export const finishEventEditController = async (req, res) => {
@@ -264,6 +271,17 @@ export const finishEventEditController = async (req, res) => {
 
     logger.debug("Parse cached data");
     const data = JSON.parse(cached);
+
+    if (
+      data.event?.eventStatus === "Cancelled" ||
+      data.event?.cancelDetails?.isCancelled === true
+    ) {
+      throw new AppError(
+        STATUS_CODE.BAD_REQUEST,
+        ERRORS.EVENT_ALREADY_CANCELLED.CODE,
+        ERRORS.EVENT_ALREADY_CANCELLED.MSG
+      );
+    }
 
     if (data.bannerImage) {
       logger.info("Deleting the old banner image");
@@ -515,7 +533,7 @@ export const getEventController = async (req, res) => {
 export const deleteEventController = async (req, res) => {
   try {
     const user = req.user;
-    const { eventId } = req.body;
+    const { eventId } = req.params;
 
     logger.http(`${req.method} ${req.originalUrl}`);
 
@@ -539,7 +557,7 @@ export const deleteEventController = async (req, res) => {
     }
 
     logger.info(`Check event is exists eventId=${eventId}`);
-    const event = await findeEventByOrganizerIdAndEventId(
+    const event = await findEventByOrganizerIdAndEventId(
       organizer._id,
       eventId
     );
@@ -579,3 +597,14 @@ export const deleteEventController = async (req, res) => {
     });
   }
 };
+
+// Cancel event
+export const cancelEventController = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { eventSlug } = req.params;
+  const data = req.body;
+
+  const event = await cancelEvent(userId, eventSlug, data);
+
+  sendResponse(res, event, STATUS_CODE.SUCCESS);
+});

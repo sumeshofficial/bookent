@@ -1,4 +1,4 @@
-const MatchTime = ({ register, errors, watch }) => {
+const MatchTime = ({ register, errors }) => {
   return (
     <div className="bg-white border border-gray-100 rounded-md px-4 py-6 sm:px-8 sm:py-8">
       <span className="font-semibold text-sm sm:text-2xl">Match Time</span>
@@ -19,7 +19,7 @@ const MatchTime = ({ register, errors, watch }) => {
           )}
         </div>
         <div className="mt-2 sm:mt-5 flex flex-col gap-2">
-          <label className="text-[.7rem] sm:text-sm">Staring Time</label>
+          <label className="text-[.7rem] sm:text-sm">Starting Time</label>
           <input
             type="time"
             {...register("matchTime")}

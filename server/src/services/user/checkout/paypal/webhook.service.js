@@ -18,6 +18,7 @@ import { findUserById } from "../../../../repositories/user/user.repository.js";
 import { sendEmailConfirmation } from "./helper/ticketEmailConfirmation.js";
 import { updateAdminWallet } from "../../../../repositories/admin/updateAdminWallet.js";
 import { generateOrderQr } from "../helper/generateQr.helper.js";
+import logger from "../../../../config/logger.js";
 
 export const processPaypalCapture = async (capture, event) => {
   const session = await mongoose.startSession();
@@ -45,6 +46,8 @@ export const processPaypalCapture = async (capture, event) => {
       await makeTicketSold(order.eventId, order.seat, session);
       const qrToken = generateOrderQr(order);
 
+      console.log(qrToken);
+
       const payloadForUpdate = {
         status: ORDER_STATUS.CONFIRMED,
         qrData: {
@@ -68,7 +71,7 @@ export const processPaypalCapture = async (capture, event) => {
     if (order && order.status === ORDER_STATUS.PAID) {
       await updateOrderStatus(order._id, ORDER_STATUS.REFUND_REQUIRED);
     }
-    console.log(error);
+    logger.error(`paypal webhook error: ${error.stack || error.message}`);
   } finally {
     session.endSession();
   }

@@ -2,6 +2,7 @@ import {
   countCouponsRepo,
   createCouponRepo,
   findCouponsRepo,
+  isCouponExists,
   updateCouponRepo,
 } from "../../../repositories/admin/coupon.repository.js";
 import { ERRORS } from "../../../utility/constants/constants.js";
@@ -13,6 +14,16 @@ import { buildCouponSort } from "./helpers/buildCouponSort.js";
 import { buildPagination } from "./helpers/buildPagination.js";
 
 export const createCoupon = async (payload) => {
+  const isExist = await isCouponExists(payload.code);
+
+  if (isExist) {
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.COUPON_ALREADY_EXISTS.CODE,
+      ERRORS.COUPON_ALREADY_EXISTS.MSG
+    );
+  }
+
   const coupon = await createCouponRepo(payload);
 
   const updatedCoupon = buildCoupon(coupon);

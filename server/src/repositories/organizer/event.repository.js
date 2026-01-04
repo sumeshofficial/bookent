@@ -9,7 +9,7 @@ export const createEvent = async (newEvent) => {
   return await Event.create(newEvent);
 };
 
-export const findeEventByOrganizerIdAndEventId = async (
+export const findEventByOrganizerIdAndEventId = async (
   organizerId,
   eventId
 ) => {
@@ -21,19 +21,24 @@ export const findeEventByOrganizerIdAndEventId = async (
  * @param {String} eventSorganizerIdlug
  * @param {String} eventSlug
  */
-export const findeEventByOrganizerIdAndEventSlug = async (
+export const findEventByOrganizerIdAndEventSlug = async (
   organizerId,
-  eventSlug
+  eventSlug,
+  session
 ) => {
-  return await Event.findOne({
+  const query = Event.findOne({
     organizer: organizerId,
     slug: eventSlug,
-  })
-    .populate({
-      path: "stadium",
-      select: "shapes stadiumDetails.stadiumName",
-    })
-    .lean();
+  }).populate({
+    path: "stadium",
+    select: "shapes stadiumDetails.stadiumName",
+  });
+
+  if (session) {
+    query.session(session);
+  }
+
+  return await query;
 };
 
 // Count Events
@@ -51,3 +56,4 @@ export const countEventsByOrganizerForDate = async ({
     isDeleted: false,
   });
 };
+

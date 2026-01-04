@@ -31,7 +31,6 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
     const savedCoupon = sessionStorage.getItem("appliedCoupon");
     if (savedCoupon) {
       setValue("coupon", savedCoupon);
-      setActiveCoupon(savedCoupon);
     }
   }, [setValue]);
 
@@ -41,7 +40,18 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
     setIsApplied(true);
     setAppliedCouponData(data);
     onCouponApplied(data);
-  }, [data, onCouponApplied]);
+    sessionStorage.setItem("appliedCoupon", activeCoupon);
+  }, [activeCoupon, data, onCouponApplied]);
+
+useEffect(() => {
+  if (!isError) return;
+
+  if (isApplied) {
+    setIsApplied(false);
+    setAppliedCouponData(null);
+    sessionStorage.removeItem("appliedCoupon");
+  }
+}, [isError, isApplied]);
 
   const onSubmit = () => {
     if (!lockId) {
@@ -52,7 +62,6 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
       return toast.error("Coupon code is required");
     }
 
-    sessionStorage.setItem("appliedCoupon", couponCode);
     setActiveCoupon(couponCode);
   };
 

@@ -24,7 +24,7 @@ const refundSchema = new mongoose.Schema(
     refunded_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: MONGO_SCHEMA.USER,
-      required: true,
+      default: null,
     },
     refundedAt: { type: Date, required: true },
   },
@@ -59,9 +59,6 @@ const orderSchema = new mongoose.Schema(
     eventDetails: {
       _id: { type: mongoose.Schema.Types.ObjectId, required: true },
       title: { type: String, required: true },
-      date: { type: Date, required: true },
-      time: { type: String, required: true },
-      venue: { type: String, required: true },
       slug: { type: String, required: true },
       stadiumName: { type: String, required: true },
       thumbnailImage: { type: String, required: true },
@@ -108,6 +105,24 @@ const orderSchema = new mongoose.Schema(
     transactionId: {
       type: mongoose.Schema.ObjectId,
       ref: MONGO_SCHEMA.TRANACTION,
+    },
+    refundStatus: {
+      type: String,
+      enum: [
+        REFUND_STATUS.NOT_REQUIRED,
+        REFUND_STATUS.PENDING,
+        REFUND_STATUS.COMPLETED,
+        REFUND_STATUS.FAILED,
+      ],
+      default: REFUND_STATUS.NOT_REQUIRED,
+    },
+    refundedAmount: {
+      type: Number,
+      default: 0,
+    },
+    refundReason: {
+      type: String,
+      default: null,
     },
     refundHistory: [refundSchema],
     meta: {

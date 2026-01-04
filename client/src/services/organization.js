@@ -1,6 +1,6 @@
 import axios from "axios";
-import { api } from "./api/apiSetup";
 import { ENV } from "../config/env";
+import { api } from "./api/apiSetup";
 
 // Organizer Registration Form
 export const registerOrganizationAccount = async ({
@@ -146,6 +146,13 @@ export const updateEvent = async (eventSlug, data) => {
   return res.data;
 };
 
+// Update event
+export const cancelEvent = async (eventSlug, data) => {
+  console.log(data)
+  const res = await api.patch(`/organizer/events/${eventSlug}/cancel`, data);
+  return res.data;
+};
+
 // Edit event finish
 export const editEventFinish = async ({ sessionId, images }) => {
   const res = await api.post("/organizer/events/edit/finish", {
@@ -157,9 +164,7 @@ export const editEventFinish = async ({ sessionId, images }) => {
 
 // Delete event
 export const deleteEvent = async (eventId) => {
-  await api.patch("/organizer/events/delete", {
-    eventId,
-  });
+  await api.delete(`/organizer/events/${eventId}`);
 };
 
 // Get all Indian States
@@ -188,7 +193,7 @@ export const getCity = async (stateCode) => {
 
 // Update organizer profile
 export const updateOrganizer = async ({ id, data }) => {
-  const res = await api.patch("/organizer/account/update-profile", {
+  const res = await api.patch("/organizer/account/profile", {
     id,
     data,
   });

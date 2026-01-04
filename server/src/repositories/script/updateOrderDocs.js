@@ -1,22 +1,20 @@
 import mongoose from "mongoose";
 import { ENV } from "../../config/env.conf.js";
 import Order from "../../models/order.model.js";
-import { ulid } from "ulid";
-
-const generatePublicOrderId = () => {
-  const year = new Date().getFullYear();
-  return `BK-${year}-${ulid()}`;
-};
+import { REFUND_STATUS } from "../../utility/constants/constants.js";
 
 const run = async () => {
   await mongoose.connect(ENV.MONGODB_ATLAS_URI);
 
   const orders = await Order.find({
-    orderId: { $exists: false },
+    $or: [
+      { orderId: { $exists: false } },
+      { refundStatus: { $exists: false } },
+    ],
   }).select("_id");
 
   if (!orders.length) {
-    console.log("No orders found without orderId");
+    console.log("No orders found missing refund fields");
     process.exit(0);
   }
 
@@ -25,7 +23,8 @@ const run = async () => {
       filter: { _id: order._id },
       update: {
         $set: {
-          orderId: generatePublicOrderId(),
+          refundStatus: REFUND_STATUS.NOT_REQUIRED,
+          refundReason: null,
         },
       },
     },
@@ -33,7 +32,7 @@ const run = async () => {
 
   await Order.bulkWrite(bulkOps);
 
-  console.log(`Updated ${orders.length} order documents with public orderId`);
+  console.log(`Updated ${orders.length} order documents with refund defaults`);
   process.exit(0);
 };
 

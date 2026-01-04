@@ -5,7 +5,11 @@ export const fetchEventById = async (eventId) => {
 };
 
 export const findEventsRepo = async () => {
-  return await Event.find({ eventStatus: "Published" }).lean();
+  return await Event.find({
+    eventStatus: { $in: ["Published", "Postpone"] },
+    isDeleted: false,
+    isBookingOpen: true,
+  }).lean();
 };
 
 export const reserveTicket = async ({ event, section, session }) => {

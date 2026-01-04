@@ -20,7 +20,7 @@ const UsersMobileCard = ({ user, onToggle }) => {
       </div>
 
       <div className="mt-3 text-sm">
-        <p>Wallet: ₹ {user.wallet}</p>
+        <p>Wallet: $ {user.wallet}</p>
         <p>Status: {user.status}</p>
       </div>
 

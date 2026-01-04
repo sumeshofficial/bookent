@@ -28,7 +28,11 @@ export const getAllOrdersForEvent = async (eventId, filters = {}) => {
   );
 
   const [orders, total] = await Promise.all([
-    Order.find(query).sort(sortQuery).limit(limit).skip(skip),
+    Order.find(query)
+      .populate("eventId")
+      .sort(sortQuery)
+      .limit(limit)
+      .skip(skip),
     Order.countDocuments(query),
   ]);
 

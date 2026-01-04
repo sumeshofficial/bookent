@@ -9,8 +9,8 @@ export const buildTicket = async (order) => {
     event: {
       id: order.eventDetails?._id,
       title: order.eventDetails?.title,
-      date: order.eventDetails?.date,
-      venue: order.eventDetails?.venue,
+      date: order.eventId?.matchDate,
+      venue: order.eventId?.stadiumAddress,
       poster: poster,
     },
 

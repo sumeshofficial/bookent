@@ -4,6 +4,7 @@ import { STATUS_MAP } from "../../myTickets/constants/ticketStatus";
 const TicketCard = ({ data }) => {
   const { event, bookingId, paymentMethod, status, bookedAt } = data;
   const formattedDate = formatDate(bookedAt);
+
   return (
     <div className="md:w-1/3 bg-gray-50 p-6 flex flex-col items-center border-r">
       <img src={event.poster} alt="event poster" className="rounded-xl mb-4" />

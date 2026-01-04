@@ -3,10 +3,10 @@ import { CheckoutPaymentIntent } from "@paypal/paypal-server-sdk";
 import { CURRENCY_CODE } from "../../../../../utility/constants/constants.js";
 
 export const preparePaypalBreakdown = (section, pricing) => {
-  const qty = section.qty;
-
   const unitAmount = new Decimal(section.price).toFixed(2);
-  const itemTotal = new Decimal(unitAmount).times(qty).toFixed(2);
+
+  const itemTotal = new Decimal(section.price).mul(section.qty).toFixed(2);
+  const orderAmount = new Decimal(pricing.orderAmount).toFixed(2);
 
   const baseFee = new Decimal(pricing.baseFee).toFixed(2);
   const gst = new Decimal(pricing.gst).toFixed(2);
@@ -35,6 +35,7 @@ export const preparePaypalBreakdown = (section, pricing) => {
   return {
     finalUnitAmount: unitAmount,
     finalItemTotal: itemTotal,
+    finalOrderAmount: orderAmount,
     finalBaseFee: baseFee,
     finalGst: gst,
     finalBookingFee: bookingFee,

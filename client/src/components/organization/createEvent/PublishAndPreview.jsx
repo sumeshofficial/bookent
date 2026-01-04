@@ -48,10 +48,6 @@ const PublishAndPreview = ({ register, errors, watch }) => {
             >
               <option value="Draft">Draft</option>
               <option value="Published">Published</option>
-              <option value="Postpone">Postpone</option>
-              <option value="Comming-Soon">Comming Soon</option>
-              <option value="Cancelled">Cancelled</option>
-              <option value="Completed">Completed</option>
             </select>
 
             <ChevronDown className="absolute right-3 text-gray-400 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />

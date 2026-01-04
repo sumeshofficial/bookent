@@ -174,7 +174,7 @@ const CreateEventForm = () => {
             images.bannerImageKey = uploadUrls.bannerImage.key;
           }
           if (uploadUrls?.thumbnailImage?.thumbnailURL) {
-              uploadFile({
+            uploadFile({
               file: dirtyPayload.thumbnailImage,
               contentType: dirtyPayload.thumbnailImage.type,
               signedUrl: uploadUrls.thumbnailImage.thumbnailURL,
@@ -217,7 +217,7 @@ const CreateEventForm = () => {
       setIsModified(false);
       setIsSubmitted(true);
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error( error?.response?.data?.error?.message||"Something went wrong");
     }
   };
 

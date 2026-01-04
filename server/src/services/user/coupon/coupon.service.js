@@ -32,12 +32,14 @@ export const applyCouopn = async (couponCode, pricing, userId) => {
     grandTotal
   );
 
+  const discountedOrderAmount = orderAmount - discount;
+
   return {
     ticketPrice,
     baseFee,
     gst,
     bookingFee,
-    orderAmount,
+    orderAmount: discountedOrderAmount.toFixed(2),
     discount,
     couponCode: coupon.code,
     grandTotal: finalGrandTotal,

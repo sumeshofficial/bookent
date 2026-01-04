@@ -34,7 +34,7 @@ export const buildDbOrderPayload = ({
     },
     pricingBreakDown: {
       ticketPrice: breakdown.finalUnitAmount,
-      orderAmount: breakdown.finalItemTotal,
+      orderAmount: breakdown.finalOrderAmount,
       baseFee: breakdown.finalBaseFee,
       gst: breakdown.finalGst,
       bookingFee: breakdown.finalBookingFee,

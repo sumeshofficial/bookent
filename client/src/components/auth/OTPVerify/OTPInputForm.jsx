@@ -129,8 +129,8 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
       }
       openModal(purpose, { response });
     } catch (error) {
-      toast.error("Something went wrong");
-      setStat({ ...stat, isLoading: false, error: error.message });
+      toast.error(error?.response?.data?.error.message || "Somethings went wrong");
+      setStat({ ...stat, isLoading: false, error: error?.response?.data?.error.message || "Somethings went wrong" });
       setIsButtonDisabled(true);
     }
   };
@@ -144,14 +144,12 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
           </div>
         )}
 
-        {/* Title */}
         <div>
           <h1 className="text-2xl font-medium font-serif mt-5">
             Verify your Email
           </h1>
           <h1 className="text-sm mt-1 text-gray-500">{title}</h1>
 
-          {/* OTP Input */}
           <div className="mt-5">
             {stat.error && <p className="text-red-500 mb-5">{stat.error}</p>}
             <div className="flex gap-1 sm:gap-3 mb-10">
@@ -173,7 +171,6 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
         </div>
 
         <div>
-          {/* ResendOTP */}
           <div className="flex justify-end">
             <button
               onClick={handleResendOTP}
@@ -186,7 +183,6 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
             </button>
           </div>
 
-          {/* Button */}
           <div className="text-center mt-3">
             <button
               onClick={handleOTP}

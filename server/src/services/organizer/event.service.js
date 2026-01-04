@@ -1,9 +1,12 @@
+import mongoose from "mongoose";
 import Event from "../../models/event.model.js";
 import {
   createEvent,
-  findeEventByOrganizerIdAndEventSlug,
+  findEventByOrganizerIdAndEventSlug,
 } from "../../repositories/organizer/event.repository.js";
 import { getAllOrdersForEvent } from "../../repositories/organizer/order.repository.js";
+import { checkOrganizer } from "../../repositories/organizer/organizer.repository.js";
+import { enqueueEventRefund } from "../../repositories/organizer/refund.queue.js";
 import {
   deleteRedisData,
   storeInRedis,
@@ -66,7 +69,7 @@ export const getEventBookings = async (
   organizerId,
   filters = {}
 ) => {
-  const event = await findeEventByOrganizerIdAndEventSlug(
+  const event = await findEventByOrganizerIdAndEventSlug(
     organizerId,
     eventSlug
   );
@@ -100,4 +103,60 @@ export const getEventBookings = async (
     },
     ...result,
   };
+};
+
+export const cancelEvent = async (userId, eventSlug, data) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const organizer = await checkOrganizer(userId);
+
+    const event = await findEventByOrganizerIdAndEventSlug(
+      organizer._id,
+      eventSlug,
+      session
+    );
+
+    if (!event) {
+      throw new AppError(
+        STATUS_CODE.NOTFOUND,
+        ERRORS.EVENT_NOT_FOUND.CODE,
+        ERRORS.EVENT_NOT_FOUND.MSG
+      );
+    }
+
+    if (event.eventStatus === "Cancelled" || event.cancelDetails?.isCancelled) {
+      throw new AppError(
+        STATUS_CODE.BAD_REQUEST,
+        ERRORS.EVENT_ALREADY_CANCELLED.CODE,
+        ERRORS.EVENT_ALREADY_CANCELLED.MSG
+      );
+    }
+
+    if (event.eventStatus === "Completed") {
+      throw new AppError(
+        STATUS_CODE.BAD_REQUEST,
+        ERRORS.EVENT_ALREADY_COMPLETED.CODE,
+        ERRORS.EVENT_ALREADY_COMPLETED.MSG
+      );
+    }
+
+    event.eventStatus = data.eventStatus;
+    event.isBookingOpen = false;
+    event.cancelDetails = data.cancelDetails;
+
+    await event.save({ session });
+
+    await enqueueEventRefund(event._id, session);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return event;
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
 };

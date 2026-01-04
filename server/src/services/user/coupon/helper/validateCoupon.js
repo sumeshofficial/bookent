@@ -42,7 +42,6 @@ export const validateCoupon = async (coupon, userId) => {
   }
 
   const userUsage = await getUserCouponUsage(coupon._id, userId);
-  console.log(userUsage)
 
   if (userUsage && userUsage.usedCount >= coupon.perUserLimit) {
     throw new AppError(

@@ -9,9 +9,9 @@ export const buildTicketDetails = async (order) => {
     event: {
       id: order.eventDetails?._id,
       title: order.eventDetails?.title,
-      date: order.eventDetails?.date,
-      time: order.eventDetails?.time,
-      venue: order.eventDetails?.venue,
+      date: order.eventId?.matchDate,
+      time: order.eventId?.matchTime,
+      venue: order.eventId?.stadiumAddress,
       poster: poster,
     },
 
@@ -26,6 +26,9 @@ export const buildTicketDetails = async (order) => {
 
     paymentMethod: order.paymentMethod,
     status: order.status,
+
+    postponeDetails: order?.eventId?.postponeDetails,
+    cancelDetails: order?.eventId?.cancelDetails,
 
     bookedAt: order.createdAt,
   };

@@ -19,15 +19,11 @@ import {
   createOrder,
   getOrder,
   getOrderForPaypal,
-  updateOrder,
   updateOrderStatus,
 } from "../../../repositories/user/order.repository.js";
 import { buildDbOrderPayload } from "./helper/buildOrderPayload.js";
 import { STATUS_CODE } from "../../../utility/constants/statusCode.js";
-import {
-  makeTicketSold,
-  reserveTicket,
-} from "../../../repositories/user/event.repository.js";
+import { reserveTicket } from "../../../repositories/user/event.repository.js";
 import mongoose from "mongoose";
 import { buildTicket } from "./helper/buildTicket.js";
 import { applyCouopn } from "../coupon/coupon.service.js";
@@ -41,15 +37,8 @@ import {
 } from "../../../repositories/user/couponUsage.repository.js";
 import { buildDbOrderPayloadForWallet } from "./helper/buildOrderPayloadForWallet.js";
 import { sendEmailConfirmation } from "./paypal/helper/ticketEmailConfirmation.js";
-import {
-  findUserById,
-  updateUserWalletBalance,
-} from "../../../repositories/user/user.repository.js";
+import { findUserById } from "../../../repositories/user/user.repository.js";
 import { finalizeBookingLocks } from "../seatLock.service.js";
-import { updateAdminWallet } from "../../../repositories/admin/updateAdminWallet.js";
-import { createMoneyTransaction } from "../../../repositories/user/transaction.repository.js";
-import { buildWalletTransactionPayload } from "./helper/buildWalletTransactionPayload.js";
-import jwt from "jsonwebtoken";
 import { validateWalletCoupon } from "./helper/validateWalletCoupon.helper.js";
 import { reserveSeatOrFail } from "./helper/reserveSeat.helper.js";
 import { processWalletPayment } from "./helper/processWalletPayment.helper.js";
@@ -116,11 +105,9 @@ export const paypalCreateOrder = async (ticketDetails, userId, couponCode) => {
     const breakdown = preparePaypalBreakdown(section, finalPricing);
     const collect = buildPaypalOrderPayload(lockId, event, section, breakdown);
 
-    // 👉 PREVENT coupon overuse BEFORE PayPal order creation
     if (couponCode) {
       const coupon = await getCoupon(couponCode);
 
-      // per-user limit
       const userUsage = await getUserCouponUsage(coupon._id, userId);
       if (userUsage && userUsage.usedCount >= coupon.perUserLimit) {
         throw new AppError(
@@ -130,7 +117,6 @@ export const paypalCreateOrder = async (ticketDetails, userId, couponCode) => {
         );
       }
 
-      // global usage limit (soft check)
       if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
         throw new AppError(
           STATUS_CODE.BAD_REQUEST,
@@ -230,7 +216,6 @@ export const paypalCaptureOrder = async (
 
     return order;
   } catch (error) {
-    console.log(error);
     await updateOrderStatus(orderID, ORDER_STATUS.ABANDONED);
     throw new AppError(
       error.response?.status || STATUS_CODE.SERVER_ERROR,

@@ -1,6 +1,7 @@
 import DateField from "./DateField";
 
-const CouponDateSection = ({ register, errors }) => {
+const CouponDateSection = ({ register, errors, getValues }) => {
+  console.log(errors)
   return (
     <>
       <DateField
@@ -11,7 +12,18 @@ const CouponDateSection = ({ register, errors }) => {
 
       <DateField
         label="Expiry Date"
-        {...register("expiryDate", { required: "Expiry date is required" })}
+        {...register("expiryDate", {
+          required: "Expiry date is required",
+          validate: (value) => {
+            const startDate = getValues("startDate");
+            if (!startDate) return true;
+
+            return (
+              new Date(value) >= new Date(startDate) ||
+              "Expiry date must be same as or after start date"
+            );
+          },
+        })}
         error={errors.expiryDate?.message}
       />
     </>

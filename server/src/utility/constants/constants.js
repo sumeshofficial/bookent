@@ -174,6 +174,10 @@ export const ERRORS = {
     CODE: "COUPON_NOTFOUND",
     MSG: "Coupon not found or already deleted",
   },
+  COUPON_ALREADY_EXISTS: {
+    CODE: "COUPON_ALREADY_EXISTS",
+    MSG: "A coupon with this code already exists. Please use a different code.",
+  },
   COUPON_EXPIRED: {
     CODE: "COUPON_EXPIRED",
     MSG: "This coupon has expired and is no longer valid.",
@@ -201,6 +205,14 @@ export const ERRORS = {
   WALLET_TRANSACTION_FAILED: {
     CODE: "WALLET_TRANSACTION_FAILED",
     MSG: "Wallet transaction failed. Amount has not been deducted.",
+  },
+  EVENT_ALREADY_CANCELLED: {
+    CODE: "EVENT_ALREADY_CANCELLED",
+    MSG: "This event has already been cancelled and cannot be updated.",
+  },
+  EVENT_ALREADY_COMPLETED: {
+    CODE: "EVENT_ALREADY_COMPELTED",
+    MSG: "Completed events cannot be cancelled",
   },
 };
 
@@ -292,6 +304,7 @@ export const ORDER_STATUS = {
 };
 
 export const REFUND_STATUS = {
+  NOT_REQUIRED: "NOT_REQUIRED",
   COMPLETED: "COMPLETED",
   PENDING: "PENDING",
   FAILED: "FAILED",

@@ -92,6 +92,9 @@ const envSchema = z.object({
 
   // Clean Order Cron
   ORDER_CLEANUP_CRON: z.string().min(1),
+
+  // Refund Check Cron
+  REFUND_CHECK_CRON: z.string().min(1),
 });
 
 const result = envSchema.safeParse(process.env);

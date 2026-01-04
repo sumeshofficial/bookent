@@ -8,8 +8,15 @@ export const buildWalletTransactionQuery = ({
   fromDate,
   toDate,
 }) => {
+  const oppositeDirection =
+    transaction_direction === "DEBIT"
+      ? "CREDIT"
+      : transaction_direction === "CREDIT"
+        ? "DEBIT"
+        : null;
+
   const query = {
-    ...(transaction_direction ? { transaction_direction } : {}),
+    ...(oppositeDirection ? { transaction_direction: oppositeDirection } : {}),
     ...(status ? { status } : {}),
     ...(reason ? { reason } : {}),
   };

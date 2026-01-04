@@ -11,7 +11,12 @@ import {
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { deleteEvent, getEvent } from "../../services/organization";
+import {
+  cancelEvent,
+  deleteEvent,
+  getEvent,
+  updateEvent,
+} from "../../services/organization";
 import toast from "react-hot-toast";
 import { useModal } from "../../utils/constants";
 import { useSelector } from "react-redux";
@@ -92,6 +97,14 @@ const EventPreview = () => {
     });
   };
 
+  const onSubmit = async (data) => {
+    if (data.eventStatus === "Cancelled") {
+      await cancelEvent(eventData.slug, data);
+      return;
+    }
+    await updateEvent(eventData.slug, data);
+  };
+
   return (
     <div className="min-h-screen bg-white px-5 rounded-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-end overflow-visible relative z-99999">
@@ -102,14 +115,14 @@ const EventPreview = () => {
           </div>
         ) : (
           <div className="flex items-center gap-3 transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]">
-            <button
+            {eventData.eventStatus !== "Cancelled" && <button
               onClick={() =>
                 navigate(`/listmyshow/event/${eventData._id}/tickets/verify`)
               }
               className="px-4 py-2 rounded-md bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition"
             >
               Verify Tickets
-            </button>
+            </button>}
             <button
               onClick={() =>
                 navigate(`/listmyshow/event/${eventData.slug}/bookings`)
@@ -142,17 +155,35 @@ const EventPreview = () => {
 
               {menuOpen && (
                 <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-md z-99999">
-                  <button
-                    onClick={() => {
-                      navigate(
-                        `/listmyshow/organizer/${eventData.organizer}/event/${eventData.slug}/edit`
-                      );
-                      setMenuOpen((prev) => !prev);
-                    }}
-                    className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700"
-                  >
-                    Edit
-                  </button>
+                  {eventData.eventStatus !== "Cancelled" && (
+                    <>
+                      <button
+                        onClick={() => {
+                          navigate(
+                            `/listmyshow/organizer/${eventData.organizer}/event/${eventData.slug}/edit`
+                          );
+                          setMenuOpen((prev) => !prev);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          openModal("eventStatus-update", {
+                            closeModal,
+                            onSubmit,
+                            currentStatus: eventData.eventStatus,
+                            oldMatchDate: eventData.matchDate,
+                          });
+                          setMenuOpen((prev) => !prev);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700"
+                      >
+                        Update Status
+                      </button>
+                    </>
+                  )}
 
                   <button
                     onClick={() => {

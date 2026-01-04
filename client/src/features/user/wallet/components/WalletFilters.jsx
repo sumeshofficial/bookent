@@ -41,9 +41,8 @@ const WalletFilters = () => {
         className="border rounded-md px-3 py-2 text-sm"
       >
         <option value="">All Types</option>
-        <option value="SALE">Sale</option>
-        <option value="REFUND">Refund</option>
-        <option value="ADJUSTMENT">Adjustment</option>
+        <option value="CREDIT">Credit</option>
+        <option value="DEBIT">Debit</option>
       </select>
 
       <input

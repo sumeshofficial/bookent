@@ -14,8 +14,6 @@ export const verifyTicket = async ({ qrData, eventId, userId }) => {
     userId: qrUserId,
   } = await verifyJWT(qrData);
 
-  console.log(orderId, eventId, userId);
-
   validateEventMatch({ qrEventId, eventId });
 
   const event = await validateOrganizerAndEvent({

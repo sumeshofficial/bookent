@@ -8,6 +8,7 @@ const WalletTable = ({ transactions, meta }) => {
         <thead className="bg-gray-50 text-left">
           <tr>
             <th className="p-3">Date</th>
+            <th className="p-3">Transaction Id</th>
             <th className="p-3">Reason</th>
             <th className="p-3">Type</th>
             <th className="p-3">Amount</th>
@@ -29,7 +30,8 @@ const WalletTable = ({ transactions, meta }) => {
                 <td className="p-3">
                   {new Date(tx.createdAt).toLocaleDateString()}
                 </td>
-                <td className="p-3">{tx.reason}</td>
+                <td className="p-3">{tx._id}</td>
+                <td className="p-3">{tx.type}</td>
                 <td
                   className={`p-3 font-medium ${
                     tx.display_direction === WALLET_DIRECTION.CREDIT

@@ -16,7 +16,7 @@ export const useCreateCoupon = () => {
 
     onError: (error) => {
       const message =
-        error?.response?.data?.message ||
+        error?.response?.data?.error.message ||
         "Failed to create coupon";
 
       toast.error(message);

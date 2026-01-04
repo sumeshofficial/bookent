@@ -7,14 +7,13 @@ const BookingTable = ({ bookings, meta }) => {
       <table className="min-w-full text-sm">
         <thead className="bg-gray-100 text-gray-700">
           <tr>
+            <th className="px-4 py-3 text-left">OrderId</th>
             <th className="px-4 py-3 text-left">Event</th>
             <th className="px-4 py-3 text-left">Date & Time</th>
             <th className="px-4 py-3 text-left">Seat</th>
             <th className="px-4 py-3 text-left">Qty</th>
             <th className="px-4 py-3 text-left">Order Amount</th>
-            <th className="px-4 py-3 text-left">Booking Fee</th>
             <th className="px-4 py-3 text-left">Total Paid</th>
-            <th className="px-4 py-3 text-left">Payment</th>
             <th className="px-4 py-3 text-left">Status</th>
           </tr>
         </thead>

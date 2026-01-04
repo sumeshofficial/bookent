@@ -1,4 +1,4 @@
-import { findeEventByOrganizerIdAndEventId } from "../../../../repositories/organizer/event.repository.js";
+import { findEventByOrganizerIdAndEventId } from "../../../../repositories/organizer/event.repository.js";
 import { ERRORS } from "../../../../utility/constants/constants.js";
 import { STATUS_CODE } from "../../../../utility/constants/statusCode.js";
 import { AppError } from "../../../../utility/helpers.js";
@@ -15,7 +15,7 @@ export const validateOrganizerAndEvent = async ({ userId, eventId }) => {
     );
   }
 
-  const event = await findeEventByOrganizerIdAndEventId(organizer._id, eventId);
+  const event = await findEventByOrganizerIdAndEventId(organizer._id, eventId);
 
   if (!event) {
     throw new AppError(

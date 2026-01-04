@@ -5,7 +5,7 @@ export const generateOrderQr = (order) => {
   return jwt.sign(
     {
       orderId: order.orderId,
-      eventId: order.eventId,
+      eventId: order.eventId._id || order.eventDetails._id,
       userId: order.userId,
     },
     ENV.QR_DATA_JWT_SECRET,

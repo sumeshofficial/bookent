@@ -10,7 +10,8 @@ const TicketCard = ({ ticket }) => {
           <div className="flex-1 p-3 sm:p-4 md:p-6">
             <TicketHeader
               pricing={ticket.pricingBreakDown}
-              event={ticket.eventDetails}
+              eventDetails={ticket.eventDetails}
+              event={ticket.event}
               seat={ticket.seat}
               status={ticket.status}
               ticketId={ticket.orderId}

@@ -15,6 +15,7 @@ const CouponForm = ({ handleSubmit, coupon, onClose, isPending }) => {
     watch,
     setValue,
     reset,
+    getValues,
     formState: { errors },
   } = useForm({
     mode: "onTouched",
@@ -55,7 +56,7 @@ const CouponForm = ({ handleSubmit, coupon, onClose, isPending }) => {
 
       <CouponLimitsSection register={register} errors={errors} />
 
-      <CouponDateSection register={register} errors={errors} />
+      <CouponDateSection register={register} errors={errors} getValues={getValues} />
 
       <CouponStatusSection isActive={isActive} setValue={setValue} />
 

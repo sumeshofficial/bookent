@@ -53,9 +53,6 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
 
   const isSoldOut = availableTickets <= 0;
   const isCancelled = event?.eventStatus === "Cancelled";
-  const isPostponed = event?.postponed?.isPostponed;
-  const isNotLive = event?.eventStatus !== "Published";
-  const isComingSoon = event?.eventStatus === "ComingSoon";
   const matchDateTime = new Date(`${matchDate}T${matchTime}`);
   const bookingCutoff = new Date(matchDateTime.getTime() - 30 * 60000);
   const isCutoffPassed = new Date() > bookingCutoff;
@@ -63,10 +60,8 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
   const disableBooking =
     isSoldOut ||
     isCancelled ||
-    isPostponed ||
-    isNotLive ||
-    isCutoffPassed ||
-    isComingSoon;
+    isCutoffPassed;
+
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8 transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]">
       <div className="relative pb-10">
@@ -203,14 +198,10 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
                       : "bg-red-500 text-white hover:bg-red-600"
                   }`}
                 >
-                  {isComingSoon
-                    ? "Coming Soon"
-                    : isSoldOut
+                  {isSoldOut
                     ? "Sold Out"
                     : isCancelled
                     ? "Cancelled"
-                    : isPostponed
-                    ? "Postponed"
                     : "Book Now"}
                 </button>
               </div>

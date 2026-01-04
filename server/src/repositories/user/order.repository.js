@@ -3,7 +3,7 @@ import Order from "../../models/order.model.js";
 export const getOrderForPaypal = async (paypalOrderId, session = null) => {
   return Order.findOne({ paypalOrderId }, null, {
     session,
-  });
+  }).populate("eventId");
 };
 
 export const createOrder = async (data, session) => {
@@ -19,7 +19,7 @@ export const updateOrder = async (orderId, payload, session) => {
   return await Order.findOneAndUpdate({ _id: orderId }, payload, {
     new: true,
     session,
-  });
+  }).populate("eventId");
 };
 
 export const getOrdersWithUserId = async (
@@ -36,6 +36,17 @@ export const getOrdersWithUserId = async (
   const result = await Order.aggregate([
     { $match: query },
     { $sort: sortQuery },
+
+    {
+      $lookup: {
+        from: "events",
+        localField: "eventId",
+        foreignField: "_id",
+        as: "event",
+      },
+    },
+    { $unwind: "$event" },
+
     {
       $facet: {
         data: [{ $skip: skip }, { $limit: limit }],
@@ -59,5 +70,5 @@ export const getOrdersWithUserId = async (
 };
 
 export const getOrder = async (orderId, userId) => {
-  return Order.findOne({ orderId, userId });
+  return Order.findOne({ orderId, userId }).populate("eventId");
 };

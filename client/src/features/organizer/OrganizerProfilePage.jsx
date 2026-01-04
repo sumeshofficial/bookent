@@ -196,19 +196,37 @@ const OrganizerProfilePage = () => {
     otp,
     purpose = "email-verify"
   ) => {
+    // Validation
+    if (!email) {
+      return toast.error("Email is required for verification");
+    }
+
+    if (!otp) {
+      return toast.error("OTP is required");
+    }
+
+    if (!/^[0-9]{4,6}$/.test(otp)) {
+      return toast.error("OTP must be 4–6 digits");
+    }
+
     try {
       const data = {
         email,
         otp,
         purpose,
       };
+
       await verifyOtp(data);
+
       setIsEmailVerified(true);
       setEmailOtpSent(false);
+      setOtp("");
       toast.dismiss();
       toast.success("Email verified successfully");
     } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(
+        error?.response?.data?.error?.message || "Invalid or expired OTP"
+      );
     }
   };
 
@@ -332,10 +350,15 @@ const OrganizerProfilePage = () => {
                       <div className="flex justify-end items-center gap-3">
                         <button
                           type="button"
+                          disabled={!/^[0-9]{4,6}$/.test(otp)}
                           onClick={() =>
                             handleOtpVerification(watch("email"), otp)
                           }
-                          className="px-4 py-2 bg-green-600 text-white font-medium rounded-lg shadow hover:bg-green-700 transition"
+                          className={`px-4 py-2 font-medium rounded-lg shadow transition ${
+                            /^[0-9]{4,6}$/.test(otp)
+                              ? "bg-green-600 text-white hover:bg-green-700"
+                              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          }`}
                         >
                           Verify
                         </button>
