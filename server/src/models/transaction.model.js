@@ -81,9 +81,15 @@ const transactionSchema = new mongoose.Schema(
       default: null,
     },
 
+    initiated_by_model: {
+      type: String,
+      enum: [MONGO_SCHEMA.USER, MONGO_SCHEMA.ORGANIZER],
+      default: MONGO_SCHEMA.USER,
+    },
+
     initiated_by: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: MONGO_SCHEMA.USER,
+      refPath: "initiated_by_model",
       required: true,
     },
 
@@ -111,6 +117,8 @@ const transactionSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+transactionSchema.index({ "metadata.eventId": 1 });
 
 const Transaction = mongoose.model(MONGO_SCHEMA.TRANACTION, transactionSchema);
 

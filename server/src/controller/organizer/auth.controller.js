@@ -7,14 +7,15 @@ import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Register Organizer
 export const organizerAccountRegister = async (req, res) => {
-  const { userId, organizationDetails, bankAccountDetails } = req.body;
+  const { userId, organizationDetails, bankAccountDetails, paypalEmail } =
+    req.body;
   try {
     if (
       !userId ||
+      !paypalEmail ||
       !organizationDetails?.name ||
       !organizationDetails?.address ||
-      !organizationDetails?.state ||
-      !bankAccountDetails?.accountNumber
+      !organizationDetails?.state
     ) {
       return res.status(statusCode.missingField).json({
         success: false,
@@ -22,13 +23,14 @@ export const organizerAccountRegister = async (req, res) => {
       });
     }
 
-    const user = findUserById(userId);
+    const user = await findUserById(userId);
 
     const organization = await createOrganizer({
       userId,
       fullname: user.fullname,
       email: user.email,
       profileImage: user.profileImage,
+      paypalEmail,
       organizationDetails,
       bankAccountDetails,
     });

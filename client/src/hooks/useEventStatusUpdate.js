@@ -30,12 +30,10 @@ const useEventStatusUpdate = (currentStatus, oldMatchDateFromEvent) => {
   const isStatusAllowed = useMemo(() => {
     if (!status) return false;
 
+    // Draft → Published
     if (currentStatus === "Draft" && status === "Published") return true;
 
-    // Allow same status (no-op edit)
-    if (currentStatus === status) return true;
-
-    // Published → Postpone / Cancelled
+    // Published / Postpone → Postpone or Cancelled
     if (
       (currentStatus === "Published" || currentStatus === "Postpone") &&
       (status === "Postpone" || status === "Cancelled")
@@ -79,10 +77,8 @@ const useEventStatusUpdate = (currentStatus, oldMatchDateFromEvent) => {
 
   const isFormValid = isStatusAllowed && isPostponeValid && isCancelValid;
 
-  // Compute error message
   const error = postponeError || cancelError || "";
 
-  // Build payload for API
   const buildPayload = () => {
     if (!isFormValid) return null;
 

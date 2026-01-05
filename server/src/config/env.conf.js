@@ -95,6 +95,15 @@ const envSchema = z.object({
 
   // Refund Check Cron
   REFUND_CHECK_CRON: z.string().min(1),
+
+  // Event Check Cron
+  EVENT_CHECK_CRON: z.string().min(1),
+
+  // Payout Check Cron
+  PAYOUT_CHECK_CRON: z.string().min(1),
+
+  // Paypal Base URL
+  PAYPAL_API_BASE: z.string().min(1),
 });
 
 const result = envSchema.safeParse(process.env);

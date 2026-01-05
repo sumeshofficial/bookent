@@ -79,6 +79,7 @@ const OrganizerProfilePage = () => {
       accountType: organizer.bankAccountDetails.accountType,
       bankName: organizer.bankAccountDetails.bankName,
       ifsc: organizer.bankAccountDetails.ifsc,
+      paypalEmail: organizer.paypalEmail || "",
     },
   });
 
@@ -116,6 +117,7 @@ const OrganizerProfilePage = () => {
       accountType: organizer.bankAccountDetails.accountType,
       bankName: organizer.bankAccountDetails.bankName,
       ifsc: organizer.bankAccountDetails.ifsc,
+      paypalEmail: organizer.paypalEmail || "",
     });
   }, [organizer, reset]);
 
@@ -144,6 +146,10 @@ const OrganizerProfilePage = () => {
       if (dirtyFields.address)
         updated.organizationDetails.address = data.address;
       if (dirtyFields.state) updated.organizationDetails.state = data.state;
+    }
+
+    if (dirtyFields.paypalEmail) {
+      updated.paypalEmail = data.paypalEmail;
     }
 
     if (
@@ -232,6 +238,7 @@ const OrganizerProfilePage = () => {
 
   const onSubmit = (formdata) => {
     const updatedData = buildUpdatedPayload(dirtyFields, formdata);
+    console.log(updatedData)
     dispatch(
       updateOrganizerProfileData({
         ...updatedData,
@@ -452,6 +459,26 @@ const OrganizerProfilePage = () => {
                   {errors.state && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.state.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-600">PayPal Email</label>
+                  <input
+                    type="email"
+                    {...register("paypalEmail", {
+                      required: "PayPal email is required for payouts",
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "Invalid email format",
+                      },
+                    })}
+                    className="w-full mt-1 px-4 py-3 bg-gray-100 rounded-lg border"
+                  />
+                  {errors.paypalEmail && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.paypalEmail.message}
                     </p>
                   )}
                 </div>

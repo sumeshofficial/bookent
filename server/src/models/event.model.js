@@ -85,10 +85,32 @@ const eventSchema = new mongoose.Schema(
       ref: "Organizer",
       required: true,
     },
+    payoutStatus: {
+      type: String,
+      enum: ["NOT_ELIGIBLE", "PENDING", "COMPLETED", "FAILED"],
+      default: "NOT_ELIGIBLE",
+    },
+    payoutReference: {
+      type: String,
+      default: null,
+    },
+    payoutProcessedAt: {
+      type: Date,
+      default: null,
+    },
+    payoutFailureReason: {
+      type: String,
+      default: null,
+    },
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
+);
+
+eventSchema.index(
+  { eventStatus: 1, payoutStatus: 1 },
+  { partialFilterExpression: { eventStatus: "Completed" } }
 );
 
 const Event = mongoose.model("Event", eventSchema);

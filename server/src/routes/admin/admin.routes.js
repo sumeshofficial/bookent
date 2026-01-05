@@ -5,6 +5,7 @@ import walletRoutes from "./wallet.routes.js";
 import organizerRoutes from "./organizer.routes.js";
 import couponRoutes from "./coupon.routes.js";
 import eventRoutes from "./event.routes.js";
+import bannerRoutes from "./banner.routes.js";
 import { adminOnly } from "../../middlewares/admin/admin.middleware.js";
 import { protect } from "../../middlewares/common/auth.middleware.js";
 
@@ -16,5 +17,6 @@ adminRouter.use("/organizers", protect, adminOnly, organizerRoutes);
 adminRouter.use("/wallet", protect, adminOnly, walletRoutes);
 adminRouter.use("/coupons", protect, adminOnly, couponRoutes);
 adminRouter.use("/events", protect, adminOnly, eventRoutes);
+adminRouter.use("/banner", protect, adminOnly, bannerRoutes);
 
 export default adminRouter;

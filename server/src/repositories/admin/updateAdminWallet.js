@@ -3,7 +3,7 @@ import User from "../../models/user.model.js";
 export const updateAdminWallet = async (amount, session) => {
   const res = await User.updateOne(
     { role: "admin" },
-    { $inc: { wallet: amount.value } },
+    { $inc: { wallet: amount } },
     { session }
   );
 

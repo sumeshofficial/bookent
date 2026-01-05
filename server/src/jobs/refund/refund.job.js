@@ -7,10 +7,14 @@ import {
   REFUND_STATUS,
 } from "../../utility/constants/constants.js";
 import logger from "../../config/logger.js";
+import { updateAdminWallet } from "../../repositories/admin/updateAdminWallet.js";
 
 export const processRefund = async () => {
   logger.info("Refund job started");
-  const orders = await findAllOrders();
+  const query = {
+    refundStatus: REFUND_STATUS.PENDING,
+  };
+  const orders = await findAllOrders(query);
 
   for (const order of orders) {
     const session = await mongoose.startSession();
@@ -19,6 +23,7 @@ export const processRefund = async () => {
     try {
       const refundAmount = order.pricingBreakDown.orderAmount;
 
+      await updateAdminWallet(-refundAmount, session);
       await updateWallet(order, refundAmount, session);
 
       await createRefundTransaction({

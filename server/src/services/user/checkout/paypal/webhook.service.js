@@ -40,13 +40,11 @@ export const processPaypalCapture = async (capture, event) => {
 
       const payload = buildTransactionPayload(order, capture, event);
       await createMoneyTransaction(payload, session);
-      await updateAdminWallet(payload.net_amount, session);
+      await updateAdminWallet(payload.net_amount.value, session);
 
       await updateOrderStatus(order._id, ORDER_STATUS.PAID, session);
       await makeTicketSold(order.eventId, order.seat, session);
       const qrToken = generateOrderQr(order);
-
-      console.log(qrToken);
 
       const payloadForUpdate = {
         status: ORDER_STATUS.CONFIRMED,

@@ -14,5 +14,5 @@ export const processWalletPayment = async ({
   const txnPayload = buildWalletTransactionPayload(order);
   await createMoneyTransaction(txnPayload, session);
 
-  await updateAdminWallet(txnPayload.net_amount, session);
+  await updateAdminWallet(txnPayload.net_amount.value, session);
 };

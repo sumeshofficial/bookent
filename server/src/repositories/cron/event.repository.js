@@ -38,3 +38,7 @@ export const releaseReservedTickets = async (query, session) => {
     await order.save({ session });
   }
 };
+
+export const findEvents = async (query, session = null) => {
+  return Event.find(query).session(session);
+};

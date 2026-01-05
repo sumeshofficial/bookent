@@ -53,6 +53,7 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
         ...organizer,
         ...organizationDetails,
         ...bankAccountDetails,
+        paypalEmail: organizer.paypalEmail || "",
       });
     }
   }, [isRejected, organizer, stateList]);
@@ -68,6 +69,7 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
         accountType: watch("accountType"),
         bankName: watch("bankName"),
         bankIFSC: watch("bankIFSC"),
+        paypalEmail: watch("paypalEmail"),
       };
 
       const original = {
@@ -79,6 +81,7 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
         accountType: organizer.bankAccountDetails.accountType,
         bankName: organizer.bankAccountDetails.bankName,
         bankIFSC: organizer.bankAccountDetails.ifsc,
+        paypalEmail: organizer.paypalEmail,
       };
 
       const unchanged = JSON.stringify(current) === JSON.stringify(original);
@@ -130,6 +133,12 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
       updatedOrganizationDetails.state = data.state;
     }
 
+    // Paypal email change detection (correct)
+    let paypalEmailUpdated = false;
+    if (!isRejected || data.paypalEmail !== organizer?.paypalEmail) {
+      paypalEmailUpdated = true;
+    }
+
     if (!isRejected || data.beneficiaryName !== originalBank?.beneficiaryName) {
       updatedBankDetails.beneficiaryName = data.beneficiaryName;
     }
@@ -148,6 +157,11 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
 
     const payload = {
       userId: user._id,
+
+      ...(paypalEmailUpdated && {
+        paypalEmail: data.paypalEmail,
+      }),
+
       ...(Object.keys(updatedOrganizationDetails).length > 0 && {
         organizationDetails: {
           ...originalOrg,
@@ -312,6 +326,29 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
                     </p>
                   )}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  PayPal Email
+                </label>
+                <input
+                  type="email"
+                  {...register("paypalEmail", {
+                    required: "PayPal email is required for payouts",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Enter a valid email address",
+                    },
+                  })}
+                  placeholder="organizer@paypal.com"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-4 focus:ring-blue-300 focus:border-blue-500 outline-none transition-all duration-200"
+                />
+                {errors.paypalEmail && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.paypalEmail.message}
+                  </p>
+                )}
               </div>
             </div>
 

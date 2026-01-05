@@ -7,11 +7,13 @@ dotenv.config();
 // Create organizer
 export const createOrganizer = async ({
   userId,
+  paypalEmail,
   organizationDetails,
   bankAccountDetails,
 }) => {
   return Organizer.create({
     userId,
+    paypalEmail,
     organizationDetails,
     bankAccountDetails,
   });
@@ -157,6 +159,7 @@ export const deleteEventService = async (organizerId, eventId) => {
 
 // Update organizer profile
 export const updateOrganizerService = async ({ id, data }) => {
+  console.log(data)
   const updateFields = {};
 
   if (data.fullname) {
@@ -169,6 +172,10 @@ export const updateOrganizerService = async ({ id, data }) => {
 
   if (data.status) {
     updateFields.status = data.status;
+  }
+
+  if (data.paypalEmail) {
+    updateFields.paypalEmail = data.paypalEmail;
   }
 
   if (data.profileImage) {

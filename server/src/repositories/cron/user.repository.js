@@ -9,3 +9,7 @@ export const updateWallet = async (order, refundAmount, session) => {
     { session }
   );
 };
+
+export const findAdmin = async (session) => {
+  return User.findOne({ role: "admin" }).session(session);
+};

@@ -33,6 +33,10 @@ const organizerSchema = new mongoose.Schema(
     profileImage: String,
     organizationDetails: organizationDetailsSchema,
     bankAccountDetails: bankAccountDetailsSchema,
+    paypalEmail: {
+      type: String,
+      required: true,
+    },
     isVerified: {
       type: Boolean,
       default: false,
