@@ -1,9 +1,76 @@
-import { asyncHandler } from "../../utility/helpers.js";
+import {
+  createBanner,
+  deleteBanner,
+  getBanners,
+  updateBanner,
+} from "../../services/admin/banner.service.js";
+import { ERRORS } from "../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
+import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
-export const getBannerController = asyncHandler(async (req, res) => {});
+export const getBannersController = asyncHandler(async (req, res) => {
+  const {
+    page = 1,
+    limit = 10,
+    isActive,
+    search,
+    sortBy = "createdAt",
+    sortOrder = "desc",
+  } = req.query;
 
-export const createBannerController = asyncHandler(async (req, res) => {});
+  const data = await getBanners({
+    page,
+    limit,
+    isActive,
+    search,
+    sortBy,
+    sortOrder,
+  });
 
-export const updateBannerController = asyncHandler(async (req, res) => {});
+  sendResponse(res, data, STATUS_CODE.SUCCESS);
+});
 
-export const deleteBannerController = asyncHandler(async (req, res) => {});
+export const createBannerController = asyncHandler(async (req, res) => {
+  const payload = req.body;
+
+  const banner = createBanner(payload);
+
+  sendResponse(res, banner, STATUS_CODE.CREATED);
+});
+
+export const updateBannerController = asyncHandler(async (req, res) => {
+  const { bannerId } = req.params;
+  const { newData } = req.body;
+
+  if (!bannerId || !newData) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
+  }
+
+  const banner = updateBanner(bannerId, newData);
+
+  sendResponse(res, banner, STATUS_CODE.SUCCESS);
+});
+
+export const deleteBannerController = asyncHandler(async (req, res) => {
+  const { bannerId } = req.params;
+
+  if (!bannerId) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
+  }
+
+  await deleteBanner(bannerId);
+
+  sendResponse(
+    res,
+    { message: "Banner deleted successfully" },
+    STATUS_CODE.SUCCESS
+  );
+});

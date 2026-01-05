@@ -17,6 +17,7 @@ import ChangePassword from "../../features/user/profile/components/modal/changeP
 import CreateCoupon from "../../features/admin/coupons/components/modal/CreateCoupon";
 import WalletPaymentConfirmation from "../../features/user/payment/components/modal/WalletPaymentConfirmation";
 import EventStatusUpdate from "../../components/modal/EventStatusUpdate";
+import BannerFormModal from "../../features/admin/banner/components/BannerFormModal";
 
 const ModalManager = () => {
   const { modalType, modalData, closeModal } = useModal();
@@ -78,6 +79,9 @@ const ModalManager = () => {
       break;
     case "eventStatus-update":
       content = <EventStatusUpdate {...modalData} />;
+      break;
+    case "create-banner":
+      content = <BannerFormModal {...modalData} />;
       break;
     default:
       return null;

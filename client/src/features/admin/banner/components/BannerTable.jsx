@@ -1,0 +1,64 @@
+import BannerActions from "./BannerActions";
+
+const BannerTable = ({ banners, onDelete }) => {
+  return (
+    <div className="overflow-x-auto rounded-lg border bg-white">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-100 text-left">
+          <tr>
+            <th className="px-4 py-3 font-medium">Banner</th>
+            <th className="px-4 py-3 font-medium">Title</th>
+            <th className="px-4 py-3 font-medium">Status</th>
+            <th className="px-4 py-3 font-medium text-center">Order</th>
+            <th className="px-4 py-3 font-medium text-right">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody className="divide-y">
+          {banners.map((b) => (
+            <tr key={b._id} className="hover:bg-gray-50">
+              <td className="p-2">
+                {b.image && (
+                  <img
+                    src={b.image}
+                    alt="Desktop banner"
+                    className="h-12 w-[120px] rounded border object-cover"
+                  />
+                )}
+              </td>
+
+              <td className="px-4 py-3">
+                <div className="font-medium text-gray-900">
+                  {b.title || "-"}
+                </div>
+                <div className="text-xs text-gray-500">
+                  ID: {b._id.slice(-6)}
+                </div>
+              </td>
+
+              <td className="px-4 py-3">
+                {b.isActive ? (
+                  <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                    Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">
+                    Inactive
+                  </span>
+                )}
+              </td>
+
+              <td className="px-4 py-3 text-center font-medium">{b.order}</td>
+
+              <td className="px-4 py-3 text-right">
+                <BannerActions onDelete={() => onDelete(b._id)} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default BannerTable;

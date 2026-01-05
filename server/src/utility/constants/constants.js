@@ -214,6 +214,14 @@ export const ERRORS = {
     CODE: "EVENT_ALREADY_COMPELTED",
     MSG: "Completed events cannot be cancelled",
   },
+  BANNER_LIMIT_REACHED: {
+    CODE: "BANNER_LIMIT_REACHED",
+    MSG: "Maximum active banners limit reached.",
+  },
+  BANNER_NOT_FOUND: {
+    CODE: "BANNER_NOT_FOUND",
+    MSG: "Banner not found or already deleted",
+  },
 };
 
 // Response Messages

@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Cropper from "react-easy-crop";
 
-const CropImageModal = ({ image, onCropDone, onCropCancel, aspectRation = 4 / 3 }) => {
+const CropImageModal = ({
+  image,
+  onCropDone,
+  onCropCancel,
+  aspectRation = 4 / 3,
+}) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
 
@@ -26,8 +31,22 @@ const CropImageModal = ({ image, onCropDone, onCropCancel, aspectRation = 4 / 3 
       </div>
 
       <div className="self-end space-x-4">
-        <button type='button' className="bg-red-600 text-white sm:text-base text-[.7rem] px-2 py-1 rounded-sm" onClick={onCropCancel}>Cancel</button>
-        <button type='button' className="bg-violet-600 text-white sm:text-base text-[.7rem] px-2 py-1 rounded-sm" onClick={() =>{ onCropDone(croppedArea)}}>Done</button>
+        <button
+          type="button"
+          className="bg-red-600 text-white sm:text-base text-[.7rem] px-2 py-1 rounded-sm"
+          onClick={onCropCancel}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="bg-violet-600 text-white sm:text-base text-[.7rem] px-2 py-1 rounded-sm"
+          onClick={() => {
+            onCropDone(croppedArea);
+          }}
+        >
+          Done
+        </button>
       </div>
     </div>
   );
