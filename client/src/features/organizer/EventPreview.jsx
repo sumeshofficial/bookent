@@ -51,6 +51,9 @@ const EventPreview = () => {
   }, [error, navigate]);
 
   const eventData = data?.event;
+  const isEventLocked =
+    eventData?.eventStatus === "Completed" ||
+    eventData?.eventStatus === "Cancelled";
 
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleDateString("en-IN", {
@@ -115,14 +118,16 @@ const EventPreview = () => {
           </div>
         ) : (
           <div className="flex items-center gap-3 transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]">
-            {eventData.eventStatus !== "Cancelled" && <button
-              onClick={() =>
-                navigate(`/listmyshow/event/${eventData._id}/tickets/verify`)
-              }
-              className="px-4 py-2 rounded-md bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition"
-            >
-              Verify Tickets
-            </button>}
+            {!isEventLocked && (
+              <button
+                onClick={() =>
+                  navigate(`/listmyshow/event/${eventData._id}/tickets/verify`)
+                }
+                className="px-4 py-2 rounded-md bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition"
+              >
+                Verify Tickets
+              </button>
+            )}
             <button
               onClick={() =>
                 navigate(`/listmyshow/event/${eventData.slug}/bookings`)
@@ -132,75 +137,79 @@ const EventPreview = () => {
               Bookings
             </button>
 
-            <div className="relative z-9999">
-              <button
-                className="p-2 rounded-full hover:bg-gray-200 transition"
-                onClick={() => setMenuOpen((prev) => !prev)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-gray-700"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            {!isEventLocked && (
+              <div className="relative z-9999">
+                <button
+                  className="p-2 rounded-full hover:bg-gray-200 transition"
+                  onClick={() => setMenuOpen((prev) => !prev)}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 6.75a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM12 13.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM12 20.25a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-gray-700"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 6.75a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM12 13.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM12 20.25a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"
+                    />
+                  </svg>
+                </button>
 
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-md z-99999">
-                  {eventData.eventStatus !== "Cancelled" && (
-                    <>
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-md z-99999">
+                    {!isEventLocked && (
+                      <>
+                        <button
+                          onClick={() => {
+                            navigate(
+                              `/listmyshow/organizer/${eventData.organizer}/event/${eventData.slug}/edit`
+                            );
+                            setMenuOpen((prev) => !prev);
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            openModal("eventStatus-update", {
+                              closeModal,
+                              onSubmit,
+                              currentStatus: eventData.eventStatus,
+                              oldMatchDate: eventData.matchDate,
+                            });
+                            setMenuOpen((prev) => !prev);
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700"
+                        >
+                          Update Status
+                        </button>
+                      </>
+                    )}
+
+                    {!isEventLocked && (
                       <button
                         onClick={() => {
-                          navigate(
-                            `/listmyshow/organizer/${eventData.organizer}/event/${eventData.slug}/edit`
-                          );
-                          setMenuOpen((prev) => !prev);
-                        }}
-                        className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          openModal("eventStatus-update", {
+                          openModal("delete-confirmation", {
                             closeModal,
-                            onSubmit,
-                            currentStatus: eventData.eventStatus,
-                            oldMatchDate: eventData.matchDate,
+                            handleDelete,
+                            id: eventData._id,
                           });
                           setMenuOpen((prev) => !prev);
                         }}
-                        className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700"
+                        className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-700"
                       >
-                        Update Status
+                        Delete
                       </button>
-                    </>
-                  )}
-
-                  <button
-                    onClick={() => {
-                      openModal("delete-confirmation", {
-                        closeModal,
-                        handleDelete,
-                        id: eventData._id,
-                      });
-                      setMenuOpen((prev) => !prev);
-                    }}
-                    className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-700"
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
-            </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

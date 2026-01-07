@@ -274,6 +274,7 @@ export const finishEventEditController = async (req, res) => {
 
     if (
       data.event?.eventStatus === "Cancelled" ||
+      data.event?.eventStatus === "Completed" ||
       data.event?.cancelDetails?.isCancelled === true
     ) {
       throw new AppError(
@@ -567,6 +568,16 @@ export const deleteEventController = async (req, res) => {
         success: false,
         error: "Event not found",
       });
+    }
+    if (
+      event.eventStatus === "Cancelled" ||
+      event.eventStatus === "Completed"
+    ) {
+      throw new AppError(
+        STATUS_CODE.BAD_REQUEST,
+        ERRORS.EVENT_ALREADY_CANCELLED.CODE,
+        "Cannot delete a completed or cancelled event"
+      );
     }
 
     logger.info(`deleting event images eventId=${eventId}`);

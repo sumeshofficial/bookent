@@ -13,6 +13,7 @@ import Events from "../features/admin/events/Events";
 import Event from "../features/admin/event/Event";
 import UsersList from "../features/admin/users/UsersList";
 import Banner from "../features/admin/banner/Banner";
+import SalesReport from "../features/admin/sales/SalesReport";
 
 const adminRoutes = [
   {
@@ -32,6 +33,7 @@ const adminRoutes = [
           { path: "events", element: <Events /> },
           { path: "events/:slug", element: <Event /> },
           { path: "banner", element: <Banner /> },
+          { path: "sales", element: <SalesReport /> },
         ],
       },
       { path: "login", element: <AdminLogin /> },

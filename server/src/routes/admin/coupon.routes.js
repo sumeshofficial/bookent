@@ -4,7 +4,7 @@ import {
   deleteCouponController,
   getCouponsController,
   updateCouponController,
-} from "../../controller/admin/counpon.controller.js";
+} from "../../controller/admin/coupon.controller.js";
 import { validate } from "../../middlewares/common/validate.middleware.js";
 import { createCouponSchema } from "../../validation/coupon.validation.js";
 const router = express.Router();

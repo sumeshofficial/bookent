@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import debounce from "lodash.debounce";
-import {
-  STATUS_OPTIONS,
-  SORT_OPTIONS,
-} from "../constants/banner.constants";
+import { STATUS_OPTIONS, SORT_OPTIONS } from "../constants/banner.constants";
 
 const BannerFilters = ({ updateParam }) => {
   const [searchParams] = useSearchParams();
@@ -32,20 +29,20 @@ const BannerFilters = ({ updateParam }) => {
   }, [debouncedUpdateSearch]);
 
   return (
-    <div className="flex gap-3 mb-4">
+    <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:gap-4">
       <input
-        placeholder="Search title / subtitle"
-        className="border px-2 py-1"
+        placeholder="Search title"
+        className="border px-3 py-2 w-full sm:w-64"
         value={search}
         onChange={(e) => {
           const value = e.target.value;
           setSearch(value);
-          debouncedUpdateSearch(value); 
+          debouncedUpdateSearch(value);
         }}
       />
 
       <select
-        className="border px-2 py-1"
+        className="border px-3 py-2 w-full sm:w-auto"
         value={isActive}
         onChange={(e) => updateParam("isActive", e.target.value)}
       >
@@ -57,7 +54,7 @@ const BannerFilters = ({ updateParam }) => {
       </select>
 
       <select
-        className="border px-2 py-1"
+        className="border px-3 py-2 w-full sm:w-auto"
         value={sort}
         onChange={(e) => updateParam("sort", e.target.value)}
       >
