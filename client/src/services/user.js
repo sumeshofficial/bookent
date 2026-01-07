@@ -44,3 +44,9 @@ export const verifySeatLock = async (lockId, appliedCoupon) => {
 
   return res.data;
 };
+
+// services/user/banner.service.js
+export const getActiveBanners = async () => {
+  const { data } = await api.get("/user/banners");
+  return data;
+};

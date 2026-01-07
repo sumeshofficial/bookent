@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { updateUserProfile } from "../../app/userSlice";
 import useGeoLocation from "../../hooks/useGeoLocation";
-import { getEventsForUser } from "../../services/user";
+import { getActiveBanners, getEventsForUser } from "../../services/user";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 
@@ -19,6 +19,14 @@ const HomePage = () => {
     queryFn: getEventsForUser,
     onError: () => toast.error("Failed to load events"),
   });
+
+  const { data: bannerData, isLoading: bannerLoading } = useQuery({
+    queryKey: ["home-banners"],
+    queryFn: getActiveBanners,
+    onError: () => toast.error("Failed to load banners"),
+  });
+
+  console.log(bannerData);
 
   const recommendedEvents = data?.recommendedEvents || [];
   const trendingEvents = data?.trendingEvents || [];
@@ -42,7 +50,12 @@ const HomePage = () => {
       <Navbar />
 
       <main className="px-4 sm:px-8 lg:px-12 py-6 space-y-10">
-        <HeroCarousel />
+        {!bannerLoading && (
+          <HeroCarousel
+            banners={bannerData || []}
+            loading={bannerLoading}
+          />
+        )}
 
         {recommendedEvents.length > 0 && (
           <EventRow

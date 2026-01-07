@@ -1,36 +1,59 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import banner1 from "../../assets/FCG_ALN_Article_1180x500-1180x350.png";
-import banner2 from "../../assets/AFC_article_1180x500-1180x350.png";
 
-const slidesData = [banner1, banner2];
-
-const HeroCarousel = () => {
+const HeroCarousel = ({ banners = [], loading = false }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slides = [0, 1];
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+
+    return () => window.removeEventListener("resize", checkScreen);
   }, []);
+
+  useEffect(() => {
+    if (!banners.length) return;
+
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [banners.length]);
+
+  if (loading) {
+    return (
+      <div className="w-full h-[180px] sm:h-[350px] rounded-2xl bg-gray-200 animate-pulse" />
+    );
+  }
+
+  if (!banners.length) return null;
 
   return (
     <div className="relative w-full h-[180px] sm:h-[350px] rounded-2xl overflow-hidden shadow-2xl">
-      {slidesData.map((slide, index) => (
-        <img
-          key={index}
-          src={slide}
-          alt={`Slide ${index}`}
-          className={`absolute top-0 left-0 w-full h-full object-cover object-top transition-opacity duration-700 ${
-            currentSlide === index ? "opacity-100 z-1" : "opacity-0 z-0"
-          }`}
-        />
-      ))}
+      {banners.map((banner, index) => {
+        const imageSrc =
+          isMobile && banner.mobileImage ? banner.mobileImage : banner.image;
 
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
-        {slides.map((_, index) => (
+        return (
+          <img
+            key={banner._id}
+            src={imageSrc}
+            alt={banner.title || `Banner ${index + 1}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+              currentSlide === index ? "opacity-100 z-10" : "opacity-0 z-0"
+            }`}
+          />
+        );
+      })}
+
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+        {banners.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
@@ -43,17 +66,20 @@ const HeroCarousel = () => {
 
       <button
         onClick={() =>
-          setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
+          setCurrentSlide(
+            (prev) => (prev - 1 + banners.length) % banners.length
+          )
         }
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10"
+        className="absolute left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 z-20"
       >
-        <ChevronLeft className="w-6 h-6 text-white" />
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
       </button>
+
       <button
-        onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors z-10"
+        onClick={() => setCurrentSlide((prev) => (prev + 1) % banners.length)}
+        className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 z-20"
       >
-        <ChevronRight className="w-6 h-6 text-white" />
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
       </button>
     </div>
   );
