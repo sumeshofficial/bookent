@@ -18,12 +18,6 @@ const bannerSchema = new mongoose.Schema(
       default: null,
     },
 
-    order: {
-      type: Number,
-      default: 0,
-      index: true,
-    },
-
     isActive: {
       type: Boolean,
       default: true,

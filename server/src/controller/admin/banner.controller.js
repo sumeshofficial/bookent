@@ -33,14 +33,14 @@ export const getBannersController = asyncHandler(async (req, res) => {
 export const createBannerController = asyncHandler(async (req, res) => {
   const payload = req.body;
 
-  const banner = createBanner(payload);
+  const banner = await createBanner(payload);
 
   sendResponse(res, banner, STATUS_CODE.CREATED);
 });
 
 export const updateBannerController = asyncHandler(async (req, res) => {
   const { bannerId } = req.params;
-  const { newData } = req.body;
+  const newData = req.body;
 
   if (!bannerId || !newData) {
     throw new AppError(
@@ -50,7 +50,7 @@ export const updateBannerController = asyncHandler(async (req, res) => {
     );
   }
 
-  const banner = updateBanner(bannerId, newData);
+  const banner = await updateBanner(bannerId, newData);
 
   sendResponse(res, banner, STATUS_CODE.SUCCESS);
 });

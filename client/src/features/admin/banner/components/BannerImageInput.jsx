@@ -4,13 +4,7 @@ import {
   validateImageRatio,
 } from "../utils/imageValidation";
 
-
-const ALLOWED_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/jpg",
-  "image/webp",
-];
+const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
 const getDimensionHint = (ratio) => {
   if (!ratio) return null;
@@ -67,7 +61,7 @@ const BannerImageInput = ({
 
           if (!ALLOWED_TYPES.includes(file.type)) {
             input.value = "";
-            setValue(name, null);
+            setValue(name, null, { shouldDirty: false });
             setError(name, { type: "manual", message: "Invalid image type" });
             bumpKey();
             setPreview(null);
@@ -76,7 +70,7 @@ const BannerImageInput = ({
 
           if (file.size > MAX_IMAGE_SIZE_BYTES) {
             input.value = "";
-            setValue(name, null);
+            setValue(name, null, { shouldDirty: false });
             setError(name, {
               type: "manual",
               message: "Image size must be under 2MB",
@@ -89,7 +83,7 @@ const BannerImageInput = ({
           const ratioResult = await validateImageRatio(file, ratio);
           if (ratioResult !== true) {
             input.value = "";
-            setValue(name, null);
+            setValue(name, null, { shouldDirty: false });
             setError(name, {
               type: "manual",
               message: ratioResult,
@@ -100,19 +94,18 @@ const BannerImageInput = ({
           }
 
           clearErrors(name);
-          setPreview(URL.createObjectURL(file));
+          setPreview((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return URL.createObjectURL(file);
+          });
         }}
       />
 
-      <p className="text-xs text-gray-500 mt-1">
-        {getDimensionHint(ratio)}
-      </p>
+      <p className="text-xs text-gray-500 mt-1">{getDimensionHint(ratio)}</p>
 
       <ImagePreview src={preview} alt={label} />
 
-      {error && (
-        <p className="text-red-500 text-xs mt-1">{error.message}</p>
-      )}
+      {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
     </div>
   );
 };

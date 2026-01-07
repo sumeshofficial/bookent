@@ -8,6 +8,7 @@ import { createOrganizerPayout } from "../services/organizer/payout.service.js";
 import { createPayoutTransaction } from "../repositories/cron/transaction.repository.js";
 import { findAdmin } from "../repositories/cron/user.repository.js";
 import { updateAdminWallet } from "../repositories/admin/updateAdminWallet.js";
+import { ORDER_STATUS } from "../utility/constants/constants.js";
 
 cron.schedule(ENV.PAYOUT_CHECK_CRON, async () => {
   logger.info("Organizer payout cron started");
@@ -29,12 +30,12 @@ cron.schedule(ENV.PAYOUT_CHECK_CRON, async () => {
     for (const event of events) {
       logger.info(`Processing payout for event ${event._id}`);
 
-      const query = {
+      const orderQuery = {
         eventId: event._id,
-        status: "CONFIRMED",
+        status: ORDER_STATUS.CONFIRMED,
       };
 
-      const orders = await findAllOrders(query, session);
+      const orders = await findAllOrders(orderQuery, session);
 
       if (!orders.length) {
         logger.warn(`No confirmed orders for event ${event._id}`);
@@ -81,6 +82,7 @@ cron.schedule(ENV.PAYOUT_CHECK_CRON, async () => {
     session.endSession();
     logger.info("Organizer payout cron finished");
   } catch (error) {
+    console.log(error);
     logger.error(
       `Payout failed for event ${error?.event?._id || "unknown"}`,
       error

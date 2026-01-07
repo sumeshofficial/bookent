@@ -11,8 +11,6 @@ export const buildEventFilter = ({
 }) => {
   const query = {};
 
-  console.log(status)
-
   if (status && status !== "All") {
     query.eventStatus = status;
   }

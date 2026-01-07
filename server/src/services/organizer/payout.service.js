@@ -17,7 +17,7 @@ export const createOrganizerPayout = async ({
     throw new Error("Organizer PayPal email not configured");
   }
 
-  const access_token = getPayPalAccessToken();
+  const access_token = await getPayPalAccessToken();
 
   const payload = {
     sender_batch_header: {
@@ -50,8 +50,6 @@ export const createOrganizerPayout = async ({
       },
     }
   );
-
-  console.log(response);
 
   if (!response.data?.batch_header?.payout_batch_id) {
     logger.error("Invalid PayPal payout response", response.data);

@@ -1,6 +1,8 @@
+import { useModal } from "../../../../utils/constants";
 import BannerActions from "./BannerActions";
 
-const BannerTable = ({ banners, onDelete }) => {
+const BannerTable = ({ banners, onDelete, onEdit, isUpdating }) => {
+  const { openModal, closeModal } = useModal();
   return (
     <div className="overflow-x-auto rounded-lg border bg-white">
       <table className="w-full text-sm">
@@ -9,7 +11,6 @@ const BannerTable = ({ banners, onDelete }) => {
             <th className="px-4 py-3 font-medium">Banner</th>
             <th className="px-4 py-3 font-medium">Title</th>
             <th className="px-4 py-3 font-medium">Status</th>
-            <th className="px-4 py-3 font-medium text-center">Order</th>
             <th className="px-4 py-3 font-medium text-right">Actions</th>
           </tr>
         </thead>
@@ -48,10 +49,33 @@ const BannerTable = ({ banners, onDelete }) => {
                 )}
               </td>
 
-              <td className="px-4 py-3 text-center font-medium">{b.order}</td>
-
               <td className="px-4 py-3 text-right">
-                <BannerActions onDelete={() => onDelete(b._id)} />
+                <BannerActions
+                  onDelete={() =>
+                    openModal("delete-confirmation", {
+                      title: "Delete Confirmation",
+                      message: "Are you sure you want to delete this banner?",
+                      handleDelete: onDelete,
+                      closeModal,
+                      id: b._id,
+                    })
+                  }
+                  onEdit={() =>
+                    openModal("create-banner", {
+                      onClose: () => closeModal(),
+                      onSubmit: onEdit,
+                      isCreating: isUpdating,
+                      initialData: {
+                        _id: b._id,
+                        title: b.title,
+                        isActive: b.isActive,
+                        image: b.image,
+                        mobileImage: b.mobileImage
+                      },
+                      isEdit: true
+                    })
+                  }
+                />
               </td>
             </tr>
           ))}

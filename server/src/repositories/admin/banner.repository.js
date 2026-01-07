@@ -21,6 +21,13 @@ export const updateBannerRepo = async (bannerId, newData) => {
   );
 };
 
+export const fetchBanner = async (bannerId) => {
+  return Banner.findOne({
+    _id: bannerId,
+    isDeleted: false,
+  }).lean();
+};
+
 export const fetchBanners = async ({
   page = 1,
   limit = 10,

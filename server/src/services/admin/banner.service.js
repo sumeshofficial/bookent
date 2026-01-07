@@ -1,36 +1,61 @@
 import {
-  countActiveBannersRepo,
   createBannerRepo,
   deleteBannerRepo,
+  fetchBanner,
   fetchBanners,
   updateBannerRepo,
 } from "../../repositories/admin/banner.repository.js";
 import { ERRORS } from "../../utility/constants/constants.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { AppError } from "../../utility/helpers.js";
-import { updateBannersHelper } from "./helper/banner.helper.js";
-
-const MAX_ACTIVE_BANNERS = 5;
+import { deleteObject, getObjectURL } from "../s3.service.js";
+import {
+  bannerMaxLimitCheck,
+  updateBannersHelper,
+} from "./helper/banner.helper.js";
 
 export const createBanner = async (payload) => {
   if (payload.isActive === true) {
-    const activeCount = await countActiveBannersRepo();
-
-    if (activeCount >= MAX_ACTIVE_BANNERS) {
-      throw new AppError(
-        STATUS_CODE.BAD_REQUEST,
-        ERRORS.BANNER_LIMIT_REACHED.CODE,
-        `${ERRORS.BANNER_LIMIT_REACHED.MSG} Maximum allowed: ${MAX_ACTIVE_BANNERS}.`
-      );
-    }
+    await bannerMaxLimitCheck();
   }
 
   const banner = await createBannerRepo(payload);
 
-  return banner;
+  let image = banner.image;
+  let mobileImage = banner.mobileImage;
+
+  if (banner.image) {
+    image = await getObjectURL(banner.image);
+  }
+
+  if (banner.mobileImage) {
+    mobileImage = await getObjectURL(banner.mobileImage);
+  }
+
+  return {
+    ...banner,
+    image,
+    mobileImage,
+  };
 };
 
 export const updateBanner = async (bannerId, newData) => {
+  if (newData.isActive === true) {
+    await bannerMaxLimitCheck();
+  }
+
+  const banner = await fetchBanner(bannerId);
+
+  if (newData?.image) {
+    await deleteObject(banner.image);
+  }
+
+  if (newData?.mobileImage) {
+    if (banner?.mobileImage) {
+      await deleteObject(banner.mobileImage);
+    }
+  }
+
   const updatedBanner = await updateBannerRepo(bannerId, newData);
 
   if (!updatedBanner) {

@@ -63,7 +63,7 @@ export const createPayoutTransaction = async ({
   payoutAmount,
   event,
   session,
-  adminId
+  adminId,
 }) => {
   await Transaction.create(
     [

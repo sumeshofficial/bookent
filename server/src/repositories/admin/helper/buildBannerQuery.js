@@ -10,8 +10,10 @@ export const buildBannerFilters = ({
     isDeleted: false,
   };
 
-  if (typeof isActive === "boolean") {
-    query.isActive = isActive;
+  if (isActive === "true") {
+    query.isActive = true;
+  } else if (isActive === "false") {
+    query.isActive = false;
   }
 
   if (search) {
