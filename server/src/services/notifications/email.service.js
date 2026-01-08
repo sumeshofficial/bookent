@@ -27,8 +27,7 @@ export const sendEmail = async ({ to, subject, html, attachments = [] }) => {
     attachments,
   };
 
-  const info = await transporter.sendMail(mailOptions);
-  console.log("Mail sent:", info.response, info.messageId);
+  await transporter.sendMail(mailOptions);
 };
 
 // OTP Template

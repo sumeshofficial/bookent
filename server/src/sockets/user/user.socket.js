@@ -7,16 +7,13 @@ import {
 import { SOCKET_EVENTS } from "../../utility/constants/constants.js";
 
 export default function userSocketHandlers(io, socket) {
-
   socket.on(SOCKET_EVENTS.JOIN_EVENT, async ({ eventId }) => {
     if (socket.currentEvent && socket.currentEvent !== eventId) {
       socket.leave(socket.currentEvent);
-      console.log("Left previous room:", socket.currentEvent);
     }
 
     if (!socket.rooms.has(eventId)) {
       socket.join(eventId);
-      console.log("Joined room:", eventId);
     }
 
     const existingLocks = await getAllCurrentLocks(eventId);
@@ -24,10 +21,6 @@ export default function userSocketHandlers(io, socket) {
     socket.emit(SOCKET_EVENTS.SEAT_UPDATE_BULK, existingLocks);
 
     socket.currentEvent = eventId;
-
-    console.log("ROOMS NOW:", [...socket.rooms]);
-
-
   });
 
   // 2. LOCK SECTION

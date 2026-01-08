@@ -23,12 +23,6 @@ export const generateRefreshToken = async ({ userId, role }) => {
     role === "user" ? userRefreshTokenExpiresIn : adminRefreshTokenExpiresIn;
 
   const tokenId = uuidv4();
-  console.log(
-    expiresIn,
-    { userId, role, tokenId },
-    "expiresIn",
-    ENV.JWT_REFRESH_SECRET
-  );
   const token = jwt.sign({ userId, role, tokenId }, ENV.JWT_REFRESH_SECRET, {
     expiresIn,
   });

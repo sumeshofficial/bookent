@@ -110,7 +110,6 @@ export const fetchEventsWithOrganizerId = async ({
   skip,
   limit,
 }) => {
-  console.log(limit);
   const events = await Event.find(query)
     .sort(sortOption)
     .skip(skip)
@@ -159,7 +158,6 @@ export const deleteEventService = async (organizerId, eventId) => {
 
 // Update organizer profile
 export const updateOrganizerService = async ({ id, data }) => {
-  console.log(data)
   const updateFields = {};
 
   if (data.fullname) {

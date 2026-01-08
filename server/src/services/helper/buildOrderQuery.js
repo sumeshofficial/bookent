@@ -1,4 +1,4 @@
-import { ORDER_STATUS } from "../../../utility/constants/constants.js";
+import { ORDER_STATUS } from "../../utility/constants/constants.js";
 
 export const buildOrdersQuery = ({
   page = 1,
@@ -6,7 +6,7 @@ export const buildOrdersQuery = ({
   sort = "latest",
   fromDate,
   toDate,
-  preset,
+  preset = "month",
   isExport = false,
 }) => {
   const query = {
@@ -36,25 +36,23 @@ export const buildOrdersQuery = ({
 
     switch (preset) {
       case "day":
-        start = new Date();
+        start = new Date(now);
         start.setHours(0, 0, 0, 0);
         break;
 
       case "week":
-        start = new Date();
-        start.setDate(now.getDate() - 7);
+        start = new Date(now);
+        start.setDate(now.getDate() - 6);
         start.setHours(0, 0, 0, 0);
         break;
 
       case "month":
-        start = new Date();
-        start.setMonth(now.getMonth() - 1);
+        start = new Date(now.getFullYear(), now.getMonth(), 1);
         start.setHours(0, 0, 0, 0);
         break;
 
       case "year":
-        start = new Date();
-        start.setFullYear(now.getFullYear() - 1);
+        start = new Date(now.getFullYear(), 0, 1);
         start.setHours(0, 0, 0, 0);
         break;
 

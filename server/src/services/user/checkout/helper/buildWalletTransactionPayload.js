@@ -8,7 +8,6 @@ import {
 } from "../../../../utility/constants/constants.js";
 
 export const buildWalletTransactionPayload = (order) => {
-  console.log(order);
   return {
     order_id: order._id,
     paymentMethod: PAYMENT_METHOD.WALLET,

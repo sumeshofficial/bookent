@@ -82,7 +82,6 @@ cron.schedule(ENV.PAYOUT_CHECK_CRON, async () => {
     session.endSession();
     logger.info("Organizer payout cron finished");
   } catch (error) {
-    console.log(error);
     logger.error(
       `Payout failed for event ${error?.event?._id || "unknown"}`,
       error

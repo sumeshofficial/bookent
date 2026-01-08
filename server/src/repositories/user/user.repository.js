@@ -29,7 +29,6 @@ export const findUserByEmail = async (email) => {
 // Find user
 export const finduser = async (email) => {
   const user = await User.findOne({ email }).select("+password");
-  console.log(user);
   return user;
 };
 

@@ -20,7 +20,7 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
       icon: Grid,
       path: "/listmyshow/dashboard",
     },
-    { id: "events", label: "Events", icon: Package, hasDropdown: true },
+    { id: "events", label: "Events/Stadiums", icon: Package, hasDropdown: true },
     { id: "sales", label: "Sales", icon: CreditCard, path: "/listmyshow/sales" },
   ];
 

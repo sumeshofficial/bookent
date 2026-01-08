@@ -57,3 +57,8 @@ export const countEventsByOrganizerForDate = async ({
   });
 };
 
+export const findEvents = async (organizerId) => {
+  return Event.find({
+    organizer: organizerId,
+  });
+};

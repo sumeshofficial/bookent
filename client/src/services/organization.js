@@ -148,7 +148,6 @@ export const updateEvent = async (eventSlug, data) => {
 
 // Update event
 export const cancelEvent = async (eventSlug, data) => {
-  console.log(data)
   const res = await api.patch(`/organizer/events/${eventSlug}/cancel`, data);
   return res.data;
 };

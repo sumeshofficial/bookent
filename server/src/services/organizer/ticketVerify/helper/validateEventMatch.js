@@ -3,7 +3,6 @@ import { STATUS_CODE } from "../../../../utility/constants/statusCode.js";
 import { AppError } from "../../../../utility/helpers.js";
 
 export const validateEventMatch = ({ qrEventId, eventId }) => {
-  console.log(qrEventId, eventId);
   if (qrEventId !== eventId) {
     throw new AppError(
       STATUS_CODE.FORBIDDEN,

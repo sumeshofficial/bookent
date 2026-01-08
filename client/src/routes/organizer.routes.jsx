@@ -13,6 +13,7 @@ import Stadiums from "../features/organizer/Stadiums";
 import StadiumDetails from "../features/organizer/StadiumDetails";
 import VerifyTicket from "../features/organizer/verifyTicket/VerifyTicket";
 import BookingHistory from "../features/organizer/bookings/BookingHistory";
+import SalesReport from "../features/organizer/sales/SalesReport";
 
 const organizerRoutes = [
   {
@@ -53,6 +54,10 @@ const organizerRoutes = [
           {
             path: "event/:eventSlug/bookings",
             element: <BookingHistory />,
+          },
+          {
+            path: "sales",
+            element: <SalesReport />,
           },
         ],
       },

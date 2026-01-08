@@ -1,4 +1,4 @@
-import { buildOrdersQuery } from "./helper/buildOrderQuery.js";
+import { buildOrdersQuery } from "../helper/buildOrderQuery.js";
 import { exportSalesPDF } from "./helper/exportPdf.js";
 import { exportSalesExcel } from "./helper/exportExcel.js";
 import { fetchSalesReport } from "../../repositories/admin/order.repository.js";

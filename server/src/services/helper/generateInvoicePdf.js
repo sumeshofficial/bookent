@@ -26,7 +26,6 @@ export const generateInvoicePDF = async ({ order, user }) => {
         align: "right",
       });
     } catch (err) {
-      console.log(err)
       doc
         .fontSize(14)
         .font("Helvetica-Bold")

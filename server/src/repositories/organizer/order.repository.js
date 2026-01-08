@@ -1,4 +1,5 @@
 import Order from "../../models/order.model.js";
+import { buildSalesReportPipeline } from "./helper/buildSalesReportPipeline.js";
 import { orderQueryBuilder } from "./helper/order.query.js";
 
 export const verifyUserTicket = async (orderId, userId) => {
@@ -43,6 +44,60 @@ export const getAllOrdersForEvent = async (eventId, filters = {}) => {
       limit,
       total,
       totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
+export const fetchOrdersForOrganizer = async ({
+  query,
+  pagination,
+  sort = { createdAt: -1 },
+  eventIds,
+}) => {
+  if (!eventIds?.length) {
+    return {
+      data: [],
+      summary: {
+        totalOrders: 0,
+        grossTicketSales: 0,
+        totalRefunded: 0,
+        organizerNetRevenue: 0,
+      },
+      meta: {
+        total: 0,
+        page: pagination?.page,
+        limit: pagination?.limit,
+        totalPages: 0,
+      },
+    };
+  }
+
+  query.eventId = { $in: eventIds };
+
+  const pipeline = buildSalesReportPipeline(
+    query,
+    sort,
+    pagination?.skip,
+    pagination?.limit
+  );
+
+  const [result] = await Order.aggregate(pipeline);
+
+  const total = result?.meta?.[0]?.total || 0;
+
+  return {
+    data: result?.data || [],
+    summary: result?.summary?.[0] || {
+      totalOrders: 0,
+      grossTicketSales: 0,
+      totalRefunded: 0,
+      organizerNetRevenue: 0,
+    },
+    meta: {
+      total,
+      page: pagination?.page,
+      limit: pagination?.limit,
+      totalPages: pagination?.limit ? Math.ceil(total / pagination.limit) : 1,
     },
   };
 };

@@ -31,8 +31,6 @@ export const lockSectionQuantity = async ({
 
   const lockId = uuidv4();
 
-  console.log(await redisClient.get(`inventory:${eventId}:${sectionId}`));
-
   const lua = `
     local invKey = KEYS[1]
     local lockKey = KEYS[2]
@@ -88,8 +86,6 @@ export const lockSectionQuantity = async ({
     ],
   });
 
-  console.log(await redisClient.get(`inventory:${eventId}:${sectionId}`));
-
   if (Array.isArray(res) && res[0] === "OK") {
     await redisClient.publish(
       SOCKET_EVENTS.SEAT_UPDATE,
@@ -115,7 +111,6 @@ export const lockSectionQuantity = async ({
 };
 
 export const finalizeBookingLocks = async ({ lockIds = [], userId }) => {
-  console.log(lockIds, userId);
   const pipeline = redisClient.multi();
 
   for (const lockId of lockIds) {
@@ -123,8 +118,6 @@ export const finalizeBookingLocks = async ({ lockIds = [], userId }) => {
   }
 
   const metas = await pipeline.exec();
-
-  console.log(metas);
 
   for (const m of metas) {
     if (!m || !m.userId) {
