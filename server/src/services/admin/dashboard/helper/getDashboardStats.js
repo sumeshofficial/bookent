@@ -95,9 +95,7 @@ export const getDashboardStats = async (filters = {}) => {
         _id: null,
 
         totalOrders: {
-          $sum: {
-            $cond: [{ $ne: ["$status", ORDER_STATUS.REFUNDED] }, 1, 0],
-          },
+          $sum: 1,
         },
 
         grossTicketSales: {

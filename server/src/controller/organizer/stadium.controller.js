@@ -14,7 +14,7 @@ import {
 } from "../../services/organizer/stadium.service.js";
 import { getObjectURL } from "../../services/s3.service.js";
 import { ERRORS, RES_MESSAGES } from "../../utility/constants/constants.js";
-import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Create Stadium
@@ -87,7 +87,7 @@ export const getStadiums = async (req, res) => {
   try {
     const organizer = await checkOrganizer({ userId: req.user._id });
     if (!organizer) {
-      return res.status(statusCode.notFound).json({
+      return res.status(STATUS_CODE.NOTFOUND).json({
         message: "Organizer profile not found",
       });
     }
@@ -95,7 +95,7 @@ export const getStadiums = async (req, res) => {
     const stadiums = await findStadiums();
 
     if (!stadiums || stadiums.length === 0) {
-      return res.status(statusCode.success).json({
+      return res.status(STATUS_CODE.SUCCESS).json({
         success: true,
         message: "No Stadiums Found",
         stadiums: [],
@@ -109,12 +109,12 @@ export const getStadiums = async (req, res) => {
       }))
     );
 
-    res.status(statusCode.success).json({
+    res.status(STATUS_CODE.SUCCESS).json({
       message: "Stadiums fetched successfully",
       stadiums: updatedStadiums,
     });
   } catch (error) {
-    res.status(statusCode.serverError).json({
+    res.status(STATUS_CODE.SERVER_ERROR).json({
       error: error.message || "Something went wrong",
     });
   }
@@ -135,7 +135,7 @@ export const getStadiumsForOrganizer = async (req, res) => {
     logger.info(`Find organizer by id=${organizerId}`);
     const organizer = await findOrganizerById(organizerId);
     if (!organizer) {
-      return res.status(statusCode.notFound).json({
+      return res.status(STATUS_CODE.NOTFOUND).json({
         message: "Organizer profile not found",
       });
     }
@@ -180,7 +180,7 @@ export const getStadiumsForOrganizer = async (req, res) => {
       });
 
     if (!stadiums || stadiums.length === 0) {
-      return res.status(statusCode.success).json({
+      return res.status(STATUS_CODE.SUCCESS).json({
         message: "No Stadiums Found",
         stadiums: [],
       });
@@ -193,7 +193,7 @@ export const getStadiumsForOrganizer = async (req, res) => {
       }))
     );
 
-    res.status(statusCode.success).json({
+    res.status(STATUS_CODE.SUCCESS).json({
       message: "Stadiums fetched successfully",
       stadiums: updatedStadiums,
       pagination: { total, page, totalPages },
@@ -202,7 +202,7 @@ export const getStadiumsForOrganizer = async (req, res) => {
     logger.error(
       `Error fecth stadium for organizer: ${error.stack || error.message}`
     );
-    res.status(statusCode.serverError).json({
+    res.status(STATUS_CODE.SERVER_ERROR).json({
       error: "Something went wrong",
     });
   }
@@ -225,7 +225,7 @@ export const getStadium = async (req, res) => {
       logger.warn(
         `Stadium not found for organizerId=${organizer._id} stadiumId=${stadiumSlug}`
       );
-      return res.status(statusCode.notFound).json({
+      return res.status(STATUS_CODE.NOTFOUND).json({
         error: "Stadium not found",
       });
     }
@@ -246,13 +246,13 @@ export const getStadium = async (req, res) => {
     );
 
     logger.info("Fetch stadium successfully");
-    res.status(statusCode.success).json({
+    res.status(STATUS_CODE.SUCCESS).json({
       message: "Staidum fetch successfully",
       stadium: updatedStadium,
     });
   } catch (error) {
     logger.error(`Error fetch stadium: ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({
+    res.status(STATUS_CODE.SERVER_ERROR).json({
       error: "Somthing went wrong",
     });
   }
@@ -266,23 +266,25 @@ export const checkStadiumName = async (req, res) => {
 
     if (!name) {
       return res
-        .status(statusCode.missingField)
+        .status(STATUS_CODE.MISSING_FIELD)
         .json({ error: "Name is required" });
     }
 
     if (!organizer) {
       return res
-        .status(statusCode.notFound)
+        .status(STATUS_CODE.NOTFOUND)
         .json({ success: false, error: "Organizer not found" });
     }
 
     const exists = await stadiumExists(name, stadiumId);
 
-    res.status(statusCode.success).json({
+    res.status(STATUS_CODE.SUCCESS).json({
       exists: !!exists,
     });
   } catch (error) {
     logger.error(`Error fetch stadium: ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({ error: "Something went wrong" });
+    res
+      .status(STATUS_CODE.SERVER_ERROR)
+      .json({ error: "Something went wrong" });
   }
 };

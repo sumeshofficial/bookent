@@ -31,7 +31,7 @@ const Dashboard = () => {
         <SalesLineChart data={data.statistics} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TopEventsCard events={data.events} />
         <RecentOrdersTable orders={data.recentOrders} />
       </div>

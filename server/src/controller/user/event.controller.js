@@ -5,7 +5,7 @@ import {
   findEventsForUser,
   eventDetails,
 } from "../../services/user.service.js";
-import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { getHomeEventsService } from "../../services/user/event/event.service.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 import { validateEventAvailability } from "../../utility/helpers.js";
@@ -156,7 +156,7 @@ export const filterAndSortEventsController = async (req, res) => {
       })
     );
 
-    res.status(statusCode.success).json({
+    res.status(STATUS_CODE.SUCCESS).json({
       success: true,
       message: "Events fetched successfully",
       events: updatedEvents,
@@ -165,7 +165,7 @@ export const filterAndSortEventsController = async (req, res) => {
   } catch (error) {
     logger.error(`Error fetching events: ${error.stack || error.message}`);
     res
-      .status(statusCode.serverError)
+      .status(STATUS_CODE.SERVER_ERROR)
       .json({ success: false, error: "Something went wrong" });
   }
 };
@@ -177,7 +177,7 @@ export const getSingleEventController = async (req, res) => {
   try {
     if (!eventSlug) {
       logger.warn("Missing required field");
-      return res.status(statusCode.missingField).json({
+      return res.status(STATUS_CODE.MISSING_FIELD).json({
         success: false,
         message: "Missing field",
       });
@@ -215,7 +215,7 @@ export const getSingleEventController = async (req, res) => {
     };
 
     if (!isEventValid(event)) {
-      return res.status(statusCode.success).json({
+      return res.status(STATUS_CODE.SUCCESS).json({
         success: false,
         message: "Event is no longer available",
         event: null,
@@ -237,7 +237,7 @@ export const getSingleEventController = async (req, res) => {
     if (!updatedEvent) {
       logger.info(`Event not found for ${eventSlug}`);
       return res
-        .status(statusCode.missingField)
+        .status(STATUS_CODE.MISSING_FIELD)
         .json({ error: "Event not found" });
     }
 
@@ -263,7 +263,9 @@ export const getSingleEventController = async (req, res) => {
     res.json({ success: true, message: "Event fetched", event: updatedEvent });
   } catch (error) {
     logger.error(`Error Event Fetch: ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({ error: "Something went wrong" });
+    res
+      .status(STATUS_CODE.SERVER_ERROR)
+      .json({ error: "Something went wrong" });
   }
 };
 
@@ -278,7 +280,7 @@ export const searchEventController = async (req, res) => {
 
     // If null or empty
     if (!events || events.length === 0) {
-      return res.status(statusCode.success).json({
+      return res.status(STATUS_CODE.SUCCESS).json({
         success: true,
         message: "Events not found",
         events: [],
@@ -292,7 +294,7 @@ export const searchEventController = async (req, res) => {
 
     // Still empty after filtering?
     if (timeFiltered.length === 0) {
-      return res.status(statusCode.success).json({
+      return res.status(STATUS_CODE.SUCCESS).json({
         success: true,
         message: "No available events",
         events: [],
@@ -307,14 +309,14 @@ export const searchEventController = async (req, res) => {
 
     logger.info("Event fetched successfully");
 
-    res.status(statusCode.success).json({
+    res.status(STATUS_CODE.SUCCESS).json({
       success: true,
       message: "Event fetched successfully",
       events: updatedEvents.slice(0, 10),
     });
   } catch (error) {
     logger.error(`Error fetch event ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({
+    res.status(STATUS_CODE.SERVER_ERROR).json({
       success: false,
       messgae: "Something went wrong",
     });

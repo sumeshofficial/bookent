@@ -8,101 +8,68 @@ import {
   getAllOrganizers,
   updateRequest,
 } from "../../services/organizer.service.js";
-import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
+import { ERRORS } from "../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
+import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Get all organizers controller
-export const getOrganizersController = async (req, res) => {
-  try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
-    const search = req.query.search?.trim() || "";
-    const sort = req.query.sort || "newest";
-    const status = req.query.status || "all";
-    const skip = (page - 1) * limit;
+export const getOrganizersController = asyncHandler(async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const search = req.query.search?.trim() || "";
+  const sort = req.query.sort || "newest";
+  const status = req.query.status || "all";
+  const skip = (page - 1) * limit;
 
-    logger.http(
-      `GET /api/admin/organizers?page=${page}&limit=${limit}&search=${search}&sort=${sort}&status=${status}`
-    );
+  const { totalOrganizers, organizers } = await getAllOrganizers({
+    limit,
+    skip,
+    search,
+    sort,
+    status,
+  });
 
-    logger.info(
-      `Fetching organizers: page=${page}, limit=${limit}, filter=${status}, status=${status}`
-    );
-
-    const { totalOrganizers, organizers } = await getAllOrganizers({
-      limit,
-      skip,
-      search,
-      sort,
-      status,
-    });
-
-    if (!organizers.length) {
-      logger.warn("No organizers found for given filters");
-    } else {
-      logger.info(
-        `Fetched ${organizers.length} organizers out of ${totalOrganizers} total`
-      );
-    }
-
-    res.status(statusCode.success).json({
-      success: true,
-      message: "Organizers fetched successfully",
+  sendResponse(
+    res,
+    {
       currentPage: page,
       totalPages: Math.ceil(totalOrganizers / limit),
       totalOrganizers,
       organizers,
-    });
-  } catch (error) {
-    logger.error(`Error fetching organizers: ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({
-      success: false,
-      error: "Failed to fetch organizers. Please try again later.",
-    });
-  }
-};
+    },
+    STATUS_CODE.SUCCESS
+  );
+});
 
 // Get organizer details controller
-export const getOrganizersDetailsController = async (req, res) => {
+export const getOrganizersDetailsController = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  try {
-    logger.http(`${req.method} ${req.originalUrl}`);
+  logger.http(`${req.method} ${req.originalUrl}`);
 
-    if (!id) {
-      logger.warn("Missing required field: organizerId not provided");
-      return res
-        .status(statusCode.missingField)
-        .json({ success: false, error: "Missing field" });
-    }
-
-    logger.info(`Fetching organizer details for organizerId=${id}`);
-    const organizer = await findOrganizerById(id);
-
-    if (!organizer) {
-      logger.warn(`Organizer not found for ID=${id}`);
-      return res
-        .status(statusCode.notFound)
-        .json({ success: false, error: "Organizer not found" });
-    }
-
-    logger.info(
-      `User fetched successfully: ID=${organizer._id} UserId=${organizer.userId} OrganizationName=${organizer.organizationDetails.name}`
+  if (!id) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
     );
-    return res.status(statusCode.success).json({
-      success: true,
-      message: "Organizer fetch successfully",
-      organizer,
-    });
-  } catch (error) {
-    logger.error(`Error fetching organizer: ${error.stack || error.message}`);
-    res
-      .status(statusCode.serverError)
-      .json({ success: false, error: "Something went wrong" });
   }
-};
+
+  const organizer = await findOrganizerById(id);
+
+  if (!organizer) {
+    throw new AppError(
+      STATUS_CODE.NOTFOUND,
+      ERRORS.ORGANIZER_NOT_FOUND.CODE,
+      ERRORS.ORGANIZER_NOT_FOUND.MSG
+    );
+  }
+
+  sendResponse(res, organizer, STATUS_CODE.SUCCESS);
+});
 
 // Handle organizer request controller
-export const handleOrganizerRequestController = async (req, res) => {
-  try {
+export const handleOrganizerRequestController = asyncHandler(
+  async (req, res) => {
     const { id } = req.params;
     const { status, reason } = req.body;
 
@@ -114,15 +81,16 @@ export const handleOrganizerRequestController = async (req, res) => {
     }
 
     if (!id || !status) {
-      logger.warn(`Missing required fields: id=${id}, status=${status}`);
-      return res
-        .status(statusCode.missingField)
-        .json({ success: false, error: "Missing field" });
+      throw new AppError(
+        STATUS_CODE.MISSING_FIELD,
+        ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+        ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+      );
     }
 
     const organizer = await updateRequest({ id, status, reason });
 
-    res.status(statusCode.success).json({ message: "Organizer Updated" });
+    sendResponse(res, { message: "Organizer Updated" }, STATUS_CODE.SUCCESS);
 
     if (status === "rejected") {
       setImmediate(async () => {
@@ -133,12 +101,5 @@ export const handleOrganizerRequestController = async (req, res) => {
         });
       });
     }
-  } catch (error) {
-    logger.error(
-      `Error updating organizer request: ${error.stack || error.message}`
-    );
-    res.status(statusCode.serverError).json({
-      error: "Something went wrong",
-    });
   }
-};
+);

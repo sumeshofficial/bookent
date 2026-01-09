@@ -9,7 +9,7 @@ export const getOrganizer = createAsyncThunk(
 
       const res = await checkOrganizer({ userId });
 
-      return res.data.organizer;
+      return res.data;
     } catch (error) {
       return rejectWithValue(
         error.response.data.message ||

@@ -1,60 +1,41 @@
 import { getObjectURL, putObject } from "../services/s3.service.js";
-import { statusCode } from "../utility/constants/statusCode.js";
+import { STATUS_CODE } from "../utility/constants/statusCode.js";
+import { AppError, asyncHandler, sendResponse } from "../utility/helpers.js";
+import { ERRORS } from "../utility/constants/constants.js";
 
 // AWS S3 upload files
-export const uploadFiles = async (req, res) => {
-  try {
-    const { fileName, contentType, folderName } = req.query;
+export const uploadFiles = asyncHandler(async (req, res) => {
+  const { fileName, contentType, folderName } = req.query;
 
-    if (!fileName || !contentType || !folderName) {
-      return res.status(statusCode.missingField).json({
-        success: false,
-        message: "Missing field",
-      });
-    }
-
-    const { signedUrl, key } = await putObject({
-      fileName,
-      contentType,
-      folderName,
-    });
-
-    res.status(statusCode.created).json({
-      success: true,
-      message: "Url created successfully",
-      signedUrl,
-      key,
-    });
-  } catch (error) {
-    res.status(statusCode.serverError).json({
-      success: false,
-      error: error.message || "Something went wrong",
-    });
+  if (!fileName || !contentType || !folderName) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
   }
-};
 
-export const getFiles = async (req, res) => {
-  try {
-    const { key } = req.query;
+  const { signedUrl, key } = await putObject({
+    fileName,
+    contentType,
+    folderName,
+  });
 
-    if (!key) {
-      return res.status(statusCode.missingField).json({
-        success: false,
-        message: "Missing field",
-      });
-    }
+  sendResponse(res, { signedUrl, key }, STATUS_CODE.CREATED);
+});
 
-    const imageUrl = await getObjectURL(key);
+export const getFiles = asyncHandler(async (req, res) => {
+  const { key } = req.query;
 
-    res.status(statusCode.created).json({
-      success: true,
-      message: "Url created successfully",
-      imageUrl,
-    });
-  } catch (error) {
-    res.status(statusCode.serverError).json({
-      success: false,
-      error: error.message || "Something went wrong",
-    });
+  if (!key) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
   }
-};
+
+  const imageUrl = await getObjectURL(key);
+
+  sendResponse(res, imageUrl, STATUS_CODE.CREATED);
+});

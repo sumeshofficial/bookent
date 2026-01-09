@@ -2,41 +2,32 @@ import logger from "../../config/logger.js";
 import { checkOrganizer } from "../../services/organizer.service.js";
 import { getDashboard } from "../../services/organizer/dashboard/dashboard.service.js";
 import { getObjectURL } from "../../services/s3.service.js";
-import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
-import { asyncHandler, sendResponse } from "../../utility/helpers.js";
+import { ERRORS } from "../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
+import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Get organizer
-export const organizerDashboard = async (req, res) => {
+export const organizerDashboard = asyncHandler(async (req, res) => {
   const userId = req.params.id;
-  try {
-    logger.http(`${req.method} ${req.originalUrl}`);
+  logger.http(`${req.method} ${req.originalUrl}`);
 
-    if (!userId) {
-      return res.status(statusCode.missingField).json({
-        success: false,
-        error: "Missing Field",
-      });
-    }
-
-    const organizer = await checkOrganizer({ userId });
-
-    if (organizer.profileImage && organizer.profileImage.includes("uploads")) {
-      const url = await getObjectURL(organizer.profileImage);
-      organizer.profileImage = url;
-    }
-
-    return res.status(statusCode.success).json({
-      success: true,
-      message: "Chceking Succesfully",
-      organizer,
-    });
-  } catch (error) {
-    res.status(statusCode.serverError).json({
-      success: false,
-      error: error.message || "Something went worng",
-    });
+  if (!userId) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
   }
-};
+
+  const organizer = await checkOrganizer({ userId });
+
+  if (organizer.profileImage && organizer.profileImage.includes("uploads")) {
+    const url = await getObjectURL(organizer.profileImage);
+    organizer.profileImage = url;
+  }
+
+  sendResponse(res, organizer, STATUS_CODE.SUCCESS);
+});
 
 export const getDashboardController = asyncHandler(async (req, res) => {
   const userId = req.user._id;

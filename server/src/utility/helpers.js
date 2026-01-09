@@ -1,4 +1,3 @@
-import Decimal from "decimal.js";
 import { STATUS_CODE } from "./constants/statusCode.js";
 import slugify from "slugify";
 

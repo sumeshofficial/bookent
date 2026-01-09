@@ -110,12 +110,78 @@ export const fetchEventsWithOrganizerId = async ({
   skip,
   limit,
 }) => {
-  const events = await Event.find(query)
-    .sort(sortOption)
-    .skip(skip)
-    .limit(limit);
+  const aggregationPipeline = [
+    { $match: { ...query, isDeleted: false } },
+    {
+      $lookup: {
+        from: "orders",
+        localField: "_id",
+        foreignField: "eventId",
+        as: "orders",
+      },
+    },
+    {
+      $addFields: {
+        totalTicketsSold: {
+          $sum: {
+            $map: {
+              input: "$orders",
+              as: "order",
+              in: "$$order.seat.qty",
+            },
+          },
+        },
 
-  const total = await Event.countDocuments(query);
+        grossTicketSales: {
+          $sum: {
+            $map: {
+              input: "$orders",
+              as: "order",
+              in: {
+                $multiply: ["$$order.seat.price", "$$order.seat.qty"],
+              },
+            },
+          },
+        },
+
+        refundedAmount: {
+          $sum: {
+            $map: {
+              input: "$orders",
+              as: "order",
+              in: {
+                $cond: [
+                  { $eq: ["$$order.status", "REFUNDED"] },
+                  "$$order.refundedAmount",
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        organizerNetRevenue: {
+          $subtract: ["$grossTicketSales", "$refundedAmount"],
+        },
+      },
+    },
+    { $sort: sortOption },
+    { $skip: skip },
+    { $limit: limit },
+    {
+      $project: {
+        orders: 0,
+        refundedAmount: 0,
+      },
+    },
+  ];
+
+  const events = await Event.aggregate(aggregationPipeline);
+
+  const total = await Event.countDocuments({ ...query, isDeleted: false });
   const totalPages = Math.ceil(total / limit);
   return { events, total, totalPages };
 };

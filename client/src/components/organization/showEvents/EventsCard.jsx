@@ -112,7 +112,7 @@ const EventsCard = ({
                     Total Revenue
                   </span>
                   <span className="text-green-600 font-semibold">
-                    {formatCurrency(event.revenue)}
+                    {formatCurrency(event.grossTicketSales)}
                   </span>
                 </div>
 
@@ -138,7 +138,7 @@ const EventsCard = ({
                     Total Revenue
                   </span>
                   <p className="text-lg font-bold text-green-600">
-                    {formatCurrency(event.revenue)}
+                    {formatCurrency(event.grossTicketSales)}
                   </p>
                 </div>
                 <div>

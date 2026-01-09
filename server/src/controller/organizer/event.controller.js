@@ -11,7 +11,7 @@ import {
   getObjectURL,
   putObject,
 } from "../../services/s3.service.js";
-import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import {
   checkOrganizer,
   deleteEventService,
@@ -53,16 +53,11 @@ export const validateEventCreateController = async (req, res) => {
       );
     }
 
-    // Daily limit check
     await validateDailyEventLimit(organizer._id);
 
-    logger.info("Validating event data");
     await eventSchema.validate(data, { abortEarly: false });
 
-    logger.info("Create a sessionId for redis");
     const sessionId = `event:create:${crypto.randomUUID()}`;
-
-    logger.info("Store Event data in redis with expires time for 10m");
 
     await storeInRedis(
       sessionId,
@@ -70,22 +65,19 @@ export const validateEventCreateController = async (req, res) => {
       JSON.stringify(data)
     );
 
-    logger.info("Generate signed url for banner image");
     const bannerImage = await putObject({
       fileName: `banner-${Date.now()}.jpg`,
       contentType: "image/jpeg",
       folderName: "events/banner_images",
     });
 
-    logger.info("Generate signed url for thumbnail image");
     const thumbnailImage = await putObject({
       fileName: `thumbnail-${Date.now()}.jpg`,
       contentType: "image/jpeg",
       folderName: "events/thumbnail_images",
     });
 
-    logger.info("Event Create Verify and Create signed Urls successfully");
-    res.status(statusCode.created).json({
+    res.status(STATUS_CODE.CREATED).json({
       success: true,
       sessionId,
       uploadUrls: {
@@ -103,13 +95,13 @@ export const validateEventCreateController = async (req, res) => {
     if (error.name === "ValidationError") {
       logger.error(`Error validation: ${error.errors}`);
       return res
-        .status(statusCode.badRequest)
+        .status(STATUS_CODE.BAD_REQUEST)
         .json({ success: false, errors: error.errors });
     }
     logger.error(
       `Error Create Event Validate: ${error.stack || error.message}`
     );
-    res.status(statusCode.serverError).json({ error: "Server error" });
+    res.status(STATUS_CODE.SERVER_ERROR).json({ error: "Server error" });
   }
 };
 
@@ -138,29 +130,24 @@ export const editEventController = asyncHandler(async (req, res) => {
   logger.http(`${req.method} ${req.originalUrl}`);
 
   if (!data || !eventSlug || !userId) {
-    logger.warn("Required fields are missing");
-    return res.status(statusCode.missingField).json({
+    return res.status(STATUS_CODE.MISSING_FIELD).json({
       error: "Required fields are missing",
     });
   }
 
-  logger.info("Check ownership");
   const organizer = await checkOrganizer({ userId });
   if (!organizer) {
     logger.warn(`Organizer not found for ${userId}`);
-    return res.status(statusCode.notFound).json({
+    return res.status(STATUS_CODE.NOTFOUND).json({
       success: false,
       error: "Organizer not found",
     });
   }
 
-  logger.info(
-    `Check event is exixts for organizerId=${organizer._id}, eventId=${eventSlug}`
-  );
   const event = await findEvent(organizer._id, eventSlug);
   if (!event) {
     logger.warn("Event not found or unauthorized");
-    return res.status(statusCode.notFound).json({
+    return res.status(STATUS_CODE.NOTFOUND).json({
       success: false,
       error: "Event not found or unauthorized",
     });
@@ -183,7 +170,6 @@ export const editEventController = asyncHandler(async (req, res) => {
   }
 
   if (!data?.bannerImage && !data?.thumbnailImage) {
-    logger.info("Update event without images");
     const updatedEvent = await updateEvent(event._id, data);
 
     if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
@@ -193,18 +179,15 @@ export const editEventController = asyncHandler(async (req, res) => {
       }
     }
 
-    logger.info("Event updated succssfully");
-    return res.status(statusCode.success).json({
+    return res.status(STATUS_CODE.SUCCESS).json({
       success: true,
       message: "Event updated successfully",
       event: updatedEvent,
     });
   }
 
-  logger.info("Create a sessionId for redis");
   const sessionId = `event:create:${crypto.randomUUID()}`;
 
-  logger.info("Store Event data in redis with expires time for 10m");
   await storeInRedis(
     sessionId,
     eventCreateValidationExpiresIn,
@@ -216,7 +199,6 @@ export const editEventController = asyncHandler(async (req, res) => {
 
   const uploadUrls = {};
   if (data?.bannerImage) {
-    logger.info("Generate signed url for banner image");
     const bannerImage = await putObject({
       fileName: `banner-${Date.now()}.jpg`,
       contentType: "image/jpeg",
@@ -230,7 +212,6 @@ export const editEventController = asyncHandler(async (req, res) => {
   }
 
   if (data?.thumbnailImage) {
-    logger.info("Generate signed url for thumbnail image");
     const thumbnailImage = await putObject({
       fileName: `thumbnail-${Date.now()}.jpg`,
       contentType: "image/jpeg",
@@ -243,8 +224,7 @@ export const editEventController = asyncHandler(async (req, res) => {
     };
   }
 
-  logger.info("Event Edit Verify and Create signed Urls successfully");
-  res.status(statusCode.created).json({
+  res.status(STATUS_CODE.CREATED).json({
     success: true,
     sessionId,
     uploadUrls,
@@ -252,362 +232,286 @@ export const editEventController = asyncHandler(async (req, res) => {
 });
 
 // Finish Event Edit
-export const finishEventEditController = async (req, res) => {
-  try {
-    const { sessionId, images } = req.body;
+export const finishEventEditController = asyncHandler(async (req, res) => {
+  const { sessionId, images } = req.body;
 
-    logger.http(`${req.method} ${req.originalUrl}`);
+  const cached = await getRedisData(sessionId);
 
-    logger.info("Fetch validated data from Redis");
-    const cached = await getRedisData(sessionId);
-
-    if (!cached) {
-      logger.warn("Validation session expired. Please start again.");
-      return res.status(statusCode.badRequest).json({
-        success: false,
-        error: "Validation session expired. Please start again.",
-      });
-    }
-
-    logger.debug("Parse cached data");
-    const data = JSON.parse(cached);
-
-    if (
-      data.event?.eventStatus === "Cancelled" ||
-      data.event?.eventStatus === "Completed" ||
-      data.event?.cancelDetails?.isCancelled === true
-    ) {
-      throw new AppError(
-        STATUS_CODE.BAD_REQUEST,
-        ERRORS.EVENT_ALREADY_CANCELLED.CODE,
-        ERRORS.EVENT_ALREADY_CANCELLED.MSG
-      );
-    }
-
-    if (data.bannerImage) {
-      logger.info("Deleting the old banner image");
-      await deleteObject(data.event.bannerImageKey);
-    }
-
-    if (data.thumbnailImage) {
-      logger.info("Deleting the old thumbnail image");
-      await deleteObject(data.event.thumbnailImageKey);
-    }
-
-    logger.info("Attach uploaded URLs");
-    const updatedData = { ...data, ...images };
-
-    logger.info("Update event");
-    const updatedEvent = await updateEvent(data.event._id, updatedData);
-    logger.info("Update Redis inventory for edited event sections");
-
-    if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
-      for (const section of updatedEvent.ticketSetup) {
-        const redisKey = `inventory:${updatedEvent._id}:${section.sectionId}`;
-        await redisClient.set(redisKey, section.availableTickets);
-      }
-    }
-
-    logger.info("Delete event session form redis");
-    await deleteRedisData(sessionId);
-
-    logger.info("Event updated succssfully");
-    res.status(statusCode.success).json({
-      success: true,
-      message: "Event updated successfully",
-      event: updatedEvent,
+  if (!cached) {
+    return res.status(STATUS_CODE.BAD_REQUEST).json({
+      success: false,
+      error: "Validation session expired. Please start again.",
     });
-  } catch (error) {
-    logger.error(`Error edit event: ${error.stack || error.message}`);
-    res
-      .status(statusCode.serverError)
-      .json({ success: false, error: "Server error" });
   }
-};
+
+  const data = JSON.parse(cached);
+
+  if (
+    data.event?.eventStatus === "Cancelled" ||
+    data.event?.eventStatus === "Completed" ||
+    data.event?.cancelDetails?.isCancelled === true
+  ) {
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.EVENT_ALREADY_CANCELLED.CODE,
+      ERRORS.EVENT_ALREADY_CANCELLED.MSG
+    );
+  }
+
+  if (data.bannerImage) {
+    await deleteObject(data.event.bannerImageKey);
+  }
+
+  if (data.thumbnailImage) {
+    await deleteObject(data.event.thumbnailImageKey);
+  }
+
+  const updatedData = { ...data, ...images };
+
+  const updatedEvent = await updateEvent(data.event._id, updatedData);
+
+  if (updatedEvent.ticketSetup && updatedEvent.ticketSetup.length > 0) {
+    for (const section of updatedEvent.ticketSetup) {
+      const redisKey = `inventory:${updatedEvent._id}:${section.sectionId}`;
+      await redisClient.set(redisKey, section.availableTickets);
+    }
+  }
+
+  await deleteRedisData(sessionId);
+
+  sendResponse(res, { event: updatedEvent }, STATUS_CODE.SUCCESS);
+});
 
 // Fetch Events
-export const getEventsController = async (req, res) => {
-  try {
-    const user = req.user;
-    const {
-      page = 1,
-      limit = 5,
-      status = "All",
-      sort = "latest",
-      search = "",
-      startDate,
-      endDate,
-      category,
-      priceFilter,
-    } = req.query;
+export const getEventsController = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const {
+    page = 1,
+    limit = 5,
+    status = "All",
+    sort = "latest",
+    search = "",
+    startDate,
+    endDate,
+    category,
+    priceFilter,
+  } = req.query;
 
-    logger.http(`${req.method} ${req.originalUrl}`);
+  logger.http(`${req.method} ${req.originalUrl}`);
 
-    const organizer = await checkOrganizer({ userId: user._id });
+  const organizer = await checkOrganizer({ userId: user._id });
 
-    if (!organizer) {
-      logger.warn(`Required field missing, ID=${organizer._id}`);
-      return res.status(statusCode.missingField).json({
-        success: false,
-        error: "Missing field",
-      });
-    }
-
-    const query = { organizer: organizer._id };
-
-    if (status && status !== "All") {
-      query.status = status;
-    }
-
-    if (category) {
-      query.sportType = category;
-    }
-
-    if (search.trim()) {
-      const regex = new RegExp(search, "i");
-
-      query.$or = [
-        { eventTitle: regex },
-        { sportType: regex },
-        { tags: { $in: [regex] } },
-        { stadiumName: regex },
-        { city: regex },
-      ];
-    }
-
-    if (startDate || endDate) {
-      query.matchDate = {};
-      if (startDate) {
-        query.matchDate.$gte = new Date(startDate);
-      }
-      if (endDate) {
-        query.matchDate.$lte = new Date(endDate);
-      }
-    }
-
-    if (priceFilter) {
-      if (priceFilter === "low") {
-        query.minPrice = { $lte: 5 };
-      } else if (priceFilter === "medium") {
-        query.minPrice = { $gte: 5, $lte: 15 };
-      } else if (priceFilter === "high") {
-        query.minPrice = { $gte: 15 };
-      }
-    }
-
-    const sortOption = {};
-    switch (sort) {
-      case "price-high":
-        sortOption.minPrice = -1;
-        break;
-
-      case "price-low":
-        sortOption.minPrice = 1;
-        break;
-
-      case "latest":
-        sortOption.createdAt = -1;
-        break;
-
-      case "oldest":
-        sortOption.createdAt = 1;
-        break;
-
-      default:
-        sortOption.createdAt = -1;
-    }
-
-    const skip = (page - 1) * limit;
-
-    query.isDeleted = false;
-
-    logger.info(`Fetching events from DB for organizer=${organizer._id}`);
-    const { events, total, totalPages } = await fetchEventsWithOrganizerId({
-      query,
-      sortOption,
-      skip,
-      limit: Number(limit),
-    });
-
-    if (!events || events.length === 0) {
-      logger.info("Events fetch successfully. No Events found");
-      return res.status(statusCode.success).json({
-        success: true,
-        message: "No events found",
-        events,
-        pagination: { total, page, totalPages },
-      });
-    }
-
-    logger.info("Fetch images from S3 bucket");
-    const updatedEvents = await Promise.all(
-      events.map(async (event) => {
-        event = event.toObject();
-        const bannerKey = event.bannerImageKey;
-        const thumbnailKey = event.thumbnailImageKey;
-
-        const bannerImage = await getObjectURL(bannerKey);
-        const thumbnailImage = await getObjectURL(thumbnailKey);
-
-        const updatedEvent = {
-          ...event,
-          bannerImage,
-          thumbnailImage,
-        };
-
-        return updatedEvent;
-      })
+  if (!organizer) {
+    throw new AppError(
+      STATUS_CODE.NOTFOUND,
+      ERRORS.ORGANIZER_NOT_FOUND.CODE,
+      ERRORS.ORGANIZER_NOT_FOUND.MSG
     );
+  }
 
-    logger.info("Events fetched from DB successfully");
-    res.status(statusCode.success).json({
+  const query = { organizer: organizer._id };
+
+  if (status && status !== "All") {
+    query.status = status;
+  }
+
+  if (category) {
+    query.sportType = category;
+  }
+
+  if (search.trim()) {
+    const regex = new RegExp(search, "i");
+
+    query.$or = [
+      { eventTitle: regex },
+      { sportType: regex },
+      { tags: { $in: [regex] } },
+      { stadiumName: regex },
+      { city: regex },
+    ];
+  }
+
+  if (startDate || endDate) {
+    query.matchDate = {};
+    if (startDate) {
+      query.matchDate.$gte = new Date(startDate);
+    }
+    if (endDate) {
+      query.matchDate.$lte = new Date(endDate);
+    }
+  }
+
+  if (priceFilter) {
+    if (priceFilter === "low") {
+      query.minPrice = { $lte: 5 };
+    } else if (priceFilter === "medium") {
+      query.minPrice = { $gte: 5, $lte: 15 };
+    } else if (priceFilter === "high") {
+      query.minPrice = { $gte: 15 };
+    }
+  }
+
+  const sortOption = {};
+  switch (sort) {
+    case "price-high":
+      sortOption.minPrice = -1;
+      break;
+
+    case "price-low":
+      sortOption.minPrice = 1;
+      break;
+
+    case "latest":
+      sortOption.createdAt = -1;
+      break;
+
+    case "oldest":
+      sortOption.createdAt = 1;
+      break;
+
+    default:
+      sortOption.createdAt = -1;
+  }
+
+  const skip = (page - 1) * limit;
+
+  query.isDeleted = false;
+
+  const { events, total, totalPages } = await fetchEventsWithOrganizerId({
+    query,
+    sortOption,
+    skip,
+    limit: Number(limit),
+  });
+
+  if (!events || events.length === 0) {
+    return res.status(STATUS_CODE.SUCCESS).json({
       success: true,
-      message: "Events fetched succussfully",
-      events: updatedEvents,
+      message: "No events found",
+      events,
       pagination: { total, page, totalPages },
     });
-  } catch (error) {
-    logger.error(`Error fetching events: ${error.stack || error.message}`);
-    res.status(statusCode.error).json({
-      success: false,
-      error: "Something went wrong",
-    });
   }
-};
+
+  const updatedEvents = await Promise.all(
+    events.map(async (event) => {
+      const bannerKey = event.bannerImageKey;
+      const thumbnailKey = event.thumbnailImageKey;
+
+      const bannerImage = await getObjectURL(bannerKey);
+      const thumbnailImage = await getObjectURL(thumbnailKey);
+
+      const updatedEvent = {
+        ...event,
+        bannerImage,
+        thumbnailImage,
+      };
+
+      return updatedEvent;
+    })
+  );
+
+  sendResponse(
+    res,
+    { events: updatedEvents, pagination: { total, page, totalPages } },
+    STATUS_CODE.SUCCESS
+  );
+});
 
 // Find Event
-export const getEventController = async (req, res) => {
-  try {
-    const { eventSlug } = req.params;
-    const user = req.user;
+export const getEventController = asyncHandler(async (req, res) => {
+  const { eventSlug } = req.params;
+  const user = req.user;
 
-    const organizer = await checkOrganizer({ userId: user._id });
+  const organizer = await checkOrganizer({ userId: user._id });
 
-    logger.http(`${req.method}, ${req.originalUrl}`);
-
-    if (!organizer || !eventSlug) {
-      logger.warn("Required fields are misiing");
-      return res.status(statusCode.missingField).json({
-        success: false,
-        message: "Miisng required fields",
-      });
-    }
-
-    logger.info(
-      `Fetching event with organizerId=${organizer._id}, eventId=${eventSlug}`
-    );
-    const event = await findEvent(organizer._id, eventSlug);
-
-    if (!event) {
-      logger.warn("Event not found or organizerId not match");
-      return res.status(statusCode.notFound).json({
-        success: false,
-        error: "Event not found or organizerId not match",
-      });
-    }
-
-    const thumbnailImage = await getObjectURL(event.thumbnailImageKey);
-    const bannerImage = await getObjectURL(event.bannerImageKey);
-
-    const updatedEvent = {
-      ...event.toObject(),
-      bannerImage,
-      thumbnailImage,
-    };
-
-    logger.info("Event fetch succesfully");
-    res.status(statusCode.success).json({
-      success: true,
-      message: "Event fetch succesfully",
-      event: updatedEvent,
-    });
-  } catch (error) {
-    logger.error(`Error fetching event: ${error.stack || error.mesage}`);
-    res.status(statusCode.serverError).json({
+  if (!organizer || !eventSlug) {
+    logger.warn("Required fields are misiing");
+    return res.status(STATUS_CODE.MISSING_FIELD).json({
       success: false,
-      error: "Server error",
+      message: "Miisng required fields",
     });
   }
-};
+
+  const event = await findEvent(organizer._id, eventSlug);
+
+  if (!event) {
+    return res.status(STATUS_CODE.NOTFOUND).json({
+      success: false,
+      error: "Event not found or organizerId not match",
+    });
+  }
+
+  const thumbnailImage = await getObjectURL(event.thumbnailImageKey);
+  const bannerImage = await getObjectURL(event.bannerImageKey);
+
+  const updatedEvent = {
+    ...event.toObject(),
+    bannerImage,
+    thumbnailImage,
+  };
+
+  res.status(STATUS_CODE.SUCCESS).json({
+    success: true,
+    message: "Event fetch succesfully",
+    event: updatedEvent,
+  });
+});
 
 // Event delete
-export const deleteEventController = async (req, res) => {
-  try {
-    const user = req.user;
-    const { eventId } = req.params;
+export const deleteEventController = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { eventId } = req.params;
 
-    logger.http(`${req.method} ${req.originalUrl}`);
-
-    if (!eventId) {
-      logger.warn("Missing required field");
-      return res.status(statusCode.missingField).json({
-        success: false,
-        error: "Misising required fields",
-      });
-    }
-
-    logger.info(`Fetching organizer with id=${user._id}`);
-    const organizer = await checkOrganizer({ userId: user._id });
-
-    if (!organizer) {
-      logger.warn("Organizer not found");
-      return res.status(statusCode.notFound).json({
-        success: false,
-        error: "Organizer not found",
-      });
-    }
-
-    logger.info(`Check event is exists eventId=${eventId}`);
-    const event = await findEventByOrganizerIdAndEventId(
-      organizer._id,
-      eventId
-    );
-    if (!event) {
-      logger.warn("Event not found");
-      return res.status(statusCode.notFound).json({
-        success: false,
-        error: "Event not found",
-      });
-    }
-    if (
-      event.eventStatus === "Cancelled" ||
-      event.eventStatus === "Completed"
-    ) {
-      throw new AppError(
-        STATUS_CODE.BAD_REQUEST,
-        ERRORS.EVENT_ALREADY_CANCELLED.CODE,
-        "Cannot delete a completed or cancelled event"
-      );
-    }
-
-    logger.info(`deleting event images eventId=${eventId}`);
-    await deleteObject(event.bannerImageKey);
-    await deleteObject(event.thumbnailImageKey);
-
-    logger.info("Deleting Redis inventory for this event");
-    if (event.ticketSetup && event.ticketSetup.length > 0) {
-      for (const section of event.ticketSetup) {
-        const redisKey = `inventory:${event._id}:${section.sectionId}`;
-        await redisClient.del(redisKey);
-      }
-    }
-
-    logger.info(`deleting event with eventId=${eventId}`);
-    await deleteEventService(organizer._id, eventId);
-
-    logger.info("Event deleted successfully");
-    res.status(statusCode.success).json({
-      success: true,
-      message: "Event deleted successfully",
-    });
-  } catch (error) {
-    logger.error(`Error delete event ${error.stack || error.message}`);
-    res.status(statusCode.serverError).json({
+  if (!eventId) {
+    return res.status(STATUS_CODE.MISSING_FIELD).json({
       success: false,
-      error: "Something went worng",
+      error: "Misising required fields",
     });
   }
-};
+
+  const organizer = await checkOrganizer({ userId: user._id });
+
+  if (!organizer) {
+    return res.status(STATUS_CODE.NOTFOUND).json({
+      success: false,
+      error: "Organizer not found",
+    });
+  }
+
+  const event = await findEventByOrganizerIdAndEventId(organizer._id, eventId);
+  if (!event) {
+    return res.status(STATUS_CODE.NOTFOUND).json({
+      success: false,
+      error: "Event not found",
+    });
+  }
+  if (event.eventStatus === "Cancelled" || event.eventStatus === "Completed") {
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.EVENT_ALREADY_CANCELLED.CODE,
+      "Cannot delete a completed or cancelled event"
+    );
+  }
+
+  await deleteObject(event.bannerImageKey);
+  await deleteObject(event.thumbnailImageKey);
+
+  if (event.ticketSetup && event.ticketSetup.length > 0) {
+    for (const section of event.ticketSetup) {
+      const redisKey = `inventory:${event._id}:${section.sectionId}`;
+      await redisClient.del(redisKey);
+    }
+  }
+
+  await deleteEventService(organizer._id, eventId);
+
+  sendResponse(
+    res,
+    { message: "Event deleted successfully" },
+    STATUS_CODE.SUCCESS
+  );
+});
 
 // Cancel event
 export const cancelEventController = asyncHandler(async (req, res) => {
