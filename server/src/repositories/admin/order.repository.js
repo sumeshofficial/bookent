@@ -36,3 +36,24 @@ export const fetchSalesReport = async ({
     },
   };
 };
+
+export const aggregateOrders = (pipeline) => {
+  return Order.aggregate(pipeline);
+};
+
+export const fetchOrders = async (query, limit) => {
+  return Order.find(query)
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .select({
+      orderId: 1,
+      status: 1,
+      paymentMethod: 1,
+      createdAt: 1,
+      refundedAmount: 1,
+      refundStatus: 1,
+      "pricingBreakDown.grandTotal": 1,
+      "eventDetails.title": 1,
+    })
+    .lean();
+};

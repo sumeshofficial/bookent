@@ -79,3 +79,7 @@ export const walletTransactions = async ({
     },
   };
 };
+
+export const aggregateTransactions = (pipeline) => {
+  return Transaction.aggregate(pipeline);
+};

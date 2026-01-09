@@ -1,7 +1,6 @@
 import AdminProtected from "../components/admin/AdminProtected";
 import AdminLayout from "../sharedComponents/admin/AdminLayout";
 
-import AdminDashboard from "../features/admin/AdminDashboard";
 import AdminLogin from "../features/admin/AdminLogin";
 import AdminNotFoundPage from "../features/admin/AdminNotFoundPage";
 import OrganizersList from "../features/admin/OrganizersList";
@@ -14,6 +13,7 @@ import Event from "../features/admin/event/Event";
 import UsersList from "../features/admin/users/UsersList";
 import Banner from "../features/admin/banner/Banner";
 import SalesReport from "../features/admin/sales/SalesReport";
+import Dashboard from "../features/admin/dashboard/Dashboard";
 
 const adminRoutes = [
   {
@@ -23,7 +23,7 @@ const adminRoutes = [
       {
         element: <AdminLayout />,
         children: [
-          { path: "dashboard", element: <AdminDashboard /> },
+          { path: "dashboard", element: <Dashboard /> },
           { path: "users", element: <UsersList /> },
           { path: "organizers", element: <OrganizersList /> },
           { path: "users/:id", element: <UserDetails /> },
