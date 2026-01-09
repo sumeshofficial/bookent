@@ -1,7 +1,11 @@
 import express from "express";
-import { organizerDashboard } from "../../controller/organizer/dashboard.controller.js";
+import {
+  getDashboardController,
+  organizerDashboard,
+} from "../../controller/organizer/dashboard.controller.js";
 const router = express.Router();
 
-router.get("/:id/dashboard", organizerDashboard);
+router.get("/stats", getDashboardController);
+router.get("/:id", organizerDashboard);
 
 export default router;

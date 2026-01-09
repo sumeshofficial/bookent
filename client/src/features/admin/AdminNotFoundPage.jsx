@@ -16,13 +16,11 @@ const AdminNotFoundPage = () => {
           </div>
         </div>
 
-        {/* 404 Illustration */}
         <div className="relative mb-8">
           <div className="text-[180px] font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-purple-600 leading-none select-none">
             404
           </div>
 
-          {/* Floating elements */}
           <div className="absolute top-1/2 left-1/4 transform -translate-x-1/2 -translate-y-1/2 animate-bounce">
             <div className="w-16 h-16 bg-blue-100 rounded-full opacity-50"></div>
           </div>
@@ -31,7 +29,6 @@ const AdminNotFoundPage = () => {
           </div>
         </div>
 
-        {/* Message */}
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
           Page Not Found
         </h1>
@@ -40,7 +37,6 @@ const AdminNotFoundPage = () => {
           moved. Let's get you back on track.
         </p>
 
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <button
             onClick={() => window.history.back()}

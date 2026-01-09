@@ -11,7 +11,6 @@ import {
 import dotenv from "dotenv";
 dotenv.config();
 
-// Business logic for home page sections
 export const getHomeEventsService = async (city) => {
   const events = await findEventsRepo();
 

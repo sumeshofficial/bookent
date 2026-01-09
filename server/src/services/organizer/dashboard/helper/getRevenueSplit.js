@@ -1,7 +1,7 @@
-import { aggregateOrders } from "../../../../repositories/admin/order.repository.js";
+import { aggregateOrders } from "../../../../repositories/organizer/order.repository.js";
 import { ORDER_STATUS } from "../../../../utility/constants/constants.js";
 
-export const getRevenueSplit = async (filters = {}) => {
+export const getRevenueSplit = async (organizerId, filters = {}) => {
   const matchStage = {
     status: {
       $in: [ORDER_STATUS.PAID, ORDER_STATUS.CONFIRMED, ORDER_STATUS.REFUNDED],
@@ -28,8 +28,7 @@ export const getRevenueSplit = async (filters = {}) => {
   }
 
   if (filters.preset) {
-    let start;
-    let end;
+    let start, end;
 
     switch (filters.preset) {
       case "day":
@@ -40,9 +39,9 @@ export const getRevenueSplit = async (filters = {}) => {
         break;
 
       case "week": {
-        const day = now.getDay();
+        const day = now.getDay() || 7;
         start = new Date(now);
-        start.setDate(now.getDate() - day);
+        start.setDate(now.getDate() - day + 1);
         start.setHours(0, 0, 0, 0);
         end = new Date(start);
         end.setDate(start.getDate() + 6);
@@ -58,16 +57,14 @@ export const getRevenueSplit = async (filters = {}) => {
             : now.getMonth();
 
         start = new Date(year, month, 1);
-        end = new Date(year, month + 1, 0);
-        end.setHours(23, 59, 59, 999);
+        end = new Date(year, month + 1, 0, 23, 59, 59, 999);
         break;
       }
 
       case "year": {
         const year = Number(filters.year) || now.getFullYear();
         start = new Date(year, 0, 1);
-        end = new Date(year, 11, 31);
-        end.setHours(23, 59, 59, 999);
+        end = new Date(year, 11, 31, 23, 59, 59, 999);
         break;
       }
     }
@@ -86,61 +83,37 @@ export const getRevenueSplit = async (filters = {}) => {
     matchStage.eventId = filters.eventId;
   }
 
-  if (filters.organizerId) {
-    matchStage["eventDetails.organizer"] = filters.organizerId;
-  }
-
   const result = await aggregateOrders([
     { $match: matchStage },
 
     {
       $lookup: {
-        from: "transactions",
-        let: { orderId: "$_id" },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ["$order_id", "$$orderId"] },
-                  { $eq: ["$type", "SALE"] },
-                  { $eq: ["$status", "COMPLETED"] },
-                ],
-              },
-            },
-          },
-          {
-            $project: {
-              _id: 0,
-              gatewayFee: { $ifNull: ["$transaction_fees.value", 0] },
-            },
-          },
-        ],
-        as: "transaction",
+        from: "events",
+        localField: "eventId",
+        foreignField: "_id",
+        as: "event",
+      },
+    },
+    { $unwind: "$event" },
+
+    {
+      $match: {
+        "event.organizer": organizerId,
       },
     },
 
     {
       $addFields: {
-        gatewayFee: {
-          $ifNull: [{ $first: "$transaction.gatewayFee" }, 0],
-        },
         grossTicketSales: {
-          $multiply: ["$pricingBreakDown.ticketPrice", "$seat.qty"],
+          $multiply: ["$seat.price", "$seat.qty"],
         },
-        discount: { $ifNull: ["$pricingBreakDown.discount", 0] },
-        platformGrossFee: {
-          $ifNull: ["$pricingBreakDown.bookingFee", 0],
+        refundedAmount: {
+          $ifNull: ["$refundedAmount", 0],
         },
-      },
-    },
-
-    {
-      $addFields: {
-        platformNetRevenue: {
+        organizerNetRevenue: {
           $subtract: [
-            "$platformGrossFee",
-            { $add: ["$gatewayFee", "$discount"] },
+            { $multiply: ["$seat.price", "$seat.qty"] },
+            { $ifNull: ["$refundedAmount", 0] },
           ],
         },
       },
@@ -149,25 +122,22 @@ export const getRevenueSplit = async (filters = {}) => {
     {
       $group: {
         _id: null,
-        platformGrossFee: { $sum: "$platformGrossFee" },
-        gatewayFee: { $sum: "$gatewayFee" },
-        discount: { $sum: "$discount" },
-        platformNetRevenue: { $sum: "$platformNetRevenue" },
+        grossTicketSales: { $sum: "$grossTicketSales" },
+        totalRefunded: { $sum: "$refundedAmount" },
+        organizerNetRevenue: { $sum: "$organizerNetRevenue" },
       },
     },
   ]);
 
   const data = result[0] || {
-    platformGrossFee: 0,
-    gatewayFee: 0,
-    discount: 0,
-    platformNetRevenue: 0,
+    grossTicketSales: 0,
+    totalRefunded: 0,
+    organizerNetRevenue: 0,
   };
 
   return [
-    { name: "Platform Gross Fee", value: data.platformGrossFee },
-    { name: "Gateway Fees", value: data.gatewayFee },
-    { name: "Platform Discounts", value: data.discount },
-    { name: "Platform Net Revenue", value: data.platformNetRevenue },
+    { name: "Gross Ticket Sales", value: data.grossTicketSales },
+    { name: "Refunded Amount", value: data.totalRefunded },
+    { name: "Organizer Net Revenue", value: data.organizerNetRevenue },
   ];
 };

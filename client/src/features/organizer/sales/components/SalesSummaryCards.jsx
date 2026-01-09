@@ -36,7 +36,7 @@ const SalesSummaryCards = ({ summary }) => {
       />
 
       <Card
-        label="Organizer Net Revenue"
+        label="Net Revenue"
         value={`$${(summary.organizerNetRevenue ?? 0).toFixed(2)}`}
         highlight
       />

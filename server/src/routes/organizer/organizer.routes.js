@@ -10,7 +10,7 @@ import { protect } from "../../middlewares/common/auth.middleware.js";
 
 const organizerRouter = express.Router();
 
-organizerRouter.use("/", protect, dashboardRoutes);
+organizerRouter.use("/dashboard", protect, dashboardRoutes);
 organizerRouter.use("/auth", protect, authRoutes);
 organizerRouter.use("/account", protect, accountRoutes);
 organizerRouter.use("/events", protect, eventRoutes);

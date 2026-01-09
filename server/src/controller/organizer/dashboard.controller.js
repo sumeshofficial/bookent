@@ -1,7 +1,9 @@
 import logger from "../../config/logger.js";
 import { checkOrganizer } from "../../services/organizer.service.js";
+import { getDashboard } from "../../services/organizer/dashboard/dashboard.service.js";
 import { getObjectURL } from "../../services/s3.service.js";
-import { statusCode } from "../../utility/constants/statusCode.js";
+import { STATUS_CODE, statusCode } from "../../utility/constants/statusCode.js";
+import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 
 // Get organizer
 export const organizerDashboard = async (req, res) => {
@@ -35,3 +37,11 @@ export const organizerDashboard = async (req, res) => {
     });
   }
 };
+
+export const getDashboardController = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const report = await getDashboard(userId, req.query);
+
+  sendResponse(res, report, STATUS_CODE.SUCCESS);
+});

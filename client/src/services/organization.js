@@ -23,7 +23,7 @@ export const registerOrganizationAccount = async ({
 
 // Check Organizer
 export const checkOrganizer = async ({ userId }) => {
-  return await api.get(`/organizer/${userId}/dashboard`);
+  return await api.get(`/organizer/dashboard/${userId}`);
 };
 
 // Create Stadium

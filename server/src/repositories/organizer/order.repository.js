@@ -101,3 +101,7 @@ export const fetchOrdersForOrganizer = async ({
     },
   };
 };
+
+export const aggregateOrders = (pipeline) => {
+  return Order.aggregate(pipeline);
+};

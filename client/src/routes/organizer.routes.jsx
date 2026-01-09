@@ -3,7 +3,6 @@ import Protected from "../components/Protected";
 import OrganizerProtected from "../components/organization/OrganizerProtected";
 
 import OrganizerLayout from "../sharedComponents/organizer/OrganizerLayout";
-import OrganizerDashboard from "../features/organizer/OrganizerDashboard";
 import CreateEventForm from "../features/organizer/CreateEventForm";
 import CreateStadium from "../features/organizer/CreateStadium";
 import OrganizerEventsPage from "../features/organizer/OrganizerEventsPage";
@@ -14,6 +13,7 @@ import StadiumDetails from "../features/organizer/StadiumDetails";
 import VerifyTicket from "../features/organizer/verifyTicket/VerifyTicket";
 import BookingHistory from "../features/organizer/bookings/BookingHistory";
 import SalesReport from "../features/organizer/sales/SalesReport";
+import Dashboard from "../features/organizer/dashboard/Dashboard";
 
 const organizerRoutes = [
   {
@@ -28,7 +28,7 @@ const organizerRoutes = [
         element: <OrganizerLayout />,
         children: [
           { index: true, element: <Navigate to="dashboard" replace /> },
-          { path: "dashboard", element: <OrganizerDashboard /> },
+          { path: "dashboard", element: <Dashboard /> },
           { path: "event/create", element: <CreateEventForm /> },
           {
             path: "organizer/:organizerId/event/:eventSlug/edit",
