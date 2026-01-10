@@ -8,75 +8,73 @@ import {
 export const getMonthlySales = async (filters = {}) => {
   const dateMatch = {};
   const now = new Date();
-
   const year = filters.year ? Number(filters.year) : now.getFullYear();
 
-  if (filters.fromDate) {
-    dateMatch.$gte = new Date(filters.fromDate);
-  }
+  let start;
+  let end;
 
-  if (filters.toDate) {
-    const end = new Date(filters.toDate);
-    end.setHours(23, 59, 59, 999);
-    dateMatch.$lte = end;
-  }
+  const preset = filters.preset || "year";
 
-  if (filters.preset) {
-    let start;
-    let end;
+  switch (preset) {
+    case "day": {
+      start = new Date(now);
+      start.setHours(0, 0, 0, 0);
 
-    switch (filters.preset) {
-      case "day": {
-        start = new Date(now);
-        start.setHours(0, 0, 0, 0);
+      end = new Date(now);
+      end.setHours(23, 59, 59, 999);
+      break;
+    }
 
-        end = new Date(now);
-        end.setHours(23, 59, 59, 999);
-        break;
-      }
+    case "week": {
+      const day = now.getDay() === 0 ? 6 : now.getDay() - 1;
 
-      case "week": {
-        const day = now.getDay() || 7;
-        start = new Date(now);
-        start.setDate(now.getDate() - day + 1);
-        start.setHours(0, 0, 0, 0);
+      start = new Date(now);
+      start.setDate(now.getDate() - day);
+      start.setHours(0, 0, 0, 0);
 
-        end = new Date(start);
-        end.setDate(start.getDate() + 6);
-        end.setHours(23, 59, 59, 999);
-        break;
-      }
+      end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
+      break;
+    }
 
-      case "month": {
-        const month = filters.month
+    case "month": {
+      const month =
+        filters.month !== undefined
           ? Number(filters.month) - 1
           : now.getMonth();
 
-        start = new Date(year, month, 1, 0, 0, 0, 0);
-        end = new Date(year, month + 1, 0, 23, 59, 59, 999);
-        break;
-      }
-
-      case "year": {
-        start = new Date(year, 0, 1, 0, 0, 0, 0);
-        end = new Date(year, 11, 31, 23, 59, 59, 999);
-        break;
-      }
-
-      default:
-        start = null;
-        end = null;
+      start = new Date(year, month, 1, 0, 0, 0, 0);
+      end = new Date(year, month + 1, 0, 23, 59, 59, 999);
+      break;
     }
 
-    if (start && end) {
-      dateMatch.$gte = start;
-      dateMatch.$lte = end;
+    case "custom": {
+      if (filters.fromDate && filters.toDate) {
+        start = new Date(filters.fromDate);
+        start.setHours(0, 0, 0, 0);
+
+        end = new Date(filters.toDate);
+        end.setHours(23, 59, 59, 999);
+      } else {
+        start = new Date(year, 0, 1, 0, 0, 0, 0);
+        end = new Date(year, 11, 31, 23, 59, 59, 999);
+      }
+      break;
+    }
+
+    case "year":
+    default: {
+      start = new Date(year, 0, 1, 0, 0, 0, 0);
+      end = new Date(year, 11, 31, 23, 59, 59, 999);
+      break;
     }
   }
 
-  const createdAtMatch = Object.keys(dateMatch).length
-    ? { createdAt: dateMatch }
-    : {};
+  dateMatch.$gte = start;
+  dateMatch.$lte = end;
+
+  const createdAtMatch = { createdAt: dateMatch };
 
   const data = await aggregateOrders([
     {

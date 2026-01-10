@@ -10,9 +10,11 @@ export const useDashboardFilters = () => {
       year: params.get("year")
         ? Number(params.get("year"))
         : new Date().getFullYear(),
-      month: params.get("month")
-        ? Number(params.get("month"))
+      month: params.get("month") ? Number(params.get("month")) : undefined,
+      fromDate: params.get("fromDate")
+        ? params.get("fromDate")
         : undefined,
+      toDate: params.get("toDate") ? params.get("toDate") : undefined,
     };
   }, [params]);
 

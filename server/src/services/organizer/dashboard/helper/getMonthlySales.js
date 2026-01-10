@@ -50,6 +50,12 @@ export const getMonthlySales = async (organizerId, filters = {}) => {
 
         start = new Date(year, month, 1, 0, 0, 0, 0);
         end = new Date(year, month + 1, 0, 23, 59, 59, 999);
+        if (filters.fromDate) {
+          start = filters.fromDate;
+        }
+        if (filters.toDate) {
+          end = filters.toDate;
+        }
         break;
       }
 

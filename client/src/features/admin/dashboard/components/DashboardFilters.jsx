@@ -5,9 +5,17 @@ const DashboardFilters = () => {
 
   const preset = searchParams.get("preset") || "year";
   const year = searchParams.get("year") || new Date().getFullYear();
+  const fromDate = searchParams.get("fromDate");
+  const toDate = searchParams.get("toDate");
 
   const updatePreset = (value) => {
     searchParams.set("preset", value);
+
+    if (value !== "custom") {
+      searchParams.delete("fromDate");
+      searchParams.delete("toDate");
+    }
+
     setSearchParams(searchParams);
   };
 
@@ -15,6 +23,11 @@ const DashboardFilters = () => {
     searchParams.set("year", value);
     setSearchParams(searchParams);
   };
+
+  const updateMonth = (key, value) => {
+    searchParams.set(key, value)
+    setSearchParams(searchParams)
+  }
 
   return (
     <div className="flex gap-4 items-center">
@@ -27,7 +40,25 @@ const DashboardFilters = () => {
         <option value="week">This Week</option>
         <option value="month">This Month</option>
         <option value="year">This Year</option>
+        <option value="custom">Custom</option>
       </select>
+
+      {
+        preset === "custom" && (
+          <div  className="space-x-3">
+            <input
+              type="date"
+              value={fromDate || ""}
+              onChange={(e) => updateMonth("fromDate", e.target.value)}
+            />
+            <input
+              type="date"
+              value={toDate || ""}
+              onChange={(e) => updateMonth("toDate", e.target.value)}
+            />
+          </div>
+        )
+      }
 
       {preset === "year" && (
         <select

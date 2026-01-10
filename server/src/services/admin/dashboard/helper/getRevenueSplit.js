@@ -11,75 +11,75 @@ export const getRevenueSplit = async (filters = {}) => {
   const dateMatch = {};
   const now = new Date();
 
-  if (!filters.fromDate && !filters.toDate && !filters.preset) {
-    const year = Number(filters.year) || now.getFullYear();
-    dateMatch.$gte = new Date(year, 0, 1);
-    dateMatch.$lte = new Date(year, 11, 31, 23, 59, 59, 999);
-  }
+  const preset = filters.preset || "year";
+  let start;
+  let end;
 
-  if (filters.fromDate) {
-    dateMatch.$gte = new Date(filters.fromDate);
-  }
-
-  if (filters.toDate) {
-    const end = new Date(filters.toDate);
-    end.setHours(23, 59, 59, 999);
-    dateMatch.$lte = end;
-  }
-
-  if (filters.preset) {
-    let start;
-    let end;
-
-    switch (filters.preset) {
-      case "day":
-        start = new Date();
+  switch (preset) {
+    case "custom": {
+      if (filters.fromDate && filters.toDate) {
+        start = new Date(filters.fromDate);
         start.setHours(0, 0, 0, 0);
-        end = new Date();
-        end.setHours(23, 59, 59, 999);
-        break;
 
-      case "week": {
-        const day = now.getDay();
-        start = new Date(now);
-        start.setDate(now.getDate() - day);
-        start.setHours(0, 0, 0, 0);
-        end = new Date(start);
-        end.setDate(start.getDate() + 6);
+        end = new Date(filters.toDate);
         end.setHours(23, 59, 59, 999);
-        break;
       }
-
-      case "month": {
-        const year = Number(filters.year) || now.getFullYear();
-        const month =
-          filters.month !== undefined
-            ? Number(filters.month) - 1
-            : now.getMonth();
-
-        start = new Date(year, month, 1);
-        end = new Date(year, month + 1, 0);
-        end.setHours(23, 59, 59, 999);
-        break;
-      }
-
-      case "year": {
-        const year = Number(filters.year) || now.getFullYear();
-        start = new Date(year, 0, 1);
-        end = new Date(year, 11, 31);
-        end.setHours(23, 59, 59, 999);
-        break;
-      }
+      break;
     }
 
-    if (start && end) {
-      dateMatch.$gte = start;
-      dateMatch.$lte = end;
+    case "day": {
+      start = new Date(now);
+      start.setHours(0, 0, 0, 0);
+
+      end = new Date(now);
+      end.setHours(23, 59, 59, 999);
+      break;
+    }
+
+    case "week": {
+      const day = now.getDay();
+      const diffToMonday = day === 0 ? -6 : 1 - day;
+
+      start = new Date(now);
+      start.setDate(now.getDate() + diffToMonday);
+      start.setHours(0, 0, 0, 0);
+
+      end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
+      break;
+    }
+
+    case "month": {
+      const year = Number(filters.year) || now.getFullYear();
+      const month =
+        filters.month !== undefined
+          ? Number(filters.month) - 1
+          : now.getMonth();
+
+      start = new Date(year, month, 1);
+      start.setHours(0, 0, 0, 0);
+
+      end = new Date(year, month + 1, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    }
+
+    case "year":
+    default: {
+      const year = Number(filters.year) || now.getFullYear();
+
+      start = new Date(year, 0, 1);
+      start.setHours(0, 0, 0, 0);
+
+      end = new Date(year, 11, 31);
+      end.setHours(23, 59, 59, 999);
+      break;
     }
   }
 
-  if (Object.keys(dateMatch).length) {
-    matchStage.createdAt = dateMatch;
+  if (start && end) {
+    matchStage.createdAt = { $gte: start, $lte: end };
   }
 
   if (filters.eventId) {

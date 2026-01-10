@@ -54,6 +54,25 @@ export const getDashboardStats = async (filters = {}) => {
       break;
     }
 
+    case "custom": {
+      if (filters.fromDate && filters.toDate) {
+        start = new Date(filters.fromDate);
+        start.setHours(0, 0, 0, 0);
+
+        end = new Date(filters.toDate);
+        end.setHours(23, 59, 59, 999);
+      } else {
+        const year = Number(filters.year) || now.getFullYear();
+
+        start = new Date(year, 0, 1);
+        start.setHours(0, 0, 0, 0);
+
+        end = new Date(year, 11, 31);
+        end.setHours(23, 59, 59, 999);
+      }
+      break;
+    }
+
     case "year":
     default: {
       const year = Number(filters.year) || now.getFullYear();
