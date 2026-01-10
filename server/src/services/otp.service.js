@@ -1,6 +1,10 @@
 import { sendMail } from "../utility/mailer.js";
-import { redisClient } from "../config/redis.conf.js";
-import { ENV } from "../config/envConfig.js";
+import {
+  deleteRedisData,
+  getRedisData,
+  storeInRedisWithExpiry,
+} from "../repositories/redis/redis.repository.js";
+import { ENV } from "../config/env.conf.js";
 
 const redisExpiresIn = ENV.REDIS_OTP_EXPIRES_IN;
 
@@ -9,7 +13,7 @@ export const generateOtp = async ({ email, userData, purpose }) => {
   const otpCode = crypto.randomInt(100000, 1000000).toString();
   const redisKey = `otp:${email}:${purpose}`;
 
-  await redisClient.del(redisKey);
+  await deleteRedisData(redisKey);
 
   const redisData = {
     ...userData,
@@ -17,7 +21,11 @@ export const generateOtp = async ({ email, userData, purpose }) => {
     purpose,
   };
 
-  await redisClient.setEx(redisKey, redisExpiresIn, JSON.stringify(redisData));
+  await storeInRedisWithExpiry(
+    redisKey,
+    redisExpiresIn,
+    JSON.stringify(redisData)
+  );
 
   await sendMail(email, otpCode, userData.fullname);
 };
@@ -25,7 +33,7 @@ export const generateOtp = async ({ email, userData, purpose }) => {
 // Check OTP is expired or not
 export const checkOtp = async (email, purpose) => {
   const redisKey = `otp:${email}:${purpose}`;
-  const data = await redisClient.get(redisKey);
+  const data = await getRedisData(redisKey);
   if (!data) {
     return null;
   }
@@ -35,5 +43,5 @@ export const checkOtp = async (email, purpose) => {
 // Verify User
 export const delOtp = async (email, purpose) => {
   const redisKey = `otp:${email}:${purpose}`;
-  await redisClient.del(redisKey);
+  await deleteRedisData(redisKey);
 };
