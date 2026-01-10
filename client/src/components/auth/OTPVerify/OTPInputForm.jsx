@@ -20,7 +20,7 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
   );
   const [timer, setTimer] = useState(RESEND_TIMEOUT);
   const [isDisabled, setIsDisabled] = useState(true);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const isButtonDisabled = inputArr.some((d) => d.trim() === "");
   const dispatch = useDispatch();
   const [stat, setStat] = useState({
     error: "",
@@ -33,11 +33,6 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
   useEffect(() => {
     refArr.current[activeIndex]?.focus();
   }, [stat]);
-
-  useEffect(() => {
-    const allFilled = inputArr.every((input) => input.trim() !== "");
-    setIsButtonDisabled(!allFilled);
-  }, [inputArr]);
 
   useEffect(() => {
     let intervalId;
@@ -100,12 +95,26 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
     }
   };
 
+  const handleOnPaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("Text");
+    const digits = pastedData.replace(/\D/g, "").slice(0, OTP_DIGITS_COUNT);
+    const newArr = new Array(OTP_DIGITS_COUNT).fill("");
+    for (let i = 0; i < digits.length; i++) {
+      newArr[i] = digits[i];
+    }
+    setInputArr(newArr);
+    setActiveIndex(
+      digits.length < OTP_DIGITS_COUNT ? digits.length : OTP_DIGITS_COUNT - 1
+    );
+  };
+
   const handleOTP = async () => {
     try {
       setStat({ ...stat, isLoading: true });
       const data = { otp: inputArr.join(""), email, purpose };
       const response = await verifyOtp(data);
-      if (purpose === ("signup" || "signin")) {
+      if (purpose === "signup" || purpose === "signin") {
         dispatch(addUser(response.user));
         localStorage.setItem("accessToken", response.accessToken);
         return closeModal();
@@ -129,9 +138,14 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
       }
       openModal(purpose, { response });
     } catch (error) {
-      toast.error(error?.response?.data?.error.message || "Somethings went wrong");
-      setStat({ ...stat, isLoading: false, error: error?.response?.data?.error.message || "Somethings went wrong" });
-      setIsButtonDisabled(true);
+      toast.error(
+        error?.response?.data?.error.message || "Somethings went wrong"
+      );
+      setStat({
+        ...stat,
+        isLoading: false,
+        error: error?.response?.data?.error.message || "Somethings went wrong",
+      });
     }
   };
 
@@ -163,6 +177,7 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
                   onKeyDown={(e) => handleOnKeyDown(e, index)}
                   onMouseDown={(e) => e.preventDefault()}
                   onBlur={() => handleOnBlur(index)}
+                  onPaste={handleOnPaste}
                   className="border-2 text-2xl border-gray-700 text-center h-10 rounded-md w-10 focus:outline-none"
                 />
               ))}
