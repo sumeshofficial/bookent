@@ -20,6 +20,7 @@ import { ENV } from "./config/env.conf.js";
 import { initCronJobs } from "./jobs/index.job.js";
 import helmet from "helmet";
 import { helmetConfig } from "./config/security/helmet.config.js";
+import rateLimit from "express-rate-limit";
 dotenv.config();
 
 const app = express();
@@ -44,6 +45,15 @@ await initSeatPubSub();
 
 // Middleware
 app.use(helmet(helmetConfig(ENV)));
+
+const globalRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(globalRateLimiter);
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -55,7 +65,14 @@ app.use(
 app.use(passport.initialize());
 
 // Routes
-app.use("/api/v1/user", userRoutes);
+const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use("/api/v1/user", authRateLimiter, userRoutes);
 app.use("/api/v1/organizer", organizerRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/s3", s3Router);
