@@ -18,6 +18,8 @@ import { initRedisExpiryListener } from "./config/redisExpiry.conf.js";
 import { initSeatPubSub } from "./config/seatPubSub.conf.js";
 import { ENV } from "./config/env.conf.js";
 import { initCronJobs } from "./jobs/index.job.js";
+import helmet from "helmet";
+import { helmetConfig } from "./config/security/helmet.config.js";
 dotenv.config();
 
 const app = express();
@@ -41,6 +43,7 @@ await initSeatPubSub();
 // });
 
 // Middleware
+app.use(helmet(helmetConfig(ENV)));
 app.use(express.json());
 app.use(cookieParser());
 app.use(

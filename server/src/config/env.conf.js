@@ -104,6 +104,9 @@ const envSchema = z.object({
 
   // Paypal Base URL
   PAYPAL_API_BASE: z.string().min(1),
+
+  ALLOW_OAUTH_INLINE: z.string().min(1),
+  NODE_ENV: z.string().min(1),
 });
 
 const result = envSchema.safeParse(process.env);
