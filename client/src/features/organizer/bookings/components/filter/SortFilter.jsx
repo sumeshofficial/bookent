@@ -1,8 +1,6 @@
 const SortFilter = ({ value, onChange }) => (
   <div>
-    <label className="block text-xs text-gray-500 mb-1">
-      Sort By
-    </label>
+    <label className="block text-xs text-gray-500 mb-1">Sort By</label>
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}

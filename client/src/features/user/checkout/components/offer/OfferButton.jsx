@@ -1,31 +1,30 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useCoupon } from "../../hooks/useCoupon";
 import { toast } from "react-hot-toast";
 
 const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
-  const [isApplied, setIsApplied] = useState(false);
-  const [appliedCouponData, setAppliedCouponData] = useState(null);
   const [activeCoupon, setActiveCoupon] = useState(null);
 
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
+    control,
     formState: { errors },
   } = useForm();
 
-  const couponCode = watch("coupon");
+  const couponCode = useWatch({
+    control,
+    name: "coupon",
+  });
 
   const lockId = sessionStorage.getItem("lockId");
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-  } = useCoupon(activeCoupon, lockId);
+  const { data, isLoading, isError, error } = useCoupon(activeCoupon, lockId);
+
+  const appliedCouponData = data ?? null;
+  const isApplied = Boolean(appliedCouponData);
 
   useEffect(() => {
     const savedCoupon = sessionStorage.getItem("appliedCoupon");
@@ -35,23 +34,11 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
   }, [setValue]);
 
   useEffect(() => {
-    if (!data) return;
+    if (!appliedCouponData) return;
 
-    setIsApplied(true);
-    setAppliedCouponData(data);
-    onCouponApplied(data);
+    onCouponApplied(appliedCouponData);
     sessionStorage.setItem("appliedCoupon", activeCoupon);
-  }, [activeCoupon, data, onCouponApplied]);
-
-useEffect(() => {
-  if (!isError) return;
-
-  if (isApplied) {
-    setIsApplied(false);
-    setAppliedCouponData(null);
-    sessionStorage.removeItem("appliedCoupon");
-  }
-}, [isError, isApplied]);
+  }, [appliedCouponData, activeCoupon, onCouponApplied]);
 
   const onSubmit = () => {
     if (!lockId) {
@@ -66,8 +53,6 @@ useEffect(() => {
   };
 
   const handleRemoveCoupon = () => {
-    setIsApplied(false);
-    setAppliedCouponData(null);
     setActiveCoupon(null);
     onCouponRemoved();
     sessionStorage.removeItem("appliedCoupon");

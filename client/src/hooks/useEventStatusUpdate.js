@@ -13,7 +13,6 @@ const useEventStatusUpdate = (currentStatus, oldMatchDateFromEvent) => {
     reason: "",
   });
 
-  // Update helpers
   const updatePostpone = (key, value) => {
     if (key === "oldMatchDate") return;
     setPostponeDetails((prev) => ({
@@ -26,14 +25,11 @@ const useEventStatusUpdate = (currentStatus, oldMatchDateFromEvent) => {
     setCancelDetails({ reason });
   };
 
-  // Status transition rules
   const isStatusAllowed = useMemo(() => {
     if (!status) return false;
 
-    // Draft → Published
     if (currentStatus === "Draft" && status === "Published") return true;
 
-    // Published / Postpone → Postpone or Cancelled
     if (
       (currentStatus === "Published" || currentStatus === "Postpone") &&
       (status === "Postpone" || status === "Cancelled")
@@ -44,7 +40,6 @@ const useEventStatusUpdate = (currentStatus, oldMatchDateFromEvent) => {
     return false;
   }, [currentStatus, status]);
 
-  // Postpone validation
   const postponeError = useMemo(() => {
     if (status !== "Postpone") return "";
 
@@ -62,7 +57,6 @@ const useEventStatusUpdate = (currentStatus, oldMatchDateFromEvent) => {
 
   const isPostponeValid = !postponeError;
 
-  // Cancel validation
   const cancelError = useMemo(() => {
     if (status !== "Cancelled") return "";
 

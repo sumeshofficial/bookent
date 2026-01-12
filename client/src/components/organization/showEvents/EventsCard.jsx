@@ -83,8 +83,8 @@ const EventsCard = ({
                     event.soldTickets / event.totalTickets > 0.8
                       ? "bg-green-600"
                       : event.soldTickets / event.totalTickets > 0.5
-                      ? "bg-orange-600"
-                      : "bg-blue-600"
+                        ? "bg-orange-600"
+                        : "bg-blue-600"
                   }`}
                   style={{
                     width: `${getBookingPercentage(

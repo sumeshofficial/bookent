@@ -41,10 +41,7 @@ const CouponRow = ({
     <tr className="hidden md:table-row border-b hover:bg-gray-50 text-sm">
       <CouponInfoCell coupon={coupon} />
 
-      <CouponStatusCell
-        coupon={coupon}
-        updateCoupon={updateCoupon}
-      />
+      <CouponStatusCell coupon={coupon} updateCoupon={updateCoupon} />
 
       <CouponActionsCell
         coupon={coupon}

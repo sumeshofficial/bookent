@@ -57,10 +57,7 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
   const bookingCutoff = new Date(matchDateTime.getTime() - 30 * 60000);
   const isCutoffPassed = new Date() > bookingCutoff;
 
-  const disableBooking =
-    isSoldOut ||
-    isCancelled ||
-    isCutoffPassed;
+  const disableBooking = isSoldOut || isCancelled || isCutoffPassed;
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8 transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]">
@@ -75,7 +72,9 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
               />
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-bold mt-8">{eventTitle}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mt-8">
+              {eventTitle}
+            </h1>
 
             <div className="flex flex-wrap items-center gap-6 text-gray-600 mt-4">
               <Link
@@ -95,7 +94,9 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
             </div>
 
             <h2 className="text-2xl font-bold mt-10">About the Match</h2>
-            <p className="text-gray-700 leading-relaxed mt-3">{eventDescription}</p>
+            <p className="text-gray-700 leading-relaxed mt-3">
+              {eventDescription}
+            </p>
 
             {tags?.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-2">
@@ -158,7 +159,9 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
 
               <div className="flex items-start gap-3">
                 <Hourglass className="w-5 h-5 text-gray-700" />
-                <span className="text-gray-800">{matchDuration / 60} Hours</span>
+                <span className="text-gray-800">
+                  {matchDuration / 60} Hours
+                </span>
               </div>
 
               <div className="flex items-start gap-3">
@@ -201,8 +204,8 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
                   {isSoldOut
                     ? "Sold Out"
                     : isCancelled
-                    ? "Cancelled"
-                    : "Book Now"}
+                      ? "Cancelled"
+                      : "Book Now"}
                 </button>
               </div>
             </div>

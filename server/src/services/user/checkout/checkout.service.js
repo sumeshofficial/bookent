@@ -158,7 +158,6 @@ export const paypalCreateOrder = async (ticketDetails, userId, couponCode) => {
 
     return result;
   } catch (error) {
-    console.log(error);
     throw new AppError(
       error?.status || STATUS_CODE.SERVER_ERROR,
       error?.code || ERRORS.PAYPAL_ORDER_ERROR.CODE,
@@ -325,7 +324,6 @@ export const walletCreateOrder = async (ticketDetails, user, couponCode) => {
 
     return order;
   } catch (error) {
-    console.log(error);
     throw new AppError(
       error?.status || STATUS_CODE.SERVER_ERROR,
       error?.code || ERRORS.WALLET_TRANSACTION_FAILED.CODE,

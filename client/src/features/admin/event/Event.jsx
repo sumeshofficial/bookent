@@ -22,10 +22,7 @@ const Event = () => {
     <div className="space-y-4 sm:px-6 sm:py-4 p-3 bg-white rounded-2xl">
       <BackButton label="Back to Events" />
 
-      <EventHeader
-        title={event.eventTitle}
-        status={event.eventStatus}
-      />
+      <EventHeader title={event.eventTitle} status={event.eventStatus} />
 
       <EventImages
         bannerImage={event.bannerImage}

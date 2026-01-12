@@ -1,5 +1,5 @@
 import { ChevronDown, Info } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 const BookingBox = ({
@@ -7,7 +7,7 @@ const BookingBox = ({
   ticketSetup = [],
   lockedSections,
   eventSlug,
-  lockSection
+  lockSection,
 }) => {
   const navigate = useNavigate();
 
@@ -41,25 +41,20 @@ const BookingBox = ({
     adjustedInfo?.availableTickets || 0
   );
 
-  useEffect(() => {
-    if (!adjustedInfo) return;
-
-    if (quantity > maxQty) {
-      setQuantity(maxQty || 1);
-    }
-
-    if (quantity < 1) {
-      setQuantity(1);
-    }
-  }, [selectedShape, adjustedInfo, maxQty, quantity]);
+  const clampedQty = useMemo(() => {
+    if (!adjustedInfo) return 1;
+    if (quantity < 1) return 1;
+    if (quantity > maxQty) return maxQty || 1;
+    return quantity;
+  }, [quantity, maxQty, adjustedInfo]);
 
   const handleSelectQty = (v) => {
-    setQuantity(v);
+    setQuantity(Math.min(Math.max(v, 1), maxQty || 1));
     setQtyOpen(false);
   };
 
   const handleBookNow = async () => {
-    lockSection(adjustedInfo.sectionId, quantity, (lockId) => {
+    lockSection(adjustedInfo.sectionId, clampedQty, (lockId) => {
       if (!lockId) return;
 
       sessionStorage.setItem("lockId", lockId);
@@ -69,8 +64,7 @@ const BookingBox = ({
   };
 
   const isSoldOut =
-    (adjustedInfo?.availableTickets || 0) === 0 ||
-    (maxQty || 0) === 0;
+    (adjustedInfo?.availableTickets || 0) === 0 || (maxQty || 0) === 0;
 
   return (
     <div className="w-full hidden lg:block lg:w-120 border rounded-xl shadow-md bg-white p-5 h-fit sticky top-5">
@@ -100,7 +94,7 @@ const BookingBox = ({
                 adjustedInfo?.availableTickets ? setQtyOpen(!qtyOpen) : null
               }
             >
-              <span>{quantity}</span>
+              <span>{clampedQty}</span>
               <ChevronDown className="w-5 h-4" />
             </div>
 

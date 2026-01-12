@@ -5,7 +5,7 @@ import { getRevenueSplit } from "./helper/getRevenueSplit.js";
 import { getSalesStatistics } from "./helper/getSalesStatistics.js";
 
 export const getAdminDashboard = async (filters = {}) => {
-  const [stats, monthlySales, revenueSplit, statistics, recentOrders, ] =
+  const [stats, monthlySales, revenueSplit, statistics, recentOrders] =
     await Promise.all([
       getDashboardStats(filters),
       getMonthlySales(filters),

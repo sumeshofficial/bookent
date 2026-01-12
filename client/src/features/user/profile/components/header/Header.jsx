@@ -25,23 +25,25 @@ const Header = ({ user, imageUpdate, openEdit }) => {
         <p className="text-gray-600 text-sm">{location.formattedLocation}</p>
       </div>
 
-      {user.authProvider === "email" && <div className="flex justify-center mt-5">
-        <button
-          type="button"
-          onClick={() =>
-            openModal("change-password", {
-              onClose: () => closeModal(),
-            })
-          }
-          className="inline-flex items-center gap-2
+      {user.authProvider === "email" && (
+        <div className="flex justify-center mt-5">
+          <button
+            type="button"
+            onClick={() =>
+              openModal("change-password", {
+                onClose: () => closeModal(),
+              })
+            }
+            className="inline-flex items-center gap-2
                px-4 py-2 rounded-lg
                bg-indigo-600 text-white text-sm font-medium
                hover:bg-indigo-700 transition
                focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        >
-          Change Password
-        </button>
-      </div>}
+          >
+            Change Password
+          </button>
+        </div>
+      )}
     </>
   );
 };

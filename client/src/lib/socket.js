@@ -6,6 +6,6 @@ const SOCKET_URL = ENV.VITE_SOCKET_URL;
 export const createSocket = (token) => {
   return io(SOCKET_URL, {
     auth: { token },
-    autoConnect: false, 
+    autoConnect: false,
   });
 };

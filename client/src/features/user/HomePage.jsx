@@ -26,8 +26,6 @@ const HomePage = () => {
     onError: () => toast.error("Failed to load banners"),
   });
 
-  console.log(bannerData);
-
   const recommendedEvents = data?.recommendedEvents || [];
   const trendingEvents = data?.trendingEvents || [];
   const liveEvents = data?.liveEvents || [];
@@ -51,10 +49,7 @@ const HomePage = () => {
 
       <main className="px-4 sm:px-8 lg:px-12 py-6 space-y-10">
         {!bannerLoading && (
-          <HeroCarousel
-            banners={bannerData || []}
-            loading={bannerLoading}
-          />
+          <HeroCarousel banners={bannerData || []} loading={bannerLoading} />
         )}
 
         {recommendedEvents.length > 0 && (

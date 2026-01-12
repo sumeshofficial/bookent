@@ -129,11 +129,17 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
                   )}
                   {selectedShape.type === "arc" && (
                     <>
-                      <h5 className="text-[11px] font-medium mt-2">Arc settings</h5>
+                      <h5 className="text-[11px] font-medium mt-2">
+                        Arc settings
+                      </h5>
                       <label>Outer Radius X</label>
                       <input
                         type="number"
-                        value={selectedShape.outerRadiusX || selectedShape.outerRadius || ""}
+                        value={
+                          selectedShape.outerRadiusX ||
+                          selectedShape.outerRadius ||
+                          ""
+                        }
                         onChange={(e) => {
                           const v = Number(e.target.value || 0);
                           setShapes((prev) =>
@@ -142,7 +148,10 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
                                 ? {
                                     ...s,
                                     outerRadiusX: v,
-                                    outerRadius: Math.max(v, s.outerRadius || 0),
+                                    outerRadius: Math.max(
+                                      v,
+                                      s.outerRadius || 0
+                                    ),
                                   }
                                 : s
                             )
@@ -154,7 +163,11 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
                       <label>Outer Radius Y</label>
                       <input
                         type="number"
-                        value={selectedShape.outerRadiusY || selectedShape.outerRadius || ""}
+                        value={
+                          selectedShape.outerRadiusY ||
+                          selectedShape.outerRadius ||
+                          ""
+                        }
                         onChange={(e) => {
                           const v = Number(e.target.value || 0);
                           setShapes((prev) =>
@@ -163,7 +176,10 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
                                 ? {
                                     ...s,
                                     outerRadiusY: v,
-                                    outerRadius: Math.max(v, s.outerRadius || 0),
+                                    outerRadius: Math.max(
+                                      v,
+                                      s.outerRadius || 0
+                                    ),
                                   }
                                 : s
                             )
@@ -175,7 +191,11 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
                       <label>Inner Radius X</label>
                       <input
                         type="number"
-                        value={selectedShape.innerRadiusX || selectedShape.innerRadius || ""}
+                        value={
+                          selectedShape.innerRadiusX ||
+                          selectedShape.innerRadius ||
+                          ""
+                        }
                         onChange={(e) => {
                           const v = Number(e.target.value || 0);
                           setShapes((prev) =>
@@ -192,7 +212,11 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
                       <label>Inner Radius Y</label>
                       <input
                         type="number"
-                        value={selectedShape.innerRadiusY || selectedShape.innerRadius || ""}
+                        value={
+                          selectedShape.innerRadiusY ||
+                          selectedShape.innerRadius ||
+                          ""
+                        }
                         onChange={(e) => {
                           const v = Number(e.target.value || 0);
                           setShapes((prev) =>
@@ -211,8 +235,12 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
                       <input
                         type="number"
                         value={
-                          (selectedShape.outerRadiusX || selectedShape.outerRadius || 0) -
-                          (selectedShape.innerRadiusX || selectedShape.innerRadius || 0)
+                          (selectedShape.outerRadiusX ||
+                            selectedShape.outerRadius ||
+                            0) -
+                          (selectedShape.innerRadiusX ||
+                            selectedShape.innerRadius ||
+                            0)
                         }
                         onChange={(e) => {
                           const v = Number(e.target.value || 0);
@@ -221,9 +249,18 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
                               s.id === selectedId
                                 ? {
                                     ...s,
-                                    innerRadiusX: Math.max(1, (s.outerRadiusX || s.outerRadius || 0) - v),
-                                    innerRadiusY: Math.max(1, (s.outerRadiusY || s.outerRadius || 0) - v),
-                                    innerRadius: Math.max(1, (s.outerRadius || 0) - v),
+                                    innerRadiusX: Math.max(
+                                      1,
+                                      (s.outerRadiusX || s.outerRadius || 0) - v
+                                    ),
+                                    innerRadiusY: Math.max(
+                                      1,
+                                      (s.outerRadiusY || s.outerRadius || 0) - v
+                                    ),
+                                    innerRadius: Math.max(
+                                      1,
+                                      (s.outerRadius || 0) - v
+                                    ),
                                   }
                                 : s
                             )
@@ -250,7 +287,10 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
                         type="number"
                         value={selectedShape.startAngle || ""}
                         onChange={(e) => {
-                          const v = e.target.value === "" ? undefined : Number(e.target.value);
+                          const v =
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value);
                           setShapes((prev) =>
                             prev.map((s) =>
                               s.id === selectedId ? { ...s, startAngle: v } : s

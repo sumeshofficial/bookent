@@ -23,7 +23,7 @@ const BasicInfo = ({ register, errors, setValue, watch }) => {
       const newTags = [...currentTags, newTag];
       try {
         await validationSchema[0].fields.tags.validate(newTags);
-        setValue("tags", newTags, { shouldValidate: true, shouldDirty: true  });
+        setValue("tags", newTags, { shouldValidate: true, shouldDirty: true });
         setTag("");
         setTagError("");
       } catch (error) {

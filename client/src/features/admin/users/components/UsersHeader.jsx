@@ -1,9 +1,6 @@
 import { Search } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
-import {
-  SORT_OPTIONS,
-  STATUS_FILTERS,
-} from "../constants/users.constants";
+import { SORT_OPTIONS, STATUS_FILTERS } from "../constants/users.constants";
 
 const UsersHeader = () => {
   const [searchParams, setSearchParams] = useSearchParams();

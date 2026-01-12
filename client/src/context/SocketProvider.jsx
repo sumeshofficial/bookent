@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { createSocket } from "../lib/socket";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../app/userSlice";
@@ -9,9 +9,14 @@ import { SOCKET_EVENTS, SocketContext } from "../utils/constants";
 
 export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
-  const [socket, setSocket] = useState(null);
+  const token =
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("adminAccessToken");
 
-  const token = localStorage.getItem("accessToken") || localStorage.getItem("adminAccessToken");
+  const socket = useMemo(() => {
+    if (!token) return null;
+    return createSocket(token);
+  }, [token]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -24,26 +29,20 @@ export const SocketProvider = ({ children }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!socket) return;
 
-    const socket = createSocket(token);
     socket.connect();
 
-    // Listen for block event
     socket.on(SOCKET_EVENTS.USER_BLOCKED, (data) => {
       toast.error(data.message || "You have been blocked.");
       handleLogout();
     });
 
-    socket.on("connect_error", (err) => {
-      console.log(err.message);
-      console.log(err.data);
-    });
-
-    setSocket(socket);
-
-    return () => socket.disconnect();
-  }, [token, handleLogout]);
+    return () => {
+      socket.off(SOCKET_EVENTS.USER_BLOCKED);
+      socket.disconnect();
+    };
+  }, [socket, handleLogout]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

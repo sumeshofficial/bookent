@@ -3,17 +3,19 @@ import { clearError } from "../../../app/userSlice";
 import { useModal } from "../../../utils/constants";
 
 const EmailButton = () => {
-
   const { openModal } = useModal();
   const dispatch = useDispatch();
 
   const handleOnClick = () => {
-    openModal("signup"); 
+    openModal("signup");
     dispatch(clearError());
-  }
+  };
 
   return (
-    <button onClick={handleOnClick} className="border-2 rounded-xl border-gray-800 px-3 py-2 flex items-center">
+    <button
+      onClick={handleOnClick}
+      className="border-2 rounded-xl border-gray-800 px-3 py-2 flex items-center"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="28"

@@ -43,13 +43,11 @@ export const useCouponFilters = (coupons) => {
         status === "ACTIVE" ? c.isActive : !c.isActive
       );
 
-    if (type !== "ALL")
-      data = data.filter((c) => c.discountType === type);
+    if (type !== "ALL") data = data.filter((c) => c.discountType === type);
 
     if (date === "ACTIVE")
       data = data.filter(
-        (c) =>
-          new Date(c.startDate) <= now && new Date(c.expiryDate) >= now
+        (c) => new Date(c.startDate) <= now && new Date(c.expiryDate) >= now
       );
     else if (date === "UPCOMING")
       data = data.filter((c) => new Date(c.startDate) > now);
@@ -58,26 +56,27 @@ export const useCouponFilters = (coupons) => {
 
     if (from)
       data = data.filter((c) => new Date(c.startDate) >= new Date(from));
-    if (to)
-      data = data.filter((c) => new Date(c.expiryDate) <= new Date(to));
+    if (to) data = data.filter((c) => new Date(c.expiryDate) <= new Date(to));
 
     if (sort === "EXPIRY")
-      data.sort(
-        (a, b) => new Date(a.expiryDate) - new Date(b.expiryDate)
-      );
-    else if (sort === "USAGE")
-      data.sort((a, b) => b.usedCount - a.usedCount);
-    else
-      data.sort(
-        (a, b) => new Date(b.startDate) - new Date(a.startDate)
-      );
+      data.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
+    else if (sort === "USAGE") data.sort((a, b) => b.usedCount - a.usedCount);
+    else data.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
 
     return data;
   }, [coupons, search, status, type, date, sort, from, to]);
 
   return {
     filters: { search, status, type, date, sort, from, to },
-    setFilters: { setSearch, setStatus, setType, setDate, setSort, setFrom, setTo },
+    setFilters: {
+      setSearch,
+      setStatus,
+      setType,
+      setDate,
+      setSort,
+      setFrom,
+      setTo,
+    },
     filteredCoupons,
   };
 };

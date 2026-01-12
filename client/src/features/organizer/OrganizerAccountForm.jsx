@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import logo from "../../assets/bookent-logo-white.png";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import {
   getState,
   registerOrganizationAccount,
@@ -21,11 +21,21 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
     handleSubmit,
     reset,
     setValue,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm({
     mode: "onBlur",
   });
+
+  const orgName = useWatch({ control, name: "orgName" });
+  const orgAddress = useWatch({ control, name: "orgAddress" });
+  const stateValue = useWatch({ control, name: "state" });
+  const beneficiaryName = useWatch({ control, name: "beneficiaryName" });
+  const accountNumber = useWatch({ control, name: "accountNumber" });
+  const accountType = useWatch({ control, name: "accountType" });
+  const bankName = useWatch({ control, name: "bankName" });
+  const bankIFSC = useWatch({ control, name: "bankIFSC" });
+  const paypalEmail = useWatch({ control, name: "paypalEmail" });
 
   const dispatch = useDispatch();
   const [stateList, setStateList] = useState([]);
@@ -33,7 +43,6 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
   const [isError, setError] = useState();
 
   const { organizer } = useSelector((store) => store.organizer);
-  const [isUnchanged, setIsUnchanged] = useState(true);
 
   useEffect(() => {
     if (isRejected && organizer && stateList.length > 0) {
@@ -56,38 +65,49 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
         paypalEmail: organizer.paypalEmail || "",
       });
     }
-  }, [isRejected, organizer, stateList]);
+  }, [isRejected, organizer, reset, stateList]);
 
-  useEffect(() => {
-    if (isRejected && organizer) {
-      const current = {
-        orgName: watch("orgName"),
-        orgAddress: watch("orgAddress"),
-        state: watch("state"),
-        beneficiaryName: watch("beneficiaryName"),
-        accountNumber: watch("accountNumber"),
-        accountType: watch("accountType"),
-        bankName: watch("bankName"),
-        bankIFSC: watch("bankIFSC"),
-        paypalEmail: watch("paypalEmail"),
-      };
+  const isUnchanged = useMemo(() => {
+  if (!isRejected || !organizer) return false;
 
-      const original = {
-        orgName: organizer.organizationDetails.name,
-        orgAddress: organizer.organizationDetails.address,
-        state: organizer.organizationDetails.state,
-        beneficiaryName: organizer.bankAccountDetails.beneficiaryName,
-        accountNumber: organizer.bankAccountDetails.accountNumber,
-        accountType: organizer.bankAccountDetails.accountType,
-        bankName: organizer.bankAccountDetails.bankName,
-        bankIFSC: organizer.bankAccountDetails.ifsc,
-        paypalEmail: organizer.paypalEmail,
-      };
+  const current = {
+    orgName,
+    orgAddress,
+    state: stateValue,
+    beneficiaryName,
+    accountNumber,
+    accountType,
+    bankName,
+    bankIFSC,
+    paypalEmail,
+  };
 
-      const unchanged = JSON.stringify(current) === JSON.stringify(original);
-      setIsUnchanged(unchanged);
-    }
-  }, [watch(), isRejected, organizer]);
+  const original = {
+    orgName: organizer.organizationDetails.name,
+    orgAddress: organizer.organizationDetails.address,
+    state: organizer.organizationDetails.state,
+    beneficiaryName: organizer.bankAccountDetails.beneficiaryName,
+    accountNumber: organizer.bankAccountDetails.accountNumber,
+    accountType: organizer.bankAccountDetails.accountType,
+    bankName: organizer.bankAccountDetails.bankName,
+    bankIFSC: organizer.bankAccountDetails.ifsc,
+    paypalEmail: organizer.paypalEmail,
+  };
+
+  return JSON.stringify(current) === JSON.stringify(original);
+}, [
+  isRejected,
+  organizer,
+  orgName,
+  orgAddress,
+  stateValue,
+  beneficiaryName,
+  accountNumber,
+  accountType,
+  bankName,
+  bankIFSC,
+  paypalEmail,
+]);
 
   useEffect(() => {
     const fetchStates = async () => {
@@ -95,8 +115,11 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
         const data = await getState();
         setStateList(data);
       } catch (error) {
-        console.error("Error fetching states:", error);
-        toast.error("Failed to load states");
+        toast.error(
+          error?.response?.data?.message ||
+            error.message ||
+            "Something went wrong"
+        );
       }
     };
     fetchStates();
@@ -133,7 +156,6 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
       updatedOrganizationDetails.state = data.state;
     }
 
-    // Paypal email change detection (correct)
     let paypalEmailUpdated = false;
     if (!isRejected || data.paypalEmail !== organizer?.paypalEmail) {
       paypalEmailUpdated = true;

@@ -2,7 +2,7 @@ import ModalCloseButton from "./components/ModalCloseButton";
 import FormActions from "./components/FormActions";
 import FormInput from "./components/FormInput";
 import { useChangePassword } from "../../../hooks/useChangePassword";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useChangePasswordLogic } from "../../../hooks/useChanegPasswordLogic";
 
 const ChangePassword = ({ onClose }) => {
@@ -10,10 +10,15 @@ const ChangePassword = ({ onClose }) => {
   const onSubmit = useChangePasswordLogic(mutate, onClose);
   const {
     register,
-    watch,
+    control,
     formState: { errors, isValid },
     handleSubmit,
   } = useForm({ mode: "onTouched" });
+
+  const newPassword = useWatch({
+    control,
+    name: "newPassword",
+  });
 
   return (
     <div className="relative p-6">
@@ -64,7 +69,7 @@ const ChangePassword = ({ onClose }) => {
             validation={{
               required: "Please confirm your new password",
               validate: (value) =>
-                value === watch("newPassword") || "Passwords do not match",
+                value === newPassword || "Passwords do not match",
             }}
           />
         </div>

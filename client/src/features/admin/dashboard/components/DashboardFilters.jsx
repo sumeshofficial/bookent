@@ -25,9 +25,9 @@ const DashboardFilters = () => {
   };
 
   const updateMonth = (key, value) => {
-    searchParams.set(key, value)
-    setSearchParams(searchParams)
-  }
+    searchParams.set(key, value);
+    setSearchParams(searchParams);
+  };
 
   return (
     <div className="flex gap-4 items-center">
@@ -43,22 +43,20 @@ const DashboardFilters = () => {
         <option value="custom">Custom</option>
       </select>
 
-      {
-        preset === "custom" && (
-          <div  className="space-x-3">
-            <input
-              type="date"
-              value={fromDate || ""}
-              onChange={(e) => updateMonth("fromDate", e.target.value)}
-            />
-            <input
-              type="date"
-              value={toDate || ""}
-              onChange={(e) => updateMonth("toDate", e.target.value)}
-            />
-          </div>
-        )
-      }
+      {preset === "custom" && (
+        <div className="space-x-3">
+          <input
+            type="date"
+            value={fromDate || ""}
+            onChange={(e) => updateMonth("fromDate", e.target.value)}
+          />
+          <input
+            type="date"
+            value={toDate || ""}
+            onChange={(e) => updateMonth("toDate", e.target.value)}
+          />
+        </div>
+      )}
 
       {preset === "year" && (
         <select

@@ -3,8 +3,7 @@ import EmailButton from "./emailAuth/EmailButton";
 import GoogleButton from "./googleAuth/GoogleButton";
 
 const AuthModal = () => {
-
-  const { error } = useSelector(store => store.user);
+  const { error } = useSelector((store) => store.user);
 
   return (
     <div className="w-full flex justify-center mt-3 mb-5 px-4">
@@ -14,7 +13,11 @@ const AuthModal = () => {
             Get Started with Bookent
           </h1>
         </div>
-        {error && <div className="text-center mb-5"><span className="text-red-500">{error}</span></div>}
+        {error && (
+          <div className="text-center mb-5">
+            <span className="text-red-500">{error}</span>
+          </div>
+        )}
         <div className="flex flex-col gap-4">
           <EmailButton />
           <GoogleButton />

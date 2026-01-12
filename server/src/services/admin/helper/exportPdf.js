@@ -160,7 +160,7 @@ export const exportSalesPDF = ({ rows, summary }) => {
   drawTableHeader(doc.y);
   let yPos = doc.y + 25;
 
-  rows.forEach((r, i) => {
+  rows.forEach((r) => {
     if (yPos > doc.page.height - 60) {
       doc.addPage();
       yPos = doc.page.margins.top;

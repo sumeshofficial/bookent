@@ -14,7 +14,7 @@ export const usePaypalLogic = (eventSlug) => {
     try {
       const order = await createPayPalOrder({
         lockId,
-        couponCode, 
+        couponCode,
       });
       return order.id;
     } catch (error) {
@@ -24,19 +24,24 @@ export const usePaypalLogic = (eventSlug) => {
   };
 
   const onApprove = async (data) => {
-    const orderID = data.orderID
+    const orderID = data.orderID;
     const order = await capturePayPalOrder({
       orderID,
       lockId,
-      couponCode, 
+      couponCode,
     });
     sessionStorage.removeItem("appliedCoupon");
-    navigate(`/payment-processing?orderId=${order.orderId}&eventSlug=${eventSlug}`);
+    navigate(
+      `/payment-processing?orderId=${order.orderId}&eventSlug=${eventSlug}`
+    );
   };
 
-  const onError = (err) => {
-    console.error("PayPal error:", err);
-    toast.error("Payment failed");
+  const onError = (error) => {
+    toast.error(
+      error?.response?.data?.error.message ||
+        error.message ||
+        "Something went wrong"
+    );
   };
 
   const onCancel = () => {

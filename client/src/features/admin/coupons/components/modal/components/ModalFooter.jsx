@@ -13,7 +13,13 @@ const ModalFooter = ({ onClose, isPending, coupon }) => {
         disabled={isPending}
         className="bg-blue-600 hover:bg-blue-700 transition text-white text-base px-3 sm:px-6 py-2.5 rounded-lg font-semibold shadow disabled:opacity-50"
       >
-        {isPending ? coupon ? "Updating..." : "Creating..." :  coupon ? "Update Coupon" :"Create Coupon"}
+        {isPending
+          ? coupon
+            ? "Updating..."
+            : "Creating..."
+          : coupon
+            ? "Update Coupon"
+            : "Create Coupon"}
       </button>
     </div>
   );

@@ -70,9 +70,9 @@ const BannerTable = ({ banners, onDelete, onEdit, isUpdating }) => {
                         title: b.title,
                         isActive: b.isActive,
                         image: b.image,
-                        mobileImage: b.mobileImage
+                        mobileImage: b.mobileImage,
                       },
-                      isEdit: true
+                      isEdit: true,
                     })
                   }
                 />

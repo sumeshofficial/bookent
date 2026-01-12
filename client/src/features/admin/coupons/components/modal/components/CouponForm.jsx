@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useEffect } from "react";
 
 import ModalFooter from "./ModalFooter";
@@ -12,10 +12,10 @@ const CouponForm = ({ handleSubmit, coupon, onClose, isPending }) => {
   const {
     register,
     handleSubmit: handleFormSubmit,
-    watch,
     setValue,
     reset,
     getValues,
+    control,
     formState: { errors },
   } = useForm({
     mode: "onTouched",
@@ -37,8 +37,15 @@ const CouponForm = ({ handleSubmit, coupon, onClose, isPending }) => {
     }
   }, [coupon, reset]);
 
-  const discountType = watch("discountType");
-  const isActive = watch("isActive");
+  const discountType = useWatch({
+    control,
+    name: "discountType",
+  });
+
+  const isActive = useWatch({
+    control,
+    name: "isActive",
+  });
 
   return (
     <form
@@ -56,7 +63,11 @@ const CouponForm = ({ handleSubmit, coupon, onClose, isPending }) => {
 
       <CouponLimitsSection register={register} errors={errors} />
 
-      <CouponDateSection register={register} errors={errors} getValues={getValues} />
+      <CouponDateSection
+        register={register}
+        errors={errors}
+        getValues={getValues}
+      />
 
       <CouponStatusSection isActive={isActive} setValue={setValue} />
 

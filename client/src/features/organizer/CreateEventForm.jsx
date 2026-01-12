@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProgressSteps from "../../components/organization/CreateEvent/ProgressSteps";
 import BasicInfo from "../../components/organization/createEvent/BasicInfo";
 import { useForm } from "react-hook-form";
@@ -22,12 +22,10 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 const CreateEventForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const { organizer } = useSelector((store) => store.organizer);
-  const [isModified, setIsModified] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [updatedEventSlug, setUpdatedEventSlug] = useState(null);
 
@@ -68,12 +66,9 @@ const CreateEventForm = () => {
 
   const { register, handleSubmit, formState, setValue, watch, trigger, reset } =
     method;
-  const { errors, isSubmitting, dirtyFields } = formState;
+  const { errors, isSubmitting, dirtyFields, isDirty } = formState;
 
-  useEffect(() => {
-    const sub = watch(() => setIsModified(true));
-    return () => sub.unsubscribe();
-  }, [watch]);
+  const isModified = isDirty;
 
   useEffect(() => {
     if (eventData) {
@@ -81,7 +76,6 @@ const CreateEventForm = () => {
         ...eventData,
         matchDate: eventData.matchDate ? eventData.matchDate.split("T")[0] : "",
       });
-      setIsModified(false);
     }
   }, [eventData, reset]);
 
@@ -158,7 +152,6 @@ const CreateEventForm = () => {
         const uploadUrls = updatedEvent?.uploadUrls;
 
         if (!uploadUrls) {
-          setIsModified(false);
           setIsSubmitted(true);
           return setUpdatedEventSlug(updatedEvent.event.slug);
         }
@@ -214,10 +207,11 @@ const CreateEventForm = () => {
         setUpdatedEventSlug(event.slug);
       }
 
-      setIsModified(false);
       setIsSubmitted(true);
     } catch (error) {
-      toast.error( error?.response?.data?.error?.message||"Something went wrong");
+      toast.error(
+        error?.response?.data?.error?.message || "Something went wrong"
+      );
     }
   };
 

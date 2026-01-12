@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import StadiumLayout from "../selectStadium/StadiumLayout";
 import { useState } from "react";
 import { Pencil } from "lucide-react";
@@ -24,11 +24,9 @@ const CreateStadiumInput = ({
   stadiumData,
   dirtyFields,
 }) => {
-  const [previewUrl, setPreviewUrl] = useState(null);
   const [isAvailable, setIsAvailable] = useState(null);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
-  const [isValid, setIsValid] = useState(false);
 
   const values = useWatch({
     control,
@@ -55,12 +53,58 @@ const CreateStadiumInput = ({
     stadiumLayout,
   ] = values;
 
-  useEffect(() => {
-    if (stateCode) fetchCities(stateCode);
-  }, [stateCode]);
+  const previewUrl = useMemo(() => {
+    if (
+      stadiumLayout?.layoutImage &&
+      typeof stadiumLayout.layoutImage === "string" &&
+      stadiumLayout.layoutImage.includes("https")
+    ) {
+      return stadiumLayout.layoutImage;
+    }
 
-  const debouncedCheck = useCallback(
-    debounce(async (name) => {
+    if (stadiumLayout?.layoutImage instanceof File) {
+      return URL.createObjectURL(stadiumLayout.layoutImage);
+    }
+
+    return null;
+  }, [stadiumLayout]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const isValid = Boolean(
+    stadiumName && address && city && state && pincode && location
+  );
+
+  const fetchCities = useCallback(
+    async (stateCode) => {
+      if (!stateCode) {
+        if (city) setCities([]);
+        return;
+      }
+      try {
+        const data = await getCity(stateCode);
+        setCities(data);
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.error?.message ||
+            error.message ||
+            "Something went wrong"
+        );
+      }
+    },
+    [city]
+  );
+
+  if (stateCode) fetchCities(stateCode);
+
+  const debouncedCheck = useMemo(() => {
+    return debounce(async (name) => {
       if (!name?.trim()) {
         setIsAvailable(null);
         return;
@@ -72,9 +116,8 @@ const CreateStadiumInput = ({
       } catch (error) {
         toast.error(error.message);
       }
-    }, 500),
-    [stadiumData]
-  );
+    }, 500);
+  }, [stadiumData]);
 
   useEffect(() => {
     debouncedCheck(stadiumName);
@@ -82,52 +125,20 @@ const CreateStadiumInput = ({
   }, [stadiumName, debouncedCheck]);
 
   useEffect(() => {
-    if (
-      stadiumLayout?.layoutImage &&
-      typeof stadiumLayout.layoutImage === "string" &&
-      stadiumLayout.layoutImage.includes("https")
-    ) {
-      const url = stadiumLayout?.layoutImage;
-      return setPreviewUrl(url);
-    }
-    if (stadiumLayout?.layoutImage) {
-      const url = URL.createObjectURL(stadiumLayout.layoutImage);
-      setPreviewUrl(url);
-
-      return () => URL.revokeObjectURL(url);
-    }
-  }, [stadiumLayout]);
-
-  useEffect(() => {
     const fetchStates = async () => {
       try {
         const data = await getState();
         setStates(data);
       } catch (error) {
-        console.error("Error fetching states:", error);
-        toast.error("Failed to load states");
+        toast.error(
+          error?.response?.data?.error.message ||
+            error.message ||
+            "Something went wrong"
+        );
       }
     };
     fetchStates();
   }, []);
-
-  const fetchCities = async (stateCode) => {
-    if (!stateCode) {
-      if (city) setCities([]);
-      return;
-    }
-    try {
-      const data = await getCity(stateCode);
-      setCities(data);
-    } catch (error) {
-      console.error("Error fetching cities:", error);
-      toast.error("Failed to load cities");
-    }
-  };
-
-  useEffect(() => {
-    setIsValid(stadiumName && address && city && state && pincode && location);
-  }, [values]);
 
   return (
     <div className="bg-white py-4 px-6 sm:py-6 sm:px-8 rounded-md">
@@ -181,7 +192,7 @@ const CreateStadiumInput = ({
             <Controller
               control={control}
               name="state"
-              render={({ field }) => (
+              render={() => (
                 <select
                   value={
                     state && stateCode

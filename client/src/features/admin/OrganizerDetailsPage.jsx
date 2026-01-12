@@ -7,7 +7,6 @@ import {
   ArrowLeft,
   ChevronDown,
   Save,
-  Circle,
   Check,
   X,
 } from "lucide-react";
@@ -24,8 +23,13 @@ import { useModal } from "../../utils/constants";
 const OrganizerDetailsPage = () => {
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["organizer", id],
+    queryFn: () => getOrganizerDetails(id),
+  });
+  const organizer = data?.organizer;
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(() => organizer?.status ?? "");
   const { openModal, closeModal } = useModal();
 
   const navigate = useNavigate();
@@ -43,22 +47,11 @@ const OrganizerDetailsPage = () => {
     }
   };
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["organizer", id],
-    queryFn: () => getOrganizerDetails(id),
-  });
-
   useEffect(() => {
     if (error) {
       toast.error(error);
     }
   }, [error]);
-
-  const organizer = data?.organizer;
-
-  useEffect(() => {
-    if (organizer) setSelectedStatus(organizer.status);
-  }, [organizer]);
 
   const handleRequestMutation = useMutation({
     mutationFn: handleOrganizerRequest,
@@ -87,7 +80,7 @@ const OrganizerDetailsPage = () => {
   };
 
   return (
-    <main className="flex-1 p-6 lg:p-8">
+    <main key={id} className="flex-1 p-6 lg:p-8">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 mb-6 text-gray-600 hover:text-gray-800 transition"
@@ -181,7 +174,6 @@ const OrganizerDetailsPage = () => {
                 </div>
               </div>
             )}
-
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

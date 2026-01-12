@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateUserProfile,
@@ -20,9 +20,18 @@ const useEditProfile = () => {
     },
   });
 
-  const { watch, reset } = form;
-  const sameFullname = user.fullname === watch("fullname");
-  const sameEmail = user.email === watch("email");
+  const { reset, control } = form;
+  const fullname = useWatch({
+    control,
+    name: "fullname",
+  });
+
+  const email = useWatch({
+    control,
+    name: "email",
+  });
+  const sameFullname = user.fullname === fullname;
+  const sameEmail = user.email === email;
 
   const submitHandler = async (data, dirtyFields) => {
     const updatedFields = Object.keys(dirtyFields).reduce((acc, key) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const useResizer = (containerRef) => {
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -15,7 +15,7 @@ const useResizer = (containerRef) => {
     updateSize();
     window.addEventListener("resize", updateSize);
     return () => window.removeEventListener("resize", updateSize);
-  }, []);
+  }, [containerRef]);
 
   return size;
 };

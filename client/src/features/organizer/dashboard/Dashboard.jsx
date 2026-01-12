@@ -11,8 +11,6 @@ import TopEventsCard from "./components/TopEventsCard";
 const Dashboard = () => {
   const { data, isLoading } = useAdminDashboard();
 
-  console.log(data);
-
   if (isLoading) {
     return <DashboardSkeleton />;
   }

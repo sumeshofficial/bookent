@@ -12,7 +12,10 @@ export const createBanner = async (payload) => {
 };
 
 export const updateBanner = async (payload) => {
-  const { data } = await adminApi.patch(`/admin/banners/${payload.id}`, payload);
+  const { data } = await adminApi.patch(
+    `/admin/banners/${payload.id}`,
+    payload
+  );
   return data;
 };
 

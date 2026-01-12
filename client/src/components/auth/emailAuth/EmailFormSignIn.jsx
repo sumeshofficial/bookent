@@ -43,7 +43,7 @@ const EmailFormSignIn = ({ onSubmit }) => {
           Forgot Password
         </button>
       </div>
-      
+
       <div className="text-center">
         <button
           type="submit"

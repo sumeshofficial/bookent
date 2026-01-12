@@ -12,7 +12,7 @@ const ForgotPasswordEmail = () => {
   const onSubmit = async (data) => {
     try {
       setError("");
-      const response = await sendOTP({ data, purpose: "forgot-password"});
+      const response = await sendOTP({ data, purpose: "forgot-password" });
       toast.success("OTP sent successfully");
       reset();
       openModal("otp", {

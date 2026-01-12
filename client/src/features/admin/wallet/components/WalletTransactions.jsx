@@ -39,7 +39,7 @@ const WalletTransactions = ({ transactions, pagination }) => {
                       : "text-red-600"
                   }`}
                 >
-                  {`${txn.transaction_direction === TRANSACTION_TYPE.CREDIT ? "+" : "-" }$${txn.amount.value}`}
+                  {`${txn.transaction_direction === TRANSACTION_TYPE.CREDIT ? "+" : "-"}$${txn.amount.value}`}
                 </td>
                 <td className="px-4 py-3">{formatDate(txn.createdAt)}</td>
                 <td className="px-4 py-3">

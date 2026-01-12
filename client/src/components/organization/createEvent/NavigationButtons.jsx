@@ -26,7 +26,10 @@ const NavigationButtons = ({
           </button>
           <button
             type="button"
-            disabled={isSubmitting || (currentStep === 5 && Object.keys(dirtyFields).length === 0)}
+            disabled={
+              isSubmitting ||
+              (currentStep === 5 && Object.keys(dirtyFields).length === 0)
+            }
             onClick={() => {
               if (currentStep === 5) {
                 document.querySelector("form").requestSubmit();

@@ -17,19 +17,16 @@ const CouponInfoCell = ({ coupon }) => {
             : `$${coupon.discountValue} OFF`}
         </p>
 
-        {coupon.discountType === "PERCENTAGE" &&
-          coupon.maxDiscountAmount && (
-            <p className="text-xs text-gray-500">
-              Max ${coupon.maxDiscountAmount}
-            </p>
-          )}
+        {coupon.discountType === "PERCENTAGE" && coupon.maxDiscountAmount && (
+          <p className="text-xs text-gray-500">
+            Max ${coupon.maxDiscountAmount}
+          </p>
+        )}
       </td>
 
       <td className="p-3 text-center">
         {coupon.usedCount} / {coupon.usageLimit ?? "∞"}
-        <p className="text-xs text-gray-500">
-          Per user: {coupon.perUserLimit}
-        </p>
+        <p className="text-xs text-gray-500">Per user: {coupon.perUserLimit}</p>
       </td>
 
       <td className="p-3 text-center text-xs">

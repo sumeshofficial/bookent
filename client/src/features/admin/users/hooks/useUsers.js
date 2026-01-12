@@ -34,14 +34,7 @@ export const useUsers = (limit = 5) => {
   }, [search, debouncedSearchFn]);
 
   return useQuery({
-    queryKey: [
-      USERS_QUERY_KEY,
-      page,
-      limit,
-      debouncedSearch,
-      sort,
-      status,
-    ],
+    queryKey: [USERS_QUERY_KEY, page, limit, debouncedSearch, sort, status],
     queryFn: () =>
       fetchUsers({
         page,
@@ -51,7 +44,6 @@ export const useUsers = (limit = 5) => {
         status,
       }),
     keepPreviousData: true,
-    onError: (err) =>
-      toast.error(err?.message || "Failed to fetch users"),
+    onError: (err) => toast.error(err?.message || "Failed to fetch users"),
   });
 };

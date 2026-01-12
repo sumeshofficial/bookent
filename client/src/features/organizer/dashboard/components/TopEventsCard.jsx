@@ -28,7 +28,9 @@ const TopEventsCard = ({ events = [] }) => {
                 )}
 
                 <div>
-                  <p className="text-sm font-medium">{event.eventTitle || event.eventSlug}</p>
+                  <p className="text-sm font-medium">
+                    {event.eventTitle || event.eventSlug}
+                  </p>
                   <p className="text-xs text-gray-500">
                     Tickets sold: {event.totalTicketsSold ?? 0}
                   </p>
@@ -37,10 +39,10 @@ const TopEventsCard = ({ events = [] }) => {
 
               <div className="text-right">
                 <p className="text-sm font-semibold text-green-600">
-                  ${((event.organizerNetRevenue ?? 0)).toFixed(2)}
+                  ${(event.organizerNetRevenue ?? 0).toFixed(2)}
                 </p>
                 <p className="text-xs text-gray-400">
-                  Gross: ${((event.grossTicketSales ?? 0)).toFixed(2)}
+                  Gross: ${(event.grossTicketSales ?? 0).toFixed(2)}
                 </p>
               </div>
             </li>

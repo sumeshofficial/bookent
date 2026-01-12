@@ -1,4 +1,11 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const MonthlySalesBar = ({ data }) => (
   <div className="bg-white rounded-xl p-5 shadow-sm">

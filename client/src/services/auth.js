@@ -110,7 +110,6 @@ export const editProfile = async ({ data }) => {
   return response.data;
 };
 
-// Admin api post
 export const adminLogin = async ({ email, password }) => {
   if (!email || !password) return;
 

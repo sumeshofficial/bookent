@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import toast from "react-hot-toast";
 
@@ -13,7 +13,7 @@ export const useTicketScanner = ({
   const hasScannedRef = useRef(false);
   const startedRef = useRef(false);
 
-  const startScanner = () => {
+  const startScanner = useCallback(() => {
     const element = document.getElementById("qr-reader");
     if (!element) return;
 
@@ -64,7 +64,7 @@ export const useTicketScanner = ({
         toast.warn(`QR error: ${error.message}`);
       }
     );
-  };
+  }, [eventId, onError, onLoading, onSuccess, verifyTicket]);
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -81,7 +81,7 @@ export const useTicketScanner = ({
       startedRef.current = false;
       hasScannedRef.current = false;
     };
-  }, []);
+  }, [startScanner]);
 
   const scanAgain = () => {
     hasScannedRef.current = false;

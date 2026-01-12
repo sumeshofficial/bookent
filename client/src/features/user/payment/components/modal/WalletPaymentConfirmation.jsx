@@ -1,14 +1,10 @@
 import { X, Wallet } from "lucide-react";
 import { usePaymentMethods } from "../../hooks/usePaymentMethods";
 
-const WalletPaymentConfirmation = ({
-  amount,
-  balance,
-  onCancel,
-}) => {
+const WalletPaymentConfirmation = ({ amount, balance, onCancel }) => {
   const insufficientBalance = balance < amount;
 
-  const { isLoading, error, onClick } = usePaymentMethods()
+  const { isLoading, error, onClick } = usePaymentMethods();
 
   return (
     <div className="w-full relative">

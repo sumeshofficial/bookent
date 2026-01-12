@@ -1,12 +1,9 @@
-// import InputBox from "../../../sharedComponents/InputBox";
 import InputBox from "../../../sharedComponents/user/InputBox";
 import { useContextForm } from "../../../utils/constants";
 
-const EmailFormSignUp = ({
-  onSubmit
-}) => {
-
-  const { handleSubmit, isSubmitting, watch, register, errors } = useContextForm();
+const EmailFormSignUp = ({ onSubmit }) => {
+  const { handleSubmit, isSubmitting, watch, register, errors } =
+    useContextForm();
   const passwordValue = watch("password");
 
   return (

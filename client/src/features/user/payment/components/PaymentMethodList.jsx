@@ -1,7 +1,6 @@
 import PaymentOptionCard from "./PaymentOptionCard";
 
 const PaymentMethodList = ({ methods }) => {
-
   return (
     <div className="p-4 flex flex-col gap-3">
       {methods.map((method) => (
@@ -12,8 +11,6 @@ const PaymentMethodList = ({ methods }) => {
           onClick={method.onClick}
         />
       ))}
-
-      
     </div>
   );
 };

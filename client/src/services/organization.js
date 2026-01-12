@@ -2,7 +2,6 @@ import axios from "axios";
 import { ENV } from "../config/env";
 import { api } from "./api/apiSetup";
 
-// Organizer Registration Form
 export const registerOrganizationAccount = async ({
   bankAccountDetails,
   organizationDetails,
@@ -21,40 +20,33 @@ export const registerOrganizationAccount = async ({
   return res.data;
 };
 
-// Check Organizer
 export const checkOrganizer = async ({ userId }) => {
   return await api.get(`/organizer/dashboard/${userId}`);
 };
 
-// Create Stadium
 export const createStadium = async ({ payload }) => {
   const res = await api.post("/organizer/stadiums/create", payload);
   return res.data;
 };
 
-// Update Stadium
 export const updateStadium = async ({ stadiumId, payload }) => {
   const res = await api.patch(`/organizer/stadiums/${stadiumId}`, payload);
   return res.data;
 };
 
-// Delete Stadium
 export const deleteStadium = async (stadiumId) => {
   return await api.patch(`/organizer/stadiums/${stadiumId}/delete`);
 };
 
-// Get all Stadiums
 export const getStadiums = async () => {
   return await api.get("/organizer/stadiums");
 };
 
-// Get all Stadiums
 export const getStadium = async (stadiumSlug) => {
   const res = await api.get(`/organizer/stadiums/${stadiumSlug}`);
   return res.data;
 };
 
-// Get all Stadiums with Organizer id
 export const getStadiumsWithOrganizerId = async ({
   id,
   page,
@@ -74,7 +66,6 @@ export const getStadiumsWithOrganizerId = async ({
   return res.data;
 };
 
-// Check Stadium name exists or not
 export const checkStadiumExists = async (name, stadiumId = "") => {
   return await api.get(
     `/organizer/stadiums/check-name?name=${encodeURIComponent(name)}`,
@@ -86,13 +77,11 @@ export const checkStadiumExists = async (name, stadiumId = "") => {
   );
 };
 
-// Creare Event validate
 export const createEventValidate = async (data) => {
   const res = await api.post("/organizer/events/create/validate", data);
   return res.data;
 };
 
-// Create event finish
 export const createEventFinish = async ({
   sessionId,
   bannerImageKey,
@@ -106,7 +95,6 @@ export const createEventFinish = async ({
   return res.data;
 };
 
-// Get events
 export const getEvents = async ({
   page,
   limit,
@@ -134,25 +122,21 @@ export const getEvents = async ({
   return res.data;
 };
 
-// Get event
 export const getEvent = async (eventSlug) => {
   const res = await api.get(`/organizer/events/${eventSlug}`);
   return res.data;
 };
 
-// Update event
 export const updateEvent = async (eventSlug, data) => {
   const res = await api.patch(`/organizer/events/${eventSlug}/edit`, data);
   return res.data;
 };
 
-// Update event
 export const cancelEvent = async (eventSlug, data) => {
   const res = await api.patch(`/organizer/events/${eventSlug}/cancel`, data);
   return res.data;
 };
 
-// Edit event finish
 export const editEventFinish = async ({ sessionId, images }) => {
   const res = await api.post("/organizer/events/edit/finish", {
     sessionId,
@@ -161,12 +145,10 @@ export const editEventFinish = async ({ sessionId, images }) => {
   return res.data;
 };
 
-// Delete event
 export const deleteEvent = async (eventId) => {
   await api.delete(`/organizer/events/${eventId}`);
 };
 
-// Get all Indian States
 export const getState = async () => {
   const url = ENV.VITE_STATE_API_URL;
   const response = await axios.get(url, {
@@ -178,7 +160,6 @@ export const getState = async () => {
   return response.data;
 };
 
-// Get all City
 export const getCity = async (stateCode) => {
   const url = `${ENV.VITE_CITY_API_URL}${stateCode}`;
   const response = await axios.get(url, {
@@ -190,7 +171,6 @@ export const getCity = async (stateCode) => {
   return response.data;
 };
 
-// Update organizer profile
 export const updateOrganizer = async ({ id, data }) => {
   const res = await api.patch("/organizer/account/profile", {
     id,
@@ -200,7 +180,6 @@ export const updateOrganizer = async ({ id, data }) => {
   return res;
 };
 
-// Send otp for email verification
 export const sendOtpEmailVerification = async (email, purpose) => {
   const res = await api.post("/organizer/auth/sendOtp", {
     email,

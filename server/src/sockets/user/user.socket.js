@@ -48,21 +48,7 @@ export default function userSocketHandlers(io, socket) {
     await releaseLockById({ lockId });
   });
 
-  // 4. CONFIRM BOOKING
-  // socket.on(SOCKET_EVENTS.CONFIRM_BOOKING, async ({ lockIds }, cb) => {
-  //   try {
-  //     await finalizeBookingLocks({
-  //       lockIds,
-  //       userId: socket.user._id,
-  //     });
-
-  //     cb?.({ success: true });
-  //   } catch (err) {
-  //     cb?.({ success: false, error: err.message });
-  //   }
-  // });
-
-  // 5. ON DISCONNECT RELEASE ALL LOCKS
+  // 4. ON DISCONNECT RELEASE ALL LOCKS
   socket.on(SOCKET_EVENTS.DISCONNECT, async () => {
     logger.info(`User disconnected: ${socket.user._id}`);
     logger.info(
@@ -72,12 +58,5 @@ export default function userSocketHandlers(io, socket) {
         event: socket.currentEvent,
       })}`
     );
-
-    // if (socket.currentEvent) {
-    //   await releaseAllLocksForUser({
-    //     eventId: socket.currentEvent,
-    //     userId: socket.user._id,
-    //   });
-    // }
   });
 }

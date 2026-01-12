@@ -3,8 +3,7 @@ import { useSearchParams } from "react-router-dom";
 export const useFilterParams = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const get = (key, fallback = "") =>
-    searchParams.get(key) || fallback;
+  const get = (key, fallback = "") => searchParams.get(key) || fallback;
 
   const updateParam = (key, value) => {
     const params = new URLSearchParams(searchParams);

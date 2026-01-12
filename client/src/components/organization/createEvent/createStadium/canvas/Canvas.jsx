@@ -10,8 +10,6 @@ import { useImperativeHandle } from "react";
 
 const Canvas = forwardRef(
   ({ deselectAll, shapes, selectedId, setShapes, setSelectedId }, ref) => {
-    const [imageUrl, setImageUrl] = useState(null);
-    const [imageFile, setImageFile] = useState(null);
     const [fillColor, setFillColor] = useState("#55E2E9");
     const [action, setAction] = useState(ACTIONS.SELECT);
 
@@ -60,32 +58,35 @@ const Canvas = forwardRef(
       };
       window.addEventListener("keydown", handleKey);
       return () => window.removeEventListener("keydown", handleKey);
-    }, [selectedId]);
+    }, [deselectAll, selectedId, setShapes]);
 
-    useEffect(() => {
-      if (imageFile && imageUrl) {
-        const localUrl = URL.createObjectURL(imageFile);
-        const id = uuidv4();
-        const newImage = {
-          id,
-          type: "image",
-          x: 50,
-          y: 50,
-          width: 200,
-          height: 200,
-          visible: true,
-          zIndex: shapes.length,
-          imageUrl: localUrl,
-          image: imageFile,
-          title: imageFile.name,
-        };
-        setShapes((prev) => [...prev, newImage]);
-        setSelectedId(id);
-        setAction(ACTIONS.SELECT);
-      }
-    }, [imageUrl]);
 
-    const handleCanvasPointerDown = (e) => {
+    const handleAddImage = (file) => {
+      if (!file) return;
+
+      const localUrl = URL.createObjectURL(file);
+      const id = uuidv4();
+
+      const newImage = {
+        id,
+        type: "image",
+        x: 50,
+        y: 50,
+        width: 200,
+        height: 200,
+        visible: true,
+        zIndex: shapes.length,
+        imageUrl: localUrl,
+        image: file,
+        title: file.name,
+      };
+
+      setShapes((prev) => [...prev, newImage]);
+      setSelectedId(id);
+      setAction(ACTIONS.SELECT);
+    };
+
+    const handleCanvasPointerDown = () => {
       if (action === ACTIONS.SELECT) return;
 
       const stage = stageRef.current;
@@ -96,8 +97,6 @@ const Canvas = forwardRef(
 
       if (action === ACTIONS.ARC) {
         arcCenterRef.current = { x: pos.x, y: pos.y };
-        const startAngle =
-          (Math.atan2(pos.y - pos.y, pos.x - pos.x) * 180) / Math.PI || 0;
         arcStartAngleRef.current = 0;
         const newArc = {
           id,
@@ -230,7 +229,10 @@ const Canvas = forwardRef(
               outerRadius: Math.max(20, Math.round(Math.max(absDx, absDy))),
               innerRadiusX: Math.max(5, Math.round(absDx * 0.5)),
               innerRadiusY: Math.max(5, Math.round(absDy * 0.5)),
-              innerRadius: Math.max(10, Math.round(Math.min(absDx, absDy) * 0.5)),
+              innerRadius: Math.max(
+                10,
+                Math.round(Math.min(absDx, absDy) * 0.5)
+              ),
               angle: Math.round(angle),
               rotation: Math.round(rotation),
             };
@@ -246,8 +248,7 @@ const Canvas = forwardRef(
           action={action}
           updateColor={updateColor}
           fillColor={fillColor}
-          setImageUrl={setImageUrl}
-          setImageFile={setImageFile}
+          onAddImage={handleAddImage}
         />
 
         <div

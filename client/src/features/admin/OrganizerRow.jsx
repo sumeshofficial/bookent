@@ -4,7 +4,10 @@ import { Link } from "react-router-dom";
 
 const OrganizerRow = React.memo(({ org }) => {
   return (
-    <tr key={org._id} className="fade-in hover:bg-gray-50 transition-all duration-300">
+    <tr
+      key={org._id}
+      className="fade-in hover:bg-gray-50 transition-all duration-300"
+    >
       <td className="px-6 py-4 font-medium text-gray-900">
         {org.organizationDetails.name}
         <div className="text-xs text-gray-400 mt-1">
@@ -20,8 +23,8 @@ const OrganizerRow = React.memo(({ org }) => {
             org.status === "approved"
               ? "bg-green-100 text-green-700"
               : org.status === "rejected"
-              ? "bg-red-100 text-red-700"
-              : "bg-yellow-100 text-yellow-700"
+                ? "bg-red-100 text-red-700"
+                : "bg-yellow-100 text-yellow-700"
           }`}
         >
           {org.status}

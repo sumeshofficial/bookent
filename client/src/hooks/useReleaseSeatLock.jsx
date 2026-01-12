@@ -21,7 +21,7 @@ const useReleaseSeatLock = (eventId) => {
         sessionStorage.removeItem("appliedCoupon");
       }
     };
-  }, []);
+  }, [releaseSection]);
 };
 
 export default useReleaseSeatLock;

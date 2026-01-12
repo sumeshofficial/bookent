@@ -27,7 +27,6 @@ export const usePaymentMethods = () => {
     onError: (error) => {
       closeModal();
       toast.error(error.message);
-      console.error("Wallet payment failed:", error);
     },
   });
 

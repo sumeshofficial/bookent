@@ -76,10 +76,13 @@ const OrganizerEventsPage = () => {
       toast.success("Event deleted");
       queryClient.invalidateQueries(["events"]);
     },
-    onError: (err) => {
-      console.log(err);
+    onError: (error) => {
       toast.dismiss();
-      toast.error("Something went wrong");
+      toast.error(
+        error?.response?.data?.error.message ||
+          error.message ||
+          "Something went wrong"
+      );
     },
   });
 

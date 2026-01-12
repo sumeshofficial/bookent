@@ -1,10 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import EventCard from "../../components/home/EventCard";
 import { X, SlidersHorizontal, ChevronDown } from "lucide-react";
 import Navbar from "../../sharedComponents/user/navbar/Navbar";
 import { getFilterAndSortEvent } from "../../services/user";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
+import FilterContent from "./FilterContent";
 
 const EventsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,24 +38,23 @@ const EventsPage = () => {
       sp.set("page", 1);
       setSearchParams(sp);
     }
-  }, []);
+  }, [searchParams, setSearchParams]);
   const sortOption = searchParams.get("sort") || "";
-
-  const [results, setResults] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
 
   const loaderRef = useRef(null);
 
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
 
-  const setPage = (val) => {
-    const sp = new URLSearchParams(searchParams);
-    sp.set("page", val);
-    setSearchParams(sp);
-  };
+  const setPage = useCallback(
+    (val) => {
+      const sp = new URLSearchParams(searchParams);
+      sp.set("page", val);
+      setSearchParams(sp);
+    },
+    [searchParams, setSearchParams]
+  );
 
-  // const { category } = useParams();
   const title = category.charAt(0).toUpperCase() + category.slice(1);
 
   const dateFilters = ["Today", "Tomorrow", "This Week", "This Month"];
@@ -92,22 +92,8 @@ const EventsPage = () => {
     keepPreviousData: true,
   });
 
-  useEffect(() => {
-    setResults([]);
-    if (page !== 1) {
-      setPage(1);
-    }
-  }, [searchParams.toString()]);
-
-  useEffect(() => {
-    if (!data) return;
-    if (page === 1) {
-      setResults(data.events);
-    } else {
-      setResults((prev) => [...prev, ...data.events]);
-    }
-    setHasMore(data.hasMore);
-  }, [data]);
+  const events = data?.events ?? [];
+  const hasMore = data?.hasMore ?? false;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -123,7 +109,7 @@ const EventsPage = () => {
     const current = loaderRef.current;
     if (current) observer.observe(current);
     return () => current && observer.unobserve(current);
-  }, [hasMore, isFetching]);
+  }, [hasMore, isFetching, page, setPage]);
 
   const toggleFilter = (filter, type) => {
     const sp = new URLSearchParams(searchParams);
@@ -184,72 +170,6 @@ const EventsPage = () => {
     return false;
   };
 
-  const FilterContent = () => (
-    <div className="bg-white rounded-2xl shadow p-6 pb-14">
-      <h2 className="text-lg font-bold text-gray-900 mb-8">Filters</h2>
-
-      <div className="mb-8">
-        <h3 className="text-sm font-bold text-gray-900 mb-4">Date</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {dateFilters.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => toggleFilter(filter, "date")}
-              className={`px-1 py-2 rounded-sm border text-xs transition-all flex items-center justify-center ${
-                isFilterSelected(filter, "date")
-                  ? "border-blue-500 text-gray-900 bg-white"
-                  : "border-gray-300 text-gray-600 hover:border-gray-400"
-              }`}
-            >
-              {filter}
-              {isFilterSelected(filter, "date") && (
-                <X size={14} className="ml-1" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <h3 className="text-sm font-bold text-gray-900 mb-4">Category</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {categoryFilters.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => toggleFilter(filter, "category")}
-              className={`px-1 py-2 rounded-sm border text-xs transition-all ${
-                isFilterSelected(filter, "category")
-                  ? "border-blue-500 text-gray-900 bg-white"
-                  : "border-gray-300 text-gray-600 hover:border-gray-400"
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-bold text-gray-900 mb-4">Price</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {priceFilters.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => toggleFilter(filter, "price")}
-              className={`px-1 py-2 rounded-sm border text-xs transition-all ${
-                isFilterSelected(filter, "price")
-                  ? "border-blue-500 text-gray-900 bg-white"
-                  : "border-gray-300 text-gray-600 hover:border-gray-400"
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gray-200 pb-16">
       <Navbar />
@@ -273,7 +193,13 @@ const EventsPage = () => {
 
       <div className="flex flex-col md:flex-row">
         <div className="hidden md:block w-90 bg-gray-200 p-6 min-h-screen">
-          <FilterContent />
+          <FilterContent
+            dateFilters={dateFilters}
+            categoryFilters={categoryFilters}
+            priceFilters={priceFilters}
+            toggleFilter={toggleFilter}
+            isFilterSelected={isFilterSelected}
+          />
         </div>
 
         <div className="flex-1 p-6 md:p-10">
@@ -310,7 +236,7 @@ const EventsPage = () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-6">
-            {results?.map((event) => (
+            {events.map((event) => (
               <EventCard key={event._id} event={event} />
             ))}
           </div>
@@ -332,7 +258,13 @@ const EventsPage = () => {
                 <X size={22} />
               </button>
             </div>
-            <FilterContent />
+            <FilterContent
+              dateFilters={dateFilters}
+              categoryFilters={categoryFilters}
+              priceFilters={priceFilters}
+              toggleFilter={toggleFilter}
+              isFilterSelected={isFilterSelected}
+            />
           </div>
         </div>
       )}

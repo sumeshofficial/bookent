@@ -1,7 +1,6 @@
 import DateField from "./DateField";
 
 const CouponDateSection = ({ register, errors, getValues }) => {
-  console.log(errors)
   return (
     <>
       <DateField

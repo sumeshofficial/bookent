@@ -8,7 +8,6 @@ export const getRevenueSplit = async (filters = {}) => {
     },
   };
 
-  const dateMatch = {};
   const now = new Date();
 
   const preset = filters.preset || "year";

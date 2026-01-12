@@ -1,5 +1,5 @@
 import { Upload, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
 
@@ -40,44 +40,47 @@ const CropImage = ({
     };
   }, []);
 
-  const onCropDone = (imageCroppedArea) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = imageCroppedArea.width;
-    canvas.height = imageCroppedArea.height;
+  const onCropDone = useCallback(
+    (imageCroppedArea) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = imageCroppedArea.width;
+      canvas.height = imageCroppedArea.height;
 
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.src = image;
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      img.src = image;
 
-    img.onload = () => {
-      ctx.drawImage(
-        img,
-        imageCroppedArea.x,
-        imageCroppedArea.y,
-        imageCroppedArea.width,
-        imageCroppedArea.height,
-        0,
-        0,
-        imageCroppedArea.width,
-        imageCroppedArea.height
-      );
+      img.onload = () => {
+        ctx.drawImage(
+          img,
+          imageCroppedArea.x,
+          imageCroppedArea.y,
+          imageCroppedArea.width,
+          imageCroppedArea.height,
+          0,
+          0,
+          imageCroppedArea.width,
+          imageCroppedArea.height
+        );
 
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
-      setImageAfterCrop(dataUrl);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+        setImageAfterCrop(dataUrl);
 
-      canvas.toBlob(
-        (blob) => {
-          if (blob) setValue(name, blob, { shouldDirty: true });
-          setImage("");
-          closeModal();
-        },
-        "image/jpeg",
-        0.9
-      );
-    };
-  };
+        canvas.toBlob(
+          (blob) => {
+            if (blob) setValue(name, blob, { shouldDirty: true });
+            setImage("");
+            closeModal();
+          },
+          "image/jpeg",
+          0.9
+        );
+      };
+    },
+    [closeModal, image, name, setValue]
+  );
 
-  const onCropCancel = () => {
+  const onCropCancel = useCallback(() => {
     setImage("");
     setImageAfterCrop("");
     setValue(name, null);
@@ -85,7 +88,7 @@ const CropImage = ({
       inputRef.current.value = null;
     }
     closeModal();
-  };
+  }, [closeModal, name, setValue]);
 
   useEffect(() => {
     if (image) {
@@ -100,7 +103,7 @@ const CropImage = ({
     return () => {
       setImage("");
     };
-  }, [image]);
+  }, [aspect, image, onCropCancel, onCropDone, openModal]);
 
   const handleOnChange = (event) => {
     const file = event.target.files?.[0];

@@ -8,8 +8,6 @@ const envFile =
 
 dotenv.config({ path: envFile });
 
-console.log(`Loaded environment: ${ENV_MODE} → ${envFile}`);
-
 const envSchema = z.object({
   // Server
   PORT: z.string().regex(/^\d+$/).transform(Number).default("3000"),

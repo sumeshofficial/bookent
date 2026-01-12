@@ -1,11 +1,7 @@
 import UserRow from "./UserRow";
 import UsersSkeleton from "./UsersSkeleton";
 
-const UsersTable = ({
-  users,
-  isLoading,
-  onToggleStatus,
-}) => {
+const UsersTable = ({ users, isLoading, onToggleStatus }) => {
   return (
     <div className="hidden md:block bg-white rounded-lg shadow">
       <table className="w-full divide-y">
@@ -19,10 +15,7 @@ const UsersTable = ({
               "Action",
               "View",
             ].map((h) => (
-              <th
-                key={h}
-                className="px-4 py-3 text-left text-sm font-medium"
-              >
+              <th key={h} className="px-4 py-3 text-left text-sm font-medium">
                 {h}
               </th>
             ))}

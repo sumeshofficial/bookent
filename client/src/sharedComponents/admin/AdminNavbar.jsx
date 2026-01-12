@@ -5,10 +5,8 @@ import { adminLogout } from "../../services/auth";
 import { logoutAdmin } from "../../app/adminSlice";
 import toast from "react-hot-toast";
 
-const AdminNavbar = ({
-  setSidebarOpen,
-}) => {
-    const { admin } = useSelector(store => store.admin);
+const AdminNavbar = ({ setSidebarOpen }) => {
+  const { admin } = useSelector((store) => store.admin);
   const [showAdminDropdown, setShowAdminDropdown] = useState(false);
 
   const dispatch = useDispatch();

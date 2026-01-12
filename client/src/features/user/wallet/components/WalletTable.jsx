@@ -17,10 +17,7 @@ const WalletTable = ({ transactions, meta }) => {
         <tbody>
           {transactions.length === 0 ? (
             <tr>
-              <td
-                colSpan="4"
-                className="p-6 text-center text-gray-500"
-              >
+              <td colSpan="4" className="p-6 text-center text-gray-500">
                 No wallet transactions found
               </td>
             </tr>
@@ -41,9 +38,7 @@ const WalletTable = ({ transactions, meta }) => {
                 >
                   {tx.display_direction}
                 </td>
-                <td className="p-3">
-                  ${tx.net_amount.value.toFixed(2)}
-                </td>
+                <td className="p-3">${tx.net_amount.value.toFixed(2)}</td>
               </tr>
             ))
           )}

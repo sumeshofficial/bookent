@@ -11,41 +11,35 @@ export const updateProfile = async ({ id, data }) => {
   );
 };
 
-// Get Home Page Events
 export const getEventsForUser = async () => {
   const res = await api.get("/user/events/home");
   return res.data;
 };
 
-// Get Filter And Sort Event
 export const getFilterAndSortEvent = async (params) => {
   const res = await api.get("/user/events/", { params });
   return res.data;
 };
 
-// Search Event
 export const searchEvent = async (params) => {
   const res = await api.get("/user/events/search", { params });
   return res.data;
 };
 
-// Fetch Event
 export const eventBySlug = async (eventSlug) => {
   const res = await api.get(`/user/events/${eventSlug}`);
   return res.data;
 };
 
-// Checkout verify lock
 export const verifySeatLock = async (lockId, appliedCoupon) => {
   const res = await api.post("/user/checkout/verify-lock", {
     lockId,
-    appliedCoupon
+    appliedCoupon,
   });
 
   return res.data;
 };
 
-// services/user/banner.service.js
 export const getActiveBanners = async () => {
   const { data } = await api.get("/user/banners");
   return data;

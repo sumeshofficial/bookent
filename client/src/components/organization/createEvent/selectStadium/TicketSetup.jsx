@@ -21,7 +21,7 @@ const TicketSetup = ({
         shouldDirty: true,
       });
     }
-  }, [capacity, id]);
+  }, [capacity, id, index, setValue]);
 
   return (
     <>
@@ -94,7 +94,9 @@ const TicketSetup = ({
           <div className="flex flex-col gap-1 sm:gap-2">
             <label className="text-xs sm:text-base">Seat Price</label>
             <div className="relative">
-              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-base">$</span>
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-base">
+                $
+              </span>
               <input
                 type="number"
                 placeholder="150"

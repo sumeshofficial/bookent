@@ -69,7 +69,6 @@ const WalletFilters = () => {
         <option value={WALLET_SORT.AMOUNT_HIGH}>Amount High → Low</option>
         <option value={WALLET_SORT.AMOUNT_LOW}>Amount Low → High</option>
       </select>
-
     </div>
   );
 };

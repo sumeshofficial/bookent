@@ -9,9 +9,7 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import {
-  getAllOrganizers,
-} from "../../services/admin.js";
+import { getAllOrganizers } from "../../services/admin.js";
 import { Link } from "react-router-dom";
 import OrganizerRow from "./OrganizerRow.jsx";
 import { useQuery } from "@tanstack/react-query";
@@ -44,7 +42,7 @@ const OrganizersList = () => {
         status: statusFilter,
       }),
     keepPreviousData: true,
-    onError: (error) => toast.error(error.message)
+    onError: (error) => toast.error(error.message),
   });
 
   const organizers = data?.data?.organizers || [];
@@ -63,7 +61,9 @@ const OrganizersList = () => {
   return (
     <main className="flex-1 p-4 md:p-8">
       <div className="flex flex-col sm:flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">Organizer List</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
+          Organizer List
+        </h1>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <div className="flex flex-col">
@@ -163,12 +163,7 @@ const OrganizersList = () => {
                 </td>
               </tr>
             ) : organizers.length > 0 ? (
-              organizers.map((org) => (
-                <OrganizerRow
-                  key={org._id}
-                  org={org}
-                />
-              ))
+              organizers.map((org) => <OrganizerRow key={org._id} org={org} />)
             ) : (
               <tr>
                 <td colSpan={8} className="text-center py-6 text-gray-500">
@@ -216,8 +211,8 @@ const OrganizersList = () => {
                       org.status === "approved"
                         ? "bg-green-100 text-green-700"
                         : org.status === "rejected"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-yellow-100 text-yellow-700"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
                     {org.status}

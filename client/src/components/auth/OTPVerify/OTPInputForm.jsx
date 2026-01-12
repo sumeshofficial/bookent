@@ -32,7 +32,7 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
 
   useEffect(() => {
     refArr.current[activeIndex]?.focus();
-  }, [stat]);
+  }, [activeIndex, stat]);
 
   useEffect(() => {
     let intervalId;

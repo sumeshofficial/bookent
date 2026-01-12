@@ -14,7 +14,10 @@ const Ticket = () => {
       <Navbar />
       <div className="bg-gray-200 min-h-screen">
         <div className="px-10 pt-4">
-          <button onClick={() => navigate(-1)} className="flex items-center text-base gap-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-base gap-2"
+          >
             <ChevronLeft className="w-6 h-6" />
             <span>Back</span>
           </button>

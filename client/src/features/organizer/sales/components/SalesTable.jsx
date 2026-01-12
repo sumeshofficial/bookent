@@ -27,7 +27,9 @@ const SalesTable = ({ data }) => {
 
               <td className="p-3">
                 {row.refundStatus === "COMPLETED" ? (
-                  <span className="text-red-600 font-medium">{row.refundedAmount}</span>
+                  <span className="text-red-600 font-medium">
+                    {row.refundedAmount}
+                  </span>
                 ) : (
                   <span className="text-green-600">—</span>
                 )}

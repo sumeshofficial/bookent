@@ -20,7 +20,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 const CreateStadium = () => {
   const [currentPage, setCurrentPage] = useState("form");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isModified, setIsModified] = useState(false);
   const navigate = useNavigate();
 
   const { stadiumSlug } = useParams();
@@ -44,7 +43,9 @@ const CreateStadium = () => {
     control,
     getValues,
   } = method;
-  const { errors, isSubmitting, dirtyFields } = formState;
+  const { errors, isSubmitting, dirtyFields, isDirty } = formState;
+
+  const isModified = isDirty;
 
   const { data, error } = useQuery({
     queryKey: ["stadium", stadiumSlug],
@@ -73,14 +74,8 @@ const CreateStadium = () => {
           layoutImage: stadiumData.layoutImage,
         },
       });
-      setIsModified(false);
     }
   }, [stadiumData, reset]);
-
-  useEffect(() => {
-    const sub = watch(() => setIsModified(true));
-    return () => sub.unsubscribe();
-  }, [watch]);
 
   useNavigationGuard(isModified && !isSubmitted);
 
@@ -144,10 +139,13 @@ const CreateStadium = () => {
       toast.success("Stadium Created");
       queryClient.invalidateQueries(["stadium"]);
     },
-    onError: (err) => {
-      console.log(err);
+    onError: (error) => {
       toast.dismiss();
-      toast.error("Something went wrong");
+      toast.error(
+        error?.response?.data?.error.message ||
+          error.message ||
+          "Something went wrong"
+      );
     },
   });
 
@@ -192,8 +190,12 @@ const CreateStadium = () => {
       toast.success("Stadium updated");
       queryClient.invalidateQueries(["stadium"]);
     },
-    onError: (err) => {
-      console.log(err);
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.error.message ||
+          error.message ||
+          "Something went wrong"
+      );
       toast.dismiss();
       toast.error("Something went wrong");
     },

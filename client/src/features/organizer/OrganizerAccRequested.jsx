@@ -6,7 +6,7 @@ const OrganizerAccRequested = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-slate-800 px-6 py-4 shadow-sm">
         <div className="max-w-6xl">
-          <Link to={'/'} className="flex items-center space-x-3">
+          <Link to={"/"} className="flex items-center space-x-3">
             <img
               src={logo}
               alt="Bookent"

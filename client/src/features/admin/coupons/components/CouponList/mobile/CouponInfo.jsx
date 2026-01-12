@@ -1,9 +1,7 @@
 const CouponInfo = ({ coupon }) => {
   return (
     <>
-      <p className="text-xs text-gray-600">
-        {coupon.description || "—"}
-      </p>
+      <p className="text-xs text-gray-600">{coupon.description || "—"}</p>
 
       <div className="grid grid-cols-2 gap-2 text-xs text-gray-700 pt-1">
         <div>
@@ -18,9 +16,7 @@ const CouponInfo = ({ coupon }) => {
         {coupon.discountType === "PERCENTAGE" && (
           <div>
             <span className="text-gray-500">Max Discount</span>
-            <p className="font-medium">
-              ${coupon.maxDiscountAmount ?? "—"}
-            </p>
+            <p className="font-medium">${coupon.maxDiscountAmount ?? "—"}</p>
           </div>
         )}
 

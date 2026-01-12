@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Plus, Minus } from "lucide-react";
 import { useState } from "react";
-import { useEffect } from "react";
 
 const MobileBookingBar = ({
   selectedShape,
@@ -40,23 +39,9 @@ const MobileBookingBar = ({
     adjustedInfo?.availableTickets || 0
   );
 
-  useEffect(() => {
-    if (!adjustedInfo) return;
-
-    if (quantity > maxQty) {
-      setQuantity(maxQty || 1);
-    }
-
-    if (quantity < 1) {
-      setQuantity(1);
-    }
-  }, [selectedShape, adjustedInfo, maxQty]);
-
   const handleBookNow = async () => {
     lockSection(adjustedInfo.sectionId, quantity, (lockId) => {
       if (!lockId) return;
-
-      console.log(lockId);
 
       sessionStorage.setItem("lockId", lockId);
 
@@ -64,11 +49,14 @@ const MobileBookingBar = ({
     });
   };
 
-  // Disable booking when no tickets available
-  const isSoldOut = (adjustedInfo?.availableTickets || 0) === 0 || (maxQty || 0) === 0;
+  const isSoldOut =
+    (adjustedInfo?.availableTickets || 0) === 0 || (maxQty || 0) === 0;
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white shadow-xl border-t p-4 z-50">
+    <div
+      key={selectedShape?.id}
+      className="lg:hidden fixed bottom-0 left-0 right-0 bg-white shadow-xl border-t p-4 z-50"
+    >
       {selectedShape ? (
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-col">
@@ -81,22 +69,20 @@ const MobileBookingBar = ({
               ${adjustedInfo?.seatPrice ?? "—"}
             </span>
 
-            {/* Quantity Selector */}
-            {/* Quantity Selector */}
             <div className="mt-2 flex items-center gap-3">
               <button
-                onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 className="p-2 border rounded-md"
               >
                 <Minus size={18} />
               </button>
 
-              <span className="font-semibold min-w-[24px] text-center">
+              <span className="font-semibold min-w-6 text-center">
                 {quantity}
               </span>
 
               <button
-                onClick={() => quantity < maxQty && setQuantity(quantity + 1)}
+                onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
                 className="p-2 border rounded-md"
               >
                 <Plus size={18} />

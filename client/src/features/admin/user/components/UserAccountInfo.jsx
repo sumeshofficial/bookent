@@ -13,9 +13,7 @@ const UserAccountInfo = ({ user }) => {
 
         <div>
           <p className="text-gray-500">Auth Provider</p>
-          <p className="font-medium capitalize">
-            {user.authProvider}
-          </p>
+          <p className="font-medium capitalize">{user.authProvider}</p>
         </div>
 
         <div>

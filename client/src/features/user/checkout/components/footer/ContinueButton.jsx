@@ -27,10 +27,13 @@ const ContinueButton = ({ eventSlug, isLoading }) => {
       }
 
       navigate(`/event/${eventSlug}/payment-method`);
-    } catch (err) {
-      console.log(err.message);
+    } catch (error) {
       toast.dismiss();
-      toast.error("Seat lock expired or invalid. Please reselect your seats.");
+      toast.error(
+        error?.response?.data?.error.message ||
+          error.message ||
+          "Something went wrong"
+      );
       sessionStorage.removeItem("lockId");
       sessionStorage.removeItem("appliedCoupon");
       return navigate("/session-expired", { replace: true });

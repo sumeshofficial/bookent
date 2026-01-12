@@ -6,9 +6,8 @@ export const fetchUsers = async (params) => {
 };
 
 export const toggleUserStatus = async ({ userId, newStatus }) => {
-  const { data } = await adminApi.patch(
-    `/admin/users/${userId}/status`,
-    { status: newStatus }
-  );
+  const { data } = await adminApi.patch(`/admin/users/${userId}/status`, {
+    status: newStatus,
+  });
   return data;
 };

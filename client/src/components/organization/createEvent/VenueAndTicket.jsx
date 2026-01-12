@@ -16,7 +16,10 @@ const VenueAndTicket = ({ register, errors, watch, setValue }) => {
     onError: (error) => toast.error(error.message),
   });
 
-  const stadiums = data?.data?.stadiums ?? [];
+  const stadiums = useMemo(() => {
+    return data?.data?.stadiums ?? [];
+  }, [data]);
+
   const selectedStadium = useMemo(() => {
     return stadiums?.find((stadium) => stadium._id === watchedStadiumId);
   }, [stadiums, watchedStadiumId]);

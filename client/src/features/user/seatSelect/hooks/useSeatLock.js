@@ -14,7 +14,6 @@ export const useSectionLock = (eventId) => {
     if (!socket || !eventId) return;
 
     const seatUpdateHandler = (data) => {
-      console.log(data);
       setSections((prev) => ({
         ...prev,
         [data.sectionId]: {
@@ -51,7 +50,6 @@ export const useSectionLock = (eventId) => {
       SOCKET_EVENTS.LOCK_SECTION,
       { eventId, sectionId, qty },
       (response) => {
-        console.log(response);
         if (!response.success) {
           openModal("seat-lock-error", {
             open: true,

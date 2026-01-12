@@ -1,12 +1,7 @@
 import CouponForm from "./components/CouponForm";
 import ModalHeader from "./components/ModalHeader";
 
-const CreateCoupon = ({
-  handleSubmit,
-  onClose,
-  isPending,
-  coupon
-}) => {
+const CreateCoupon = ({ handleSubmit, onClose, isPending, coupon }) => {
   return (
     <div>
       <ModalHeader onClose={onClose} />

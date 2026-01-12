@@ -3,8 +3,7 @@ import InputBox from "./InputBox";
 import { Loader } from "lucide-react";
 
 const EmailVerification = ({ title, onSubmit, error }) => {
-  const { register, errors, isSubmitting, handleSubmit } =
-    useContextForm();
+  const { register, errors, isSubmitting, handleSubmit } = useContextForm();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -15,9 +14,7 @@ const EmailVerification = ({ title, onSubmit, error }) => {
           </div>
         )}
         <div className="flex flex-col gap-2 mt-5 mb-10">
-          <h2 className="text-2xl font-bold mb-3 text-center">
-            {title}
-          </h2>
+          <h2 className="text-2xl font-bold mb-3 text-center">{title}</h2>
 
           {error && <p className="text-red-500 mb-5">{error}</p>}
 

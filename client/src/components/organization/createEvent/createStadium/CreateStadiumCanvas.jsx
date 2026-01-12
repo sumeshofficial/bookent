@@ -2,20 +2,15 @@ import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import Canvas from "./canvas/Canvas";
 import Layers from "./canvas/Layers";
-import { useEffect } from "react";
 
 const CreateStadiumForm = ({ setValue, setCurrentPage, watch }) => {
-  const [shapes, setShapes] = useState([]);
+  const initialLayout = watch("stadiumLayout");
+
+  const [shapes, setShapes] = useState(
+    () => initialLayout?.shapes ?? []
+  );
   const [selectedId, setSelectedId] = useState(null);
   const stageRef = useRef(null);
-
-  useEffect(() => {
-    const stadiumLayout = watch("stadiumLayout");
-
-    if (stadiumLayout) {
-      setShapes(stadiumLayout.shapes);
-    }
-  }, [watch("stadiumLayout")]);
 
   const handleSaveLayout = async () => {
     try {

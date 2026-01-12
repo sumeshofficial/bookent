@@ -41,9 +41,7 @@ const UserAccountStatus = ({ user }) => {
 
         <div className="flex items-center justify-between">
           <span className="text-gray-500">Role</span>
-          <span className="font-medium capitalize">
-            {user.role}
-          </span>
+          <span className="font-medium capitalize">{user.role}</span>
         </div>
       </div>
     </div>

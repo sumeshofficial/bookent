@@ -3,7 +3,7 @@ import {
   getState,
   sendOtpEmailVerification,
 } from "../../services/organization";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateOrganizerProfile,
@@ -26,8 +26,8 @@ const OrganizerProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [emailOtpSent, setEmailOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
-  const [isEmailVerified, setIsEmailVerified] = useState(true);
   const [resendTimer, setResendTimer] = useState(0);
+  const [emailVerifiedLocally, setEmailVerifiedLocally] = useState(false);
 
   const imageUpdate = async (image) => {
     const previewUrl = URL.createObjectURL(image);
@@ -57,7 +57,11 @@ const OrganizerProfilePage = () => {
         })
       );
     } catch (error) {
-      toast.error("Failed to upload image");
+      toast.error(
+        error?.response?.data?.error.message ||
+          error.message ||
+          "Something went wrong"
+      );
     }
   };
 
@@ -65,7 +69,7 @@ const OrganizerProfilePage = () => {
     register,
     handleSubmit,
     reset,
-    watch,
+    control,
     formState: { errors, isDirty, dirtyFields },
   } = useForm({
     defaultValues: {
@@ -83,17 +87,10 @@ const OrganizerProfilePage = () => {
     },
   });
 
-  useEffect(() => {
-    const subscription = watch((value) => {
-      if (value?.email === organizer.email) {
-        setIsEmailVerified(true);
-        setEmailOtpSent(false);
-      } else {
-        setIsEmailVerified(false);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch, organizer.email]);
+  const emailValue = useWatch({ control, name: "email" });
+
+  const isEmailVerified =
+    emailValue === organizer.email || emailVerifiedLocally;
 
   useEffect(() => {
     let interval = null;
@@ -127,8 +124,11 @@ const OrganizerProfilePage = () => {
         const data = await getState();
         setStateList(data);
       } catch (error) {
-        console.error("Error fetching states:", error);
-        toast.error("Failed to load states");
+        toast.error(
+          error?.response?.data?.error.message ||
+            error.message ||
+            "Something went wrong"
+        );
       }
     };
     fetchStates();
@@ -180,9 +180,15 @@ const OrganizerProfilePage = () => {
       toast.success("OTP sent");
       setEmailOtpSent(true);
       setResendTimer(30);
+      setEmailVerifiedLocally(false);
       await sendOtpEmailVerification(email, purpose);
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.dismiss();
+      toast.error(
+        error?.response?.data?.error.message ||
+          error.message ||
+          "Something went wrong"
+      );
     }
   };
 
@@ -193,7 +199,11 @@ const OrganizerProfilePage = () => {
       setResendTimer(30);
       await onResend({ email, purpose });
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error(
+        error?.response?.data?.error.message ||
+          error.message ||
+          "Something went wrong"
+      );
     }
   };
 
@@ -202,7 +212,6 @@ const OrganizerProfilePage = () => {
     otp,
     purpose = "email-verify"
   ) => {
-    // Validation
     if (!email) {
       return toast.error("Email is required for verification");
     }
@@ -223,8 +232,7 @@ const OrganizerProfilePage = () => {
       };
 
       await verifyOtp(data);
-
-      setIsEmailVerified(true);
+      setEmailVerifiedLocally(true);
       setEmailOtpSent(false);
       setOtp("");
       toast.dismiss();
@@ -238,7 +246,6 @@ const OrganizerProfilePage = () => {
 
   const onSubmit = (formdata) => {
     const updatedData = buildUpdatedPayload(dirtyFields, formdata);
-    console.log(updatedData)
     dispatch(
       updateOrganizerProfileData({
         ...updatedData,
@@ -337,7 +344,7 @@ const OrganizerProfilePage = () => {
                     <div className="mt-2 flex justify-end">
                       <button
                         type="button"
-                        onClick={() => handleSendOtp(watch("email"))}
+                        onClick={() => handleSendOtp(emailValue)}
                         className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
                       >
                         Send OTP
@@ -358,9 +365,7 @@ const OrganizerProfilePage = () => {
                         <button
                           type="button"
                           disabled={!/^[0-9]{4,6}$/.test(otp)}
-                          onClick={() =>
-                            handleOtpVerification(watch("email"), otp)
-                          }
+                          onClick={() => handleOtpVerification(emailValue, otp)}
                           className={`px-4 py-2 font-medium rounded-lg shadow transition ${
                             /^[0-9]{4,6}$/.test(otp)
                               ? "bg-green-600 text-white hover:bg-green-700"
@@ -373,7 +378,7 @@ const OrganizerProfilePage = () => {
                         <button
                           type="button"
                           disabled={resendTimer > 0}
-                          onClick={() => handleResendOtp(watch("email"))}
+                          onClick={() => handleResendOtp(emailValue)}
                           className={`px-4 py-2 font-medium rounded-lg shadow transition ${
                             resendTimer > 0
                               ? "bg-gray-200 text-gray-400 cursor-not-allowed"

@@ -32,7 +32,6 @@ const SalesTable = ({ data }) => {
                 -${row.discount.toFixed(2)}
               </td>
 
-
               <td className="p-3 text-right">
                 ${row.platformGrossFee.toFixed(2)}
               </td>

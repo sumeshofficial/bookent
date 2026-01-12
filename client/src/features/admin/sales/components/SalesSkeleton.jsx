@@ -12,10 +12,7 @@ const SalesSkeleton = ({ rows = 6, cols = 8 }) => {
       </div>
 
       {Array.from({ length: rows }).map((_, rowIdx) => (
-        <div
-          key={rowIdx}
-          className="grid grid-cols-8 gap-2 px-4 py-3 border-t"
-        >
+        <div key={rowIdx} className="grid grid-cols-8 gap-2 px-4 py-3 border-t">
           {Array.from({ length: cols }).map((_, colIdx) => (
             <SkeletonCell key={colIdx} />
           ))}

@@ -1,8 +1,6 @@
 const DateFilter = ({ label, value, onChange }) => (
   <div>
-    <label className="block text-xs text-gray-500 mb-1">
-      {label}
-    </label>
+    <label className="block text-xs text-gray-500 mb-1">{label}</label>
     <input
       type="date"
       value={value}

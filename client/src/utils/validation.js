@@ -102,7 +102,10 @@ export const validationSchema = [
       .date()
       .typeError("Please enter a valid date")
       .required("Match date is required")
-      .min(new Date(new Date().setHours(0, 0, 0, 0)), "Match date cannot be in the past"),
+      .min(
+        new Date(new Date().setHours(0, 0, 0, 0)),
+        "Match date cannot be in the past"
+      ),
 
     matchTime: yup.string().required("Match time is required"),
 

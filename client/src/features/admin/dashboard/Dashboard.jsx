@@ -10,7 +10,6 @@ import DashboardFilters from "./components/DashboardFilters";
 const Dashboard = () => {
   const { data, isLoading } = useAdminDashboard();
 
-
   if (isLoading) {
     return <DashboardSkeleton />;
   }

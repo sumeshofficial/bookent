@@ -22,8 +22,8 @@ const ProgressSteps = ({ currentStep = 1 }) => {
                     currentStep === step.number
                       ? "bg-violet-600 text-white"
                       : step.number < currentStep
-                      ? "bg-violet-600"
-                      : "bg-gray-200 text-gray-500"
+                        ? "bg-violet-600"
+                        : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   {currentStep <= step.number ? (

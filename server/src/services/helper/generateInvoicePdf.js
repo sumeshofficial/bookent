@@ -25,7 +25,8 @@ export const generateInvoicePDF = async ({ order, user }) => {
         fit: [120, 60],
         align: "right",
       });
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       doc
         .fontSize(14)
         .font("Helvetica-Bold")
@@ -69,7 +70,7 @@ export const generateInvoicePDF = async ({ order, user }) => {
 
     const tableEndX = col.total + colWidth.total;
     const rightEdgeX = doc.page.width - doc.page.margins.right;
-    const totalsStartX = col.qty; // align totals with Qty/Price/Amount block
+    const totalsStartX = col.qty;
 
     doc
       .fontSize(11)

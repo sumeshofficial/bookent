@@ -33,11 +33,6 @@ export const createSlug = (text) => {
   });
 };
 
-// export const convertToUSD = (amountInINR, rateDecimal) => {
-//   const INR_TO_USD_RATE = new Decimal(1).div(rateDecimal);
-//   return new Decimal(amountInINR).times(INR_TO_USD_RATE);
-// };
-
 export const validateEventAvailability = (event, blockHours = 4) => {
   if (!event.matchDate || !event.matchTime) {
     return false;

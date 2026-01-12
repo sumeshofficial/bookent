@@ -3,8 +3,7 @@ import BookingsFilter from "./components/filter/BookingsFilter";
 import { useBookingHistory } from "./hooks/useBookingHistory";
 
 const BookingHistory = () => {
-  const { bookings, seatCategories, meta, loading } =
-    useBookingHistory();
+  const { bookings, seatCategories, meta, loading } = useBookingHistory();
 
   return (
     <div className="p-6 space-y-6">
@@ -24,10 +23,7 @@ const BookingHistory = () => {
           <div className="h-10 bg-gray-200 rounded mb-4" />
           <div className="space-y-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-8 bg-gray-200 rounded"
-              />
+              <div key={i} className="h-8 bg-gray-200 rounded" />
             ))}
           </div>
         </div>

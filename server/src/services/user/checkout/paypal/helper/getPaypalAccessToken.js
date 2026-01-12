@@ -18,4 +18,4 @@ export const getPayPalAccessToken = async () => {
   );
 
   return response.data.access_token;
-}
+};

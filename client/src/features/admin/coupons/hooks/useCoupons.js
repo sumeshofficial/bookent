@@ -37,7 +37,10 @@ export const useCoupons = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["coupons", { page, q: debouncedQ, status, type, date, sort, from, to }],
+    queryKey: [
+      "coupons",
+      { page, q: debouncedQ, status, type, date, sort, from, to },
+    ],
     queryFn: () =>
       fetchCoupons({
         page,

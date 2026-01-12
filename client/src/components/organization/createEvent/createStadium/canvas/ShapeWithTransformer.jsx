@@ -149,7 +149,6 @@ const ShapeWithTransformer = ({
 
     const chars = full.split("");
 
-    // support elliptical arcs with separate inner/outer X/Y radii and startAngle
     const irx = shape.innerRadiusX || shape.innerRadius || 40;
     const iry = shape.innerRadiusY || shape.innerRadius || irx;
     const orx = shape.outerRadiusX || shape.outerRadius || 80;
@@ -164,7 +163,8 @@ const ShapeWithTransformer = ({
     const usableAngle = sweep * 0.85;
     const step = usableAngle / Math.max(1, charCount - 1);
 
-    const startAngle = typeof shape.startAngle === "number" ? shape.startAngle : -sweep / 2;
+    const startAngle =
+      typeof shape.startAngle === "number" ? shape.startAngle : -sweep / 2;
 
     return chars.map((ch, i) => {
       const angleLocal = startAngle + i * step;
@@ -259,69 +259,41 @@ const ShapeWithTransformer = ({
         {shape.type === "arc" && (
           <>
             <Shape
-              sceneFunc={(context, shapeNode) => {
+              sceneFunc={(context) => {
                 const orx = shape.outerRadiusX || shape.outerRadius || 100;
                 const ory = shape.outerRadiusY || shape.outerRadius || orx;
-                const irx = shape.innerRadiusX || shape.innerRadius || Math.max(5, Math.round(orx * 0.6));
-                const iry = shape.innerRadiusY || shape.innerRadius || Math.max(5, Math.round(ory * 0.6));
+                const irx =
+                  shape.innerRadiusX ||
+                  shape.innerRadius ||
+                  Math.max(5, Math.round(orx * 0.6));
+                const iry =
+                  shape.innerRadiusY ||
+                  shape.innerRadius ||
+                  Math.max(5, Math.round(ory * 0.6));
 
                 const sweepDeg = shape.angle || 90;
-                const startDeg = typeof shape.startAngle === "number" ? shape.startAngle : -sweepDeg / 2;
+                const startDeg =
+                  typeof shape.startAngle === "number"
+                    ? shape.startAngle
+                    : -sweepDeg / 2;
                 const start = (startDeg * Math.PI) / 180;
                 const end = start + (sweepDeg * Math.PI) / 180;
 
-                // mid radii (used to compute cap normal)
                 const midRx = irx + (orx - irx) * 0.5;
                 const midRy = iry + (ory - iry) * 0.5;
 
-                // helper: intersect line p = p0 + u * d with ellipse x^2/A^2 + y^2/B^2 = 1
-                const solveLineEllipse = (p0x, p0y, dx, dy, A, B) => {
-                  const a = (dx * dx) / (A * A) + (dy * dy) / (B * B);
-                  const b = (2 * p0x * dx) / (A * A) + (2 * p0y * dy) / (B * B);
-                  const c = (p0x * p0x) / (A * A) + (p0y * p0y) / (B * B) - 1;
-                  const disc = b * b - 4 * a * c;
-                  if (disc < 0 || Math.abs(a) < 1e-8) return null;
-                  const sqrtD = Math.sqrt(Math.max(0, disc));
-                  const u1 = (-b + sqrtD) / (2 * a);
-                  const u2 = (-b - sqrtD) / (2 * a);
-                  return [u1, u2];
-                };
-
-                const capIntersections = (t) => {
-                  const px = midRx * Math.cos(t);
-                  const py = midRy * Math.sin(t);
-                  const nx = Math.cos(t) / (midRx || 1);
-                  const ny = Math.sin(t) / (midRy || 1);
-                  const solsOuter = solveLineEllipse(px, py, nx, ny, orx, ory);
-                  const solsInner = solveLineEllipse(px, py, nx, ny, irx, iry);
-                  if (!solsOuter || !solsInner) {
-                    const outerX = orx * Math.cos(t);
-                    const outerY = ory * Math.sin(t);
-                    const innerX = irx * Math.cos(t);
-                    const innerY = iry * Math.sin(t);
-                    return { outer: { x: outerX, y: outerY }, inner: { x: innerX, y: innerY } };
-                  }
-                  const uOuter = Math.abs(solsOuter[0]) > Math.abs(solsOuter[1]) ? solsOuter[0] : solsOuter[1];
-                  const uInner = Math.abs(solsInner[0]) > Math.abs(solsInner[1]) ? solsInner[0] : solsInner[1];
-                  const outerX = px + uOuter * nx;
-                  const outerY = py + uOuter * ny;
-                  const innerX = px + uInner * nx;
-                  const innerY = py + uInner * ny;
-                  return { outer: { x: outerX, y: outerY }, inner: { x: innerX, y: innerY } };
-                };
-
-                const capStart = capIntersections(start);
-                const capEnd = capIntersections(end);
-
-                // Draw open band as a stroked centerline ellipse (no filled end faces)
                 const thicknessX = Math.max(1, Math.abs(orx - irx));
                 const thicknessY = Math.max(1, Math.abs(ory - iry));
-                const thickness = Math.max(2, Math.round((thicknessX + thicknessY) / 2));
+                const thickness = Math.max(
+                  2,
+                  Math.round((thicknessX + thicknessY) / 2)
+                );
 
                 context.beginPath();
-                context.globalAlpha = typeof shape.fillOpacity === "number" ? shape.fillOpacity : 1;
+                context.globalAlpha =
+                  typeof shape.fillOpacity === "number" ? shape.fillOpacity : 1;
                 context.lineWidth = thickness;
-                context.lineCap = "butt"; // flat ends; minimal visible caps
+                context.lineCap = "butt";
                 context.strokeStyle = shape.fillColor || "#ccc";
                 context.ellipse(0, 0, midRx, midRy, 0, start, end, false);
                 context.stroke();

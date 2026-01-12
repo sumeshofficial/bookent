@@ -35,9 +35,7 @@ const UserDetails = () => {
       </button>
 
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">
-          User Details
-        </h1>
+        <h1 className="text-2xl font-semibold text-gray-900">User Details</h1>
         <p className="text-sm text-gray-500">
           Overview of user account and activity
         </p>

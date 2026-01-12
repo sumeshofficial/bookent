@@ -5,7 +5,7 @@ const InputField = ({
   register,
   name,
   rule,
-  placeholder
+  placeholder,
 }) => {
   return (
     <div className="flex flex-col gap-1">

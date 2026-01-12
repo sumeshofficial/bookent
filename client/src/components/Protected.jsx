@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../app/userSlice";
-import WelcomePage from "../features/user/WelcomePage"
+import WelcomePage from "../features/user/WelcomePage";
 
 const Protected = ({ children }) => {
   const dispatch = useDispatch();
@@ -11,11 +11,11 @@ const Protected = ({ children }) => {
     dispatch(getUser());
   }, [dispatch]);
 
-  if (!user){
-    return <WelcomePage />
+  if (!user) {
+    return <WelcomePage />;
   }
 
-  return children
+  return children;
 };
 
 export default Protected;

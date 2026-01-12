@@ -15,14 +15,17 @@ const ForgotPasswordInput = ({ response }) => {
 
   const onSubmit = async (data) => {
     try {
-        const res = await forgotPassword({ email: response.user.email, password: data.password });
-        toast.success(res.message)
-        reset();
-        openModal('signup');
+      const res = await forgotPassword({
+        email: response.user.email,
+        password: data.password,
+      });
+      toast.success(res.message);
+      reset();
+      openModal("signup");
     } catch (error) {
-        setError(error.message);
+      setError(error.message);
     }
-  }
+  };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className=" flex flex-col justify-between">

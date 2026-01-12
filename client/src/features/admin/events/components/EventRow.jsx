@@ -23,9 +23,7 @@ const EventRow = ({ event }) => {
       <td className="p-3 font-medium">{event.eventTitle}</td>
       <td className="p-3">{event.sportType}</td>
       <td className="p-3">{event.stadiumName}</td>
-      <td className="p-3">
-        {new Date(event.matchDate).toLocaleDateString()}
-      </td>
+      <td className="p-3">{new Date(event.matchDate).toLocaleDateString()}</td>
       <td className="p-3">
         ${event.minPrice} - ${event.maxPrice}
       </td>

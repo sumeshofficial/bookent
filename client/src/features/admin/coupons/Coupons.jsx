@@ -11,15 +11,8 @@ const Coupons = () => {
       <CouponHeader />
 
       <div className="bg-white rounded-lg shadow">
-        <CouponTable
-          coupons={coupons}
-          meta={meta}
-          isLoading={loading}
-        />
-        <CouponMobileCard
-          coupons={coupons}
-          isLoading={loading}
-        />
+        <CouponTable coupons={coupons} meta={meta} isLoading={loading} />
+        <CouponMobileCard coupons={coupons} isLoading={loading} />
       </div>
     </div>
   );

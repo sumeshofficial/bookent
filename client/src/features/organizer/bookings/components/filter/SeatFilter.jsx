@@ -1,8 +1,6 @@
 const SeatFilter = ({ seatCategories, value, onChange }) => (
   <div>
-    <label className="block text-xs text-gray-500 mb-1">
-      Seat Section
-    </label>
+    <label className="block text-xs text-gray-500 mb-1">Seat Section</label>
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}

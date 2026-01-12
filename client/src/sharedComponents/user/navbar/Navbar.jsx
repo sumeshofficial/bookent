@@ -43,10 +43,7 @@ const Navbar = () => {
 
   const events = data?.events;
 
-  const navLinks = [
-    { title: "All Events", link: "/events/all-events" },
-    // { title: "Venue", link: "/venue" },
-  ];
+  const navLinks = [{ title: "All Events", link: "/events/all-events" }];
 
   return (
     <div className="select-none">

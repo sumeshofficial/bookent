@@ -16,11 +16,7 @@ const router = createBrowserRouter([
     children: [
       {
         element: <GlobalLoader />,
-        children: [
-          ...userRoutes,
-          ...organizerRoutes,
-          ...adminRoutes,
-        ],
+        children: [...userRoutes, ...organizerRoutes, ...adminRoutes],
       },
       {
         path: "*",

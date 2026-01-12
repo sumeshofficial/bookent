@@ -4,16 +4,16 @@ import { useForm } from "react-hook-form";
 const AuthProvider = ({ children }) => {
   const { register, handleSubmit, reset, watch, formState } = useForm();
   const { errors, isSubmitting } = formState;
-  
+
   return (
     <FromContext.Provider
       value={{
-        register, 
-        handleSubmit, 
-        reset, 
-        watch, 
-        errors, 
-        isSubmitting
+        register,
+        handleSubmit,
+        reset,
+        watch,
+        errors,
+        isSubmitting,
       }}
     >
       {children}

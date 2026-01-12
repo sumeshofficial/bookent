@@ -1,6 +1,5 @@
 import { adminApi } from "../../../../services/api/apiSetup";
 
-
 export const fetchSalesReport = async (params) => {
   const { data } = await adminApi.get("/admin/sales", { params });
   return data;

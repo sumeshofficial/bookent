@@ -11,7 +11,7 @@ const BookingRow = ({ booking }) => {
       <td className="px-4 py-3 text-xs font-mono text-gray-700">
         {booking.orderId}
       </td>
-      
+
       <td className="px-4 py-3">
         <p className="font-medium">{booking.eventDetails.title}</p>
         <p className="text-xs text-gray-500">{booking.eventDetails.venue}</p>

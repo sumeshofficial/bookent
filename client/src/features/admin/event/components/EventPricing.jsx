@@ -1,4 +1,9 @@
-const EventPricing = ({ minPrice, maxPrice, ticketSetup = [], shapes = [] }) => {
+const EventPricing = ({
+  minPrice,
+  maxPrice,
+  ticketSetup = [],
+  shapes = [],
+}) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow">
       <h3 className="font-semibold mb-3">Ticket Pricing</h3>
@@ -9,8 +14,7 @@ const EventPricing = ({ minPrice, maxPrice, ticketSetup = [], shapes = [] }) => 
 
       <div className="space-y-3">
         {ticketSetup.map((ticket, index) => {
-          const sectionTitle =
-            shapes[index]?.title || `Section ${index + 1}`;
+          const sectionTitle = shapes[index]?.title || `Section ${index + 1}`;
 
           return (
             <div
@@ -18,9 +22,7 @@ const EventPricing = ({ minPrice, maxPrice, ticketSetup = [], shapes = [] }) => 
               className="flex items-center justify-between text-sm border-b pb-2"
             >
               <div>
-                <p className="font-medium text-gray-800">
-                  {sectionTitle}
-                </p>
+                <p className="font-medium text-gray-800">{sectionTitle}</p>
                 <p className="text-xs text-gray-500">
                   Max {ticket.perUserLimit} tickets per user
                 </p>

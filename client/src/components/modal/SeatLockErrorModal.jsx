@@ -1,4 +1,4 @@
-import img from '../../assets/error-illustration.png'
+import img from "../../assets/error-illustration.png";
 
 const SeatLockErrorModal = ({ open, onClose, message }) => {
   if (!open) return null;

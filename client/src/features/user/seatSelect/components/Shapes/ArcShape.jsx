@@ -52,10 +52,10 @@ const ArcShape = ({
             isDisabled
               ? "#d1d5db"
               : !selectedShape
-              ? shape.fillColor
-              : isSelected
-              ? shape.fillColor
-              : "#d1d5db"
+                ? shape.fillColor
+                : isSelected
+                  ? shape.fillColor
+                  : "#d1d5db"
           }
           strokeWidth={thickness}
           strokeOpacity={shape.fillOpacity ?? 0.6}

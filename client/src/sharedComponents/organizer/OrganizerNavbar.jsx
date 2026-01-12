@@ -2,9 +2,7 @@ import { List, UserCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const OrganizerNavbar = ({
-  setSidebarOpen,
-}) => {
+const OrganizerNavbar = ({ setSidebarOpen }) => {
   const { organizer } = useSelector((store) => store.organizer);
 
   return (
@@ -19,9 +17,7 @@ const OrganizerNavbar = ({
       <div className="flex-1 md:hidden"></div>
 
       <div className="relative ml-auto">
-        <button
-          className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition"
-        >
+        <button className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition">
           <Link
             to={"/listmyshow/profile"}
             className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100 flex items-center justify-center"
@@ -36,8 +32,7 @@ const OrganizerNavbar = ({
               <UserCircle className="w-8 h-8 text-gray-600" />
             )}
           </Link>
-          <div className="hidden md:flex items-center gap-1">
-          </div>
+          <div className="hidden md:flex items-center gap-1"></div>
         </button>
       </div>
     </div>

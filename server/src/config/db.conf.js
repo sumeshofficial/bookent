@@ -12,7 +12,6 @@ const connectDB = async () => {
       logger.info("Database Connected")
     );
     await mongoose.connect(ENV.MONGODB_ATLAS_URI);
-    // await mongoose.connect(`${ENV.MONGODB_URI}bookent`);
   } catch (error) {
     logger.error(error.message);
   }

@@ -18,10 +18,10 @@ const CircleShape = ({
           isDisabled
             ? "#d1d5db"
             : !selectedShape
-            ? shape.fillColor
-            : isSelected
-            ? shape.fillColor
-            : "#d1d5db"
+              ? shape.fillColor
+              : isSelected
+                ? shape.fillColor
+                : "#d1d5db"
         }
         fillOpacity={0.7}
       />

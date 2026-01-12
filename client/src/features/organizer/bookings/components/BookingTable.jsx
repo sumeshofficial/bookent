@@ -1,5 +1,5 @@
 import BookingRow from "./BookingRow";
-import Pagination from '../../../../sharedComponents/Pagination'
+import Pagination from "../../../../sharedComponents/Pagination";
 
 const BookingTable = ({ bookings, meta }) => {
   return (
@@ -24,7 +24,7 @@ const BookingTable = ({ bookings, meta }) => {
           ))}
         </tbody>
       </table>
-          <Pagination meta={meta} />
+      <Pagination meta={meta} />
     </div>
   );
 };

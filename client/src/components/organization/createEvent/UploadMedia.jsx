@@ -1,7 +1,6 @@
 import CropImage from "../CropImage";
 
 const UploadMedia = ({ errors, watch, setValue }) => {
-
   return (
     <div className="bg-white border border-gray-100 rounded-md px-4 py-6 sm:px-8 sm:py-8">
       <span className="font-semibold text-sm sm:text-2xl">Upload Media</span>

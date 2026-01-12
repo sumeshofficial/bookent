@@ -20,8 +20,18 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
       icon: Grid,
       path: "/listmyshow/dashboard",
     },
-    { id: "events", label: "Events/Stadiums", icon: Package, hasDropdown: true },
-    { id: "sales", label: "Sales", icon: CreditCard, path: "/listmyshow/sales" },
+    {
+      id: "events",
+      label: "Events/Stadiums",
+      icon: Package,
+      hasDropdown: true,
+    },
+    {
+      id: "sales",
+      label: "Sales",
+      icon: CreditCard,
+      path: "/listmyshow/sales",
+    },
   ];
 
   return (
@@ -33,7 +43,7 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
       >
         <div className="px-6 py-4 sm:py-3 border-b border-b-gray-200">
           <div className="flex items-center gap-2">
-            <Link to='/' className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center space-x-3">
               <img
                 src={logo}
                 alt="Bookent"

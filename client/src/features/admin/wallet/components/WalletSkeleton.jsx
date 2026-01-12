@@ -3,10 +3,7 @@ const WalletSkeleton = ({ type = "page" }) => {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-pulse">
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="h-24 bg-gray-200 rounded-xl"
-          />
+          <div key={i} className="h-24 bg-gray-200 rounded-xl" />
         ))}
       </div>
     );
@@ -19,10 +16,7 @@ const WalletSkeleton = ({ type = "page" }) => {
 
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="h-12 bg-gray-200 rounded-lg"
-            />
+            <div key={i} className="h-12 bg-gray-200 rounded-lg" />
           ))}
         </div>
       </div>
@@ -35,10 +29,7 @@ const WalletSkeleton = ({ type = "page" }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="h-24 bg-gray-200 rounded-xl"
-          />
+          <div key={i} className="h-24 bg-gray-200 rounded-xl" />
         ))}
       </div>
 

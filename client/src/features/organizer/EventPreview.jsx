@@ -43,9 +43,12 @@ const EventPreview = () => {
 
   useEffect(() => {
     if (error) {
-      console.log(error);
       toast.dismiss();
-      toast.error("Something went wrong");
+      toast.error(
+        error?.response?.data?.error.message ||
+          error.message ||
+          "Something went wrong"
+      );
       navigate("/error");
     }
   }, [error, navigate]);
@@ -87,10 +90,13 @@ const EventPreview = () => {
       toast.dismiss();
       toast.success("Event deleted");
     },
-    onError: (err) => {
-      console.log(err);
+    onError: (error) => {
       toast.dismiss();
-      toast.error("Something went wrong");
+      toast.error(
+        error?.response?.data?.error.message ||
+          error.message ||
+          "Something went wrong"
+      );
     },
   });
 

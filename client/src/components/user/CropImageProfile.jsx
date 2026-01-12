@@ -1,5 +1,5 @@
 import { Pencil } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
 
@@ -10,8 +10,7 @@ const CropImageProfile = ({ imageUpdate, label, user }) => {
   const inputRef = useRef();
   const { openModal, closeModal } = useModal();
 
-  // Crop done
-  const onCropDone = (imageCroppedArea) => {
+  const onCropDone = useCallback((imageCroppedArea) => {
     const canvas = document.createElement("canvas");
     canvas.width = imageCroppedArea.width;
     canvas.height = imageCroppedArea.height;
@@ -45,12 +44,12 @@ const CropImageProfile = ({ imageUpdate, label, user }) => {
 
       setImageAfterCrop(canvas.toDataURL("image/jpeg", 0.9));
     };
-  };
+  }, [closeModal, image, imageUpdate]);
 
-  const onCropCancel = () => {
+  const onCropCancel = useCallback(() => {
     setImage("");
     closeModal();
-  };
+  }, [closeModal]);
 
   useEffect(() => {
     if (image) {
@@ -61,7 +60,7 @@ const CropImageProfile = ({ imageUpdate, label, user }) => {
         aspectRation: 1,
       });
     }
-  }, [image]);
+  }, [image, onCropCancel, onCropDone, openModal]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];

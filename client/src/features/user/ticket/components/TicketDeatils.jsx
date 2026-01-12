@@ -4,7 +4,17 @@ import TicketPricing from "../../myTickets/components/TicketPricing";
 import InvoiceActions from "./InvoiceActions";
 
 const TicketDetails = ({ data }) => {
-  const { event, qty, section, pricing, qrData, bookingId, status, postponeDetails, cancelDetails } = data;
+  const {
+    event,
+    qty,
+    section,
+    pricing,
+    qrData,
+    bookingId,
+    status,
+    postponeDetails,
+    cancelDetails,
+  } = data;
 
   const isPostponed = postponeDetails?.isPostponed;
   const isCancelled = cancelDetails?.isCancelled;
@@ -27,11 +37,14 @@ const TicketDetails = ({ data }) => {
           <p className="font-semibold text-yellow-800">Event Postponed</p>
           {postponeDetails?.oldMatchDate && postponeDetails?.newMatchDate && (
             <p className="text-yellow-700 mt-1">
-              {formatDate(postponeDetails.oldMatchDate)} → {formatDate(postponeDetails.newMatchDate)}
+              {formatDate(postponeDetails.oldMatchDate)} →{" "}
+              {formatDate(postponeDetails.newMatchDate)}
             </p>
           )}
           {postponeDetails?.reason && (
-            <p className="text-yellow-700 mt-1">Reason: {postponeDetails.reason}</p>
+            <p className="text-yellow-700 mt-1">
+              Reason: {postponeDetails.reason}
+            </p>
           )}
         </div>
       )}

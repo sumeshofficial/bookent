@@ -13,7 +13,7 @@ const OrganizerProtected = () => {
 
   useEffect(() => {
     dispatch(getOrganizer({ userId: user._id }));
-  }, []);
+  }, [dispatch, user._id]);
 
   if (!organizer) {
     return <OrganizerAccountForm />;

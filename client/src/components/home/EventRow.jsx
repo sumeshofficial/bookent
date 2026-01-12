@@ -49,7 +49,9 @@ const EventRow = ({ title, events, seeAllLink, loading = false }) => {
   return (
     <section className="space-y-4 mt-8 relative">
       <div className="flex justify-between items-center">
-        <h2 className="text-base sm:text-xl font-semibold text-gray-800">{title}</h2>
+        <h2 className="text-base sm:text-xl font-semibold text-gray-800">
+          {title}
+        </h2>
 
         {!loading && events?.length > 0 && (
           <Link

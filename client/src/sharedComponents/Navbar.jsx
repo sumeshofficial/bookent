@@ -4,7 +4,7 @@ import { logout } from "../services/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../app/userSlice";
 import logo from "../assets/bookent-logo-black.png";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ChevronLeft, Search, Ticket, UserCircle2, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { logoutOrganizer } from "../app/organizerSlice";
@@ -21,8 +21,6 @@ const Navbar = () => {
   const [debouncedSearch] = useDebounce(searchQuery, 500);
   const location = useLocation();
   const inputRef = useRef(null);
-
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -43,10 +41,7 @@ const Navbar = () => {
 
   const events = data?.events;
 
-  const navLinks = [
-    { title: "All Events", link: "/events/all-events" },
-    // { title: "Venue", link: "/venue" },
-  ];
+  const navLinks = [{ title: "All Events", link: "/events/all-events" }];
 
   return (
     <>
@@ -279,7 +274,10 @@ const Navbar = () => {
                     <Link
                       key={event.id}
                       to={`/event/${event.id}`}
-                      onClick={() => location.pathname === `/event/${event.id}` && setIsSearchOpen(false)}
+                      onClick={() =>
+                        location.pathname === `/event/${event.id}` &&
+                        setIsSearchOpen(false)
+                      }
                       className="p-2 rounded-md hover:bg-gray-100 cursor-pointer transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]"
                     >
                       {event.title}
@@ -347,7 +345,10 @@ const Navbar = () => {
                     <Link
                       key={event.id}
                       to={`/event/${event.id}`}
-                      onClick={() => location.pathname === `/event/${event.id}` && setIsSearchOpen(false)}
+                      onClick={() =>
+                        location.pathname === `/event/${event.id}` &&
+                        setIsSearchOpen(false)
+                      }
                       className="p-2 rounded-md hover:bg-gray-100 cursor-pointer transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]"
                     >
                       {event.title}
