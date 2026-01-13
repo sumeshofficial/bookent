@@ -3,50 +3,87 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.conf.js";
-import authRouter from "./routes/auth.router.js";
-import userRouter from "./routes/user.router.js";
-import passport from "./middlewares/passport.js";
-import organizerRouter from "./routes/organizer.router.js";
-import adminRouter from "./routes/admin.router.js";
-import morgan from "morgan";
+import userRoutes from "./routes/user/user.routes.js";
+import paypalRoutes from "./routes/paypal.routes.js";
+import passport from "./middlewares/user/passport.js";
+import organizerRoutes from "./routes/organizer/organizer.routes.js";
+import adminRoutes from "./routes/admin/admin.routes.js";
 import { connectRedis } from "./config/redis.conf.js";
+import s3Router from "./routes/s3.router.js";
+import logger from "./config/logger.js";
+import { errorHandler } from "./middlewares/common/error.handler.js";
+import { initSocket } from "./config/socket.conf.js";
+import http from "http";
+import { initRedisExpiryListener } from "./config/redisExpiry.conf.js";
+import { initSeatPubSub } from "./config/seatPubSub.conf.js";
+import { ENV } from "./config/env.conf.js";
+import { initCronJobs } from "./jobs/index.job.js";
+import helmet from "helmet";
+import { helmetConfig } from "./config/security/helmet.config.js";
+import rateLimit from "express-rate-limit";
 dotenv.config();
 
 const app = express();
 
-const PORT = process.env.PORT;
+const PORT = ENV.PORT;
+const server = http.createServer(app);
 
 // Database connect
 await connectDB();
 await connectRedis();
 
+initSocket(server);
+
+await initRedisExpiryListener();
+await initSeatPubSub();
+
 // Logger
-app.use(morgan("dev"));
+// app.use((req, res, next) => {
+//   logger.http(`${req.method} ${req.url}`);
+//   next();
+// });
 
 // Middleware
+// app.use(helmet(helmetConfig(ENV)));
+
+// const globalRateLimiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
+
+// app.use(globalRateLimiter);
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [ENV.FRONTEND_URL],
     credentials: true,
   })
 );
 app.use(passport.initialize());
 
-// auth route
-app.use("/api/auth", authRouter);
+// // Routes
+// const authRateLimiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 20,
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
 
-// user route
-app.use("/api/me", userRouter);
+app.use("/api/v1/user", userRoutes);
+// app.use("/api/v1/user", authRateLimiter, userRoutes);
+app.use("/api/v1/organizer", organizerRoutes);
+app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/s3", s3Router);
+app.use("/api/v1/paypal", paypalRoutes);
 
-// organizar route
-app.use("/api/organizer", organizerRouter);
+app.use(errorHandler);
 
-// admin route
-app.use("/api/admin", adminRouter);
+initCronJobs();
 
 // Server listening
-app.listen(PORT, () => {
-  console.log(`server running at http://localhost:${PORT}`);
+server.listen(PORT, () => {
+  logger.info(`server running at http://localhost:${PORT}`);
 });

@@ -8,7 +8,7 @@ const bankAccountDetailsSchema = new mongoose.Schema(
     ifsc: { type: String },
     bankName: { type: String },
   },
-  { _id: false }
+  { _id: false, versionKey: false }
 );
 
 const organizationDetailsSchema = new mongoose.Schema(
@@ -17,7 +17,7 @@ const organizationDetailsSchema = new mongoose.Schema(
     address: { type: String },
     state: { type: String },
   },
-  { _id: false }
+  { _id: false, versionKey: false }
 );
 
 const organizerSchema = new mongoose.Schema(
@@ -28,17 +28,32 @@ const organizerSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    fullname: String,
+    email: String,
+    profileImage: String,
     organizationDetails: organizationDetailsSchema,
     bankAccountDetails: bankAccountDetailsSchema,
+    paypalEmail: {
+      type: String,
+      required: true,
+    },
     isVerified: {
       type: Boolean,
       default: false,
     },
+    rejectReason: {
+      type: String,
+      default: null,
+    },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'],
-      default: 'pending'
-    }
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+    wallet: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

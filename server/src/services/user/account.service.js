@@ -1,0 +1,98 @@
+import {
+  updateUserPassword,
+  updateUserService,
+  validatePassword,
+} from "../../repositories/user/user.repository.js";
+import { ERRORS } from "../../utility/constants/constants.js";
+import { STATUS_CODE } from "../../utility/constants/statusCode.js";
+import { AppError } from "../../utility/helpers.js";
+import { sanitizeUser } from "../../utility/user/sanitizeUser.js";
+import { getObjectURL } from "../s3.service.js";
+import { reverseGeocoding } from "../user.service.js";
+import bcrypt from "bcrypt";
+
+// Get user service
+export const getUser = async (user) => {
+  if (!user) {
+    throw new AppError(
+      STATUS_CODE.NOTFOUND,
+      ERRORS.USER_NOT_FOUND.CODE,
+      ERRORS.USER_NOT_FOUND.MSG
+    );
+  }
+
+  let updatedUser;
+  if (user.role === "user" && user.location) {
+    const response = await reverseGeocoding({
+      lat: user.location.latitude,
+      lng: user.location.longitude,
+    });
+
+    updatedUser = {
+      ...user,
+      location: { ...user.location, address: response },
+    };
+  }
+
+  return updatedUser;
+};
+
+// Update user service
+export const updateUser = async (body) => {
+  const { id, data } = body;
+
+  if (!id || !data) {
+    throw new AppError(
+      STATUS_CODE.MISSING_FIELD,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.CODE,
+      ERRORS.ALL_FIELDS_ARE_REQUIRED.MSG
+    );
+  }
+
+  const user = await updateUserService({ id, data });
+
+  if (!user) {
+    throw new AppError(
+      STATUS_CODE.NOTFOUND,
+      ERRORS.USER_NOT_FOUND.CODE,
+      ERRORS.USER_NOT_FOUND.MSG
+    );
+  }
+
+  if (user.profileImage && user.profileImage.includes("uploads")) {
+    const url = await getObjectURL(user.profileImage);
+    user.profileImage = url;
+  }
+
+  let updatedUser = sanitizeUser(user);
+
+  if (user.role === "user" && user.location) {
+    const response = await reverseGeocoding({
+      lat: user.location.latitude,
+      lng: user.location.longitude,
+    });
+
+    updatedUser = {
+      ...user,
+      location: { ...user.location, address: response },
+    };
+  }
+
+  return updatedUser;
+};
+
+export const updatePassword = async (userId, currentPassword, newPassword) => {
+  const user = await validatePassword(userId, currentPassword);
+
+  const isSame = await bcrypt.compare(newPassword, user.password);
+
+  if (isSame) {
+    throw new AppError(
+      STATUS_CODE.BAD_REQUEST,
+      ERRORS.NEW_PASSWORD_SAME_AS_OLD.CODE,
+      ERRORS.NEW_PASSWORD_SAME_AS_OLD.MSG
+    );
+  }
+
+  await updateUserPassword(userId, newPassword);
+};

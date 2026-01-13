@@ -1,0 +1,49 @@
+services:
+  nginx:
+    image: nginx:trixie
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - server
+    networks:
+      - backend
+
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - backend
+
+  redis:
+    image: redis
+    restart: always
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+
+  server:
+    build: ./server
+    restart: always
+    env_file:
+      - ./server/.env.production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - backend
+
+volumes:
+  mongo-data:
+  redis-data:
+
+networks:
+  backend:
+    driver: bridge

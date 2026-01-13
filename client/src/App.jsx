@@ -1,23 +1,32 @@
-import ModalManager from "./sharedCompents/Modal/ModalManager";
+import ModalManager from "./sharedComponents/modal/ModalManager";
 import ModalProvider from "./context/ModalContext";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "./context/FormContext";
 import { Outlet } from "react-router-dom";
-import ErrorBoundary from "./componets/ErrorBoundary";
+import ErrorBoundary from "./components/ErrorBoundary";
+import useOfflineTracker from "./hooks/useOfflineTracker";
+import useGlobalSeatEvents from "./hooks/useGlobalSeatEvents";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { ENV } from "./config/env";
 
 function App() {
+  useOfflineTracker();
+  useGlobalSeatEvents();
+
   return (
-    <>
-      <AuthProvider>
-        <ModalProvider>
-          <Toaster position="top-center" reverseOrder={false} />
-          <ModalManager />
-          <ErrorBoundary>
+    <AuthProvider>
+      <ModalProvider>
+        <Toaster position="top-center" reverseOrder={false} />
+        <ModalManager />
+        <ErrorBoundary>
+          <PayPalScriptProvider
+            options={{ clientId: ENV.VITE_PAYPAL_CLIENT_ID }}
+          >
             <Outlet />
-          </ErrorBoundary>
-        </ModalProvider>
-      </AuthProvider>
-    </>
+          </PayPalScriptProvider>
+        </ErrorBoundary>
+      </ModalProvider>
+    </AuthProvider>
   );
 }
 

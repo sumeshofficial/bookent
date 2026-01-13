@@ -1,7 +1,8 @@
 import axios from "axios";
-import { api } from "./axiosSetup";
-import { logout } from "../auth";
-const API_URL = import.meta.env.VITE_API_URL;
+import { adminLogout, logout } from "../auth";
+import { ENV } from "../../config/env";
+
+const API_URL = ENV.VITE_API_URL;
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -17,77 +18,107 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+export const createApiInstance = (type = "user") => {
+  const instance = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
+  });
 
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status !== 401 || originalRequest._retry) {
+  instance.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem(
+        type === "admin" ? "adminAccessToken" : "accessToken"
+      );
+      if (token) {
+        config.headers["Authorization"] = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
       return Promise.reject(error);
     }
+  );
 
-    if (isRefreshing) {
-      try {
-        const token = await new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        });
+  instance.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    async (error) => {
+      const originalRequest = error.config;
 
-        originalRequest.headers["Authorization"] = `Bearer ${token}`;
-        return await api(originalRequest);
-      } catch (err) {
-        return Promise.reject(err);
+      if (error.response?.status !== 401 || originalRequest._retry) {
+        return Promise.reject(error);
       }
-    }
 
-    originalRequest._retry = true;
-    isRefreshing = true;
-
-    try {
-      const response = await axios.post(
-        `${API_URL}/auth/refresh-token`,
-        {},
-        { withCredentials: true }
+      const storedToken = localStorage.getItem(
+        type === "admin" ? "adminAccessToken" : "accessToken"
       );
 
-      const { accessToken } = response.data;
+      if (!storedToken) {
+        return Promise.reject(error);
+      }
 
-      localStorage.setItem("accessToken", accessToken);
+      if (isRefreshing) {
+        try {
+          const token = await new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          });
 
-      originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+          originalRequest.headers["Authorization"] = `Bearer ${token}`;
+          return await instance(originalRequest);
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      }
 
-      processQueue(null, accessToken);
+      originalRequest._retry = true;
+      isRefreshing = true;
 
-      return await api(originalRequest);
-    } catch (refreshError) {
+      try {
+        const refreshUrl =
+          type === "admin"
+            ? `${API_URL}/admin/auth/refresh-token`
+            : `${API_URL}/user/auth/refresh-token`;
 
-      processQueue(refreshError, null);
+        const response = await axios.post(
+          refreshUrl,
+          {},
+          { withCredentials: true }
+        );
+        const { accessToken } = response.data;
 
-      const { default: store } = await import("../../Redux/store");
-      const { logoutUser } = await import("../../Redux/userSlice");
+        localStorage.setItem(
+          type === "admin" ? "adminAccessToken" : "accessToken",
+          accessToken
+        );
 
-      await logout();
-      store.dispatch(logoutUser());
+        originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+        processQueue(null, accessToken);
 
-      return Promise.reject(refreshError);
-    } finally {
-      isRefreshing = false;
+        return await instance(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+
+        const { default: store } = await import("../../app/store");
+
+        if (type === "admin") {
+          const { logoutAdmin } = await import("../../app/adminSlice");
+          await adminLogout();
+          store.dispatch(logoutAdmin());
+        } else {
+          const { logoutUser } = await import("../../app/userSlice");
+          const { logoutOrganizer } = await import("../../app/organizerSlice");
+          await logout();
+          store.dispatch(logoutUser());
+          store.dispatch(logoutOrganizer());
+        }
+
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
-  }
-);
+  );
 
-export default api;
+  return instance;
+};

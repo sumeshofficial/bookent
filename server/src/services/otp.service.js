@@ -1,40 +1,47 @@
-import { Error } from "mongoose";
-import Otp from "../models/otp.model.js";
 import { sendMail } from "../utility/mailer.js";
-import { redisClient } from "../config/redis.conf.js";
+import {
+  deleteRedisData,
+  getRedisData,
+  storeInRedisWithExpiry,
+} from "../repositories/redis/redis.repository.js";
+import { ENV } from "../config/env.conf.js";
+
+const redisExpiresIn = ENV.REDIS_OTP_EXPIRES_IN;
 
 // Generate OTP
 export const generateOtp = async ({ email, userData, purpose }) => {
-  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpCode = crypto.randomInt(100000, 1000000).toString();
   const redisKey = `otp:${email}:${purpose}`;
 
-  try {
-    await redisClient.del(redisKey);
+  await deleteRedisData(redisKey);
 
-    const redisData = {
-      ...userData,
-      otp: otpCode,
-      purpose,
-    };
+  const redisData = {
+    ...userData,
+    otp: otpCode,
+    purpose,
+  };
 
-    await redisClient.setEx(redisKey, 300, JSON.stringify(redisData));
+  await storeInRedisWithExpiry(
+    redisKey,
+    redisExpiresIn,
+    JSON.stringify(redisData)
+  );
 
-    await sendMail(email, otpCode, userData.fullname);
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  await sendMail(email, otpCode, userData.fullname);
 };
 
 // Check OTP is expired or not
 export const checkOtp = async (email, purpose) => {
   const redisKey = `otp:${email}:${purpose}`;
-  const data = await redisClient.get(redisKey);
-  if (!data) return null;
+  const data = await getRedisData(redisKey);
+  if (!data) {
+    return null;
+  }
   return JSON.parse(data);
 };
 
 // Verify User
 export const delOtp = async (email, purpose) => {
   const redisKey = `otp:${email}:${purpose}`;
-  await redisClient.del(redisKey);
+  await deleteRedisData(redisKey);
 };

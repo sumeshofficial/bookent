@@ -1,253 +1,126 @@
-import adminApi from "./api/adminInterceptor";
-import api from "./api/interceptor";
 import axios from "axios";
+import { adminApi, api } from "./api/apiSetup";
+import { ENV } from "../config/env";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = ENV.VITE_API_URL;
 
 export const sendOTPForSignup = async (data) => {
-  try {
-    const { fullname, email, password, role } = data;
-    const response = await axios.post(
-      `${API_URL}/auth/email/signup`,
-      {
-        fullname,
-        email,
-        role,
-        password,
-        purpose: "signup",
-      },
-      { withCredentials: true }
-    );
+  const { fullname, email, password, role } = data;
+  const response = await axios.post(
+    `${API_URL}/user/auth/email/signup`,
+    {
+      fullname,
+      email,
+      role,
+      password,
+      purpose: "signup",
+    },
+    { withCredentials: true }
+  );
 
-    return response.data.message;
-  } catch (error) {
-    const message =
-      error.response?.data?.error ||
-      error.response?.data?.message ||
-      error?.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  return response.data.message;
 };
 
-export const sendOTP = async ({ data, purpose }) => {
-  try {
-    const { email } = data;
+export const sendOTP = async ({ data, purpose, oldEmail = "" }) => {
+  const { email } = data;
 
-    const response = await axios.post(
-      `${API_URL}/auth/send-otp`,
-      {
-        email,
-        purpose,
-      },
-      { withCredentials: true }
-    );
+  const response = await axios.post(`${API_URL}/user/auth/send-otp`, {
+    email,
+    purpose,
+    oldEmail,
+  });
 
-    return response.data.message;
-  } catch (error) {
-    const message =
-      error.response?.data?.error ||
-      error.response?.data?.message ||
-      error?.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  return response.data.message;
 };
 
 export const loginUserWithEmail = async (data) => {
   const { email, password } = data;
-  try {
-    const response = await axios.post(
-      `${API_URL}/auth/email/signin`,
-      {
-        email,
-        password,
-        purpose: "signin",
-      },
-      { withCredentials: true }
-    );
+  const response = await axios.post(
+    `${API_URL}/user/auth/email/signin`,
+    {
+      email,
+      password,
+      purpose: "signin",
+    },
+    { withCredentials: true }
+  );
 
-    return response;
-  } catch (error) {
-    const message =
-      error.response.data.message ||
-      error.response.data.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  return response;
 };
 
 export const verifyOtp = async (data) => {
-  try {
-    const { email, otp, purpose } = data;
-    const response = await axios.post(
-      `${API_URL}/auth/verify-otp`,
-      {
-        email,
-        otp,
-        purpose,
-      },
-      { withCredentials: true }
-    );
-    return response.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message || error.message || "Something went wrong";
-    throw new Error(message);
-  }
+  const { email, otp, purpose } = data;
+  const response = await axios.post(
+    `${API_URL}/user/auth/verify-otp`,
+    {
+      email,
+      otp,
+      purpose,
+    },
+    { withCredentials: true }
+  );
+  return response.data;
 };
 
 export const onResend = async ({ email, purpose }) => {
-  try {
-    return await axios.post(
-      `${API_URL}/auth/resend-otp`,
-      { email, purpose },
-      { withCredentials: true }
-    );
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  return await axios.post(
+    `${API_URL}/user/auth/resend-otp`,
+    { email, purpose },
+    { withCredentials: true }
+  );
 };
 
 export const verifyToken = async (token) => {
-  try {
-    return await api.get(
-      `/auth/getUser`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  return await api.get(
+    `/user/account/getUser`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-      { withCredentials: true }
-    );
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+    },
+    { withCredentials: true }
+  );
 };
 
-export const verifyTokenAdmin = async (token) => {
-  try {
-    const res = await adminApi.get(
-      `/admin`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-      { withCredentials: true }
-    );
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+export const verifyTokenAdmin = async () => {
+  return await adminApi.get("/admin/auth");
 };
 
 export const logout = async () => {
-  try {
-    await axios.post(
-      `${API_URL}/auth/logout`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-    localStorage.removeItem("accessToken");
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  await api.post("/user/auth/logout");
+  localStorage.removeItem("accessToken");
 };
 
 export const adminLogout = async () => {
-  try {
-    await axios.post(
-      `${API_URL}/admin/logout`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-    localStorage.removeItem("adminAccessToken");
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  await adminApi.post("/admin/auth/logout");
+  localStorage.removeItem("adminAccessToken");
 };
 
 export const forgotPassword = async ({ email, password }) => {
-  try {
-    const response = await axios.post(`${API_URL}/auth/forgot-password`, {
-      email,
-      password,
-    });
+  const response = await axios.post(`${API_URL}/user/auth/forgot-password`, {
+    email,
+    password,
+  });
 
-    return response.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  return response.data;
 };
 
 export const editProfile = async ({ data }) => {
-  try {
-    const response = await api.patch("/me", data);
-
-    return response.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  const response = await api.patch("/user/account", data);
+  return response.data;
 };
 
-// Admin api post
 export const adminLogin = async ({ email, password }) => {
-  try {
-    if (!email || !password) return;
+  if (!email || !password) return;
 
-    const response = await axios.post(`${API_URL}/admin/login`, {
+  const response = await axios.post(
+    `${API_URL}/admin/auth/login`,
+    {
       email,
       password,
     },
-  { withCredentials: true });
+    { withCredentials: true }
+  );
 
-    return response.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Something went wrong";
-    throw new Error(message);
-  }
+  return response.data;
 };

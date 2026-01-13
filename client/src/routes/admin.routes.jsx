@@ -1,0 +1,45 @@
+import AdminProtected from "../components/admin/AdminProtected";
+import AdminLayout from "../sharedComponents/admin/AdminLayout";
+
+import AdminLogin from "../features/admin/AdminLogin";
+import AdminNotFoundPage from "../features/admin/AdminNotFoundPage";
+import OrganizersList from "../features/admin/OrganizersList";
+import UserDetails from "../features/admin/user/UserDetails";
+import OrganizerDetailsPage from "../features/admin/OrganizerDetailsPage";
+import AdminWallet from "../features/admin/wallet/AdminWallet";
+import Coupons from "../features/admin/coupons/Coupons";
+import Events from "../features/admin/events/Events";
+import Event from "../features/admin/event/Event";
+import UsersList from "../features/admin/users/UsersList";
+import Banner from "../features/admin/banner/Banner";
+import SalesReport from "../features/admin/sales/SalesReport";
+import Dashboard from "../features/admin/dashboard/Dashboard";
+
+const adminRoutes = [
+  {
+    path: "admin",
+    element: <AdminProtected />,
+    children: [
+      {
+        element: <AdminLayout />,
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "users", element: <UsersList /> },
+          { path: "organizers", element: <OrganizersList /> },
+          { path: "users/:id", element: <UserDetails /> },
+          { path: "organizers/:id", element: <OrganizerDetailsPage /> },
+          { path: "wallet", element: <AdminWallet /> },
+          { path: "coupons", element: <Coupons /> },
+          { path: "events", element: <Events /> },
+          { path: "events/:slug", element: <Event /> },
+          { path: "banner", element: <Banner /> },
+          { path: "sales", element: <SalesReport /> },
+        ],
+      },
+      { path: "login", element: <AdminLogin /> },
+      { path: "*", element: <AdminNotFoundPage /> },
+    ],
+  },
+];
+
+export default adminRoutes;
