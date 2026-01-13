@@ -13,7 +13,6 @@ const envSchema = z.object({
   PORT: z.string().regex(/^\d+$/).transform(Number).default("3000"),
 
   // MongoDB URIs
-  MONGODB_URI: z.string().min(1),
   MONGODB_ATLAS_URI: z.string().min(1),
 
   // Google OAuth
