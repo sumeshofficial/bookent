@@ -1,6 +1,6 @@
 services:
   mongo:
-    image: mongo:latest
+    image: mongo
     container_name: bookent_db
     restart: always
     volumes:
@@ -24,13 +24,15 @@ services:
     ports:
       - 3000:3000
     env_file:
-      - ./server/.env
+      - ./server/.env.development
     volumes:
       - ./server:/app
-      - /app/node_modules
+      - server-node-modules:/app/node_modules
     depends_on:
       - mongo
+      - redis
 
 volumes:
   mongo-data:
   redis-data:
+  server-node-modules:

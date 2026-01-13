@@ -44,7 +44,7 @@ await initSeatPubSub();
 // });
 
 // Middleware
-app.use(helmet(helmetConfig(ENV)));
+// app.use(helmet(helmetConfig(ENV)));
 
 // const globalRateLimiter = rateLimit({
 //   windowMs: 15 * 60 * 1000,
