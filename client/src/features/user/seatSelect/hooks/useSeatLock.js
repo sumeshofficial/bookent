@@ -24,23 +24,33 @@ export const useSectionLock = (eventId) => {
       }));
     };
 
-    socket.on(SOCKET_EVENTS.CONNECT, () => {
+    const seatUpdateBulkHandler = (lockData) => {
+      setSections(lockData);
+    };
+
+    const connectHandler = () => {
       socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId });
-    });
+    };
+
+    socket.on(SOCKET_EVENTS.CONNECT, connectHandler);
 
     if (socket.connected) {
       socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId });
     }
 
     socket.on(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
-
-    socket.on(SOCKET_EVENTS.SEAT_UPDATE_BULK, (lockData) => {
-      setSections(lockData);
-    });
+    socket.on(SOCKET_EVENTS.SEAT_UPDATE_BULK, seatUpdateBulkHandler);
 
     return () => {
-      socket.off(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
-      socket.off(SOCKET_EVENTS.CONNECT);
+      try {
+        if (socket && typeof socket.off === "function") {
+          socket.off(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
+          socket.off(SOCKET_EVENTS.SEAT_UPDATE_BULK, seatUpdateBulkHandler);
+        }
+      // eslint-disable-next-line no-unused-vars
+      } catch (e) {
+        // ignore socket.io cleanup errors during reconnect/unmount
+      }
     };
   }, [socket, eventId]);
 
@@ -55,13 +65,15 @@ export const useSectionLock = (eventId) => {
             open: true,
             message: response.error,
             onClose: () => {
-              closeModal;
+              closeModal();
               window.location.reload();
             },
           });
           return;
         }
-        cb(response?.lockId || null);
+        if (typeof cb === "function") {
+          cb(response?.lockId || null);
+        }
       }
     );
   };
