@@ -1,0 +1,53 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Backend to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > ~/.ssh/ec2.pem
+          chmod 600 ~/.ssh/ec2.pem
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          ssh -i ~/.ssh/ec2.pem \
+            -o StrictHostKeyChecking=no \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+
+          set -e
+
+          echo " Connected to EC2"
+
+          cd ${{ secrets.APP_PATH }}
+
+          echo " Resetting repository"
+          git fetch origin
+          git reset --hard origin/main
+          git clean -fd
+
+          echo " Creating server/.env.production"
+          mkdir -p server
+          cat << 'ENVEOF' > server/.env.production
+          ${{ secrets.SERVER_ENV_PRODUCTION }}
+          ENVEOF
+
+          chmod 600 server/.env.production
+
+          echo " Deploying backend containers"
+          docker compose -f docker-compose.prod.yml down
+          docker compose -f docker-compose.prod.yml up -d --build --pull
+
+          echo " Backend deployment completed"
