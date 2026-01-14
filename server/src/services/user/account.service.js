@@ -21,7 +21,7 @@ export const getUser = async (user) => {
     );
   }
 
-  let updatedUser;
+  let updatedUser = user;
   if (user.role === "user" && user.location) {
     const response = await reverseGeocoding({
       lat: user.location.latitude,

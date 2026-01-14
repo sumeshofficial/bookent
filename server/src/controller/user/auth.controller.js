@@ -79,6 +79,8 @@ export const loginwithEmailController = asyncHandler(async (req, res) => {
     accessToken,
   };
 
+  console.log(response);
+
   sendResponse(res, response, STATUS_CODE.SUCCESS);
 });
 
