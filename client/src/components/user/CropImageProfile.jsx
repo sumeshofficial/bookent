@@ -32,11 +32,12 @@ const CropImageProfile = ({ imageUpdate, label, user }) => {
         imageCroppedArea.height
       );
 
+      setImage("");
       closeModal();
+
       canvas.toBlob(
         async (blob) => {
           if (blob) await imageUpdate(blob);
-          setImage("");
         },
         "image/jpeg",
         0.9
