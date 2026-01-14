@@ -72,8 +72,8 @@ export const signinUser = async (data) => {
   if (!isPasswordValid) {
     throw new AppError(
       STATUS_CODE.UNAUTHORIZED,
-      ERRORS.AUTHENTICATION_FAILED.CODE,
-      ERRORS.AUTHENTICATION_FAILED.MSG
+      ERRORS.INVALID_CREDENTIALS.CODE,
+      ERRORS.INVALID_CREDENTIALS.MSG
     );
   }
 

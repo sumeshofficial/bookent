@@ -222,6 +222,10 @@ export const ERRORS = {
     CODE: "BANNER_NOT_FOUND",
     MSG: "Banner not found or already deleted",
   },
+  INVALID_CREDENTIALS: {
+    CODE: "INVALID_CREDENTIALS",
+    MSG: "Invalid email or password",
+  }
 };
 
 // Response Messages
