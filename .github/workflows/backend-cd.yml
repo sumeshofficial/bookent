@@ -48,7 +48,7 @@ jobs:
 
           echo " Deploying backend containers"
           docker compose -f docker-compose.prod.yml down
-          docker compose -f docker-compose.prod.yml up -d --build --pull
+          docker compose -f docker-compose.prod.yml up -d --build --pull=always
 
           echo " Backend deployment completed"
           EOF
