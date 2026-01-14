@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import ProgressSteps from "../../components/organization/CreateEvent/ProgressSteps";
+import ProgressSteps from "../../components/organization/createEvent/ProgressSteps";
 import BasicInfo from "../../components/organization/createEvent/BasicInfo";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
