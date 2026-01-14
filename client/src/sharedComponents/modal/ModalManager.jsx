@@ -3,7 +3,7 @@ import AuthModal from "../../components/auth/AuthModal";
 import OTPInputForm from "../../components/auth/OTPVerify/OTPInputForm";
 import Modal from "./Modal";
 import EmailVerification from "../../sharedComponents/user/EmailVerification";
-import ForgotPasswordEmail from "../../components/auth/emailAuth/forgotPasswordd/ForgotPasswordEmail";
+import ForgotPasswordEmail from "../../components/auth/emailAuth/forgotPassword/ForgotPasswordEmail";
 import EditUserProfile from "../../features/user/profile/components/modal/EditUserProfile";
 import CropImageModal from "../../components/modal/CropImageModal";
 import DeleteConfirmationModal from "../../components/modal/DeleteConfirmationModal";
@@ -17,7 +17,7 @@ import CreateCoupon from "../../features/admin/coupons/components/modal/CreateCo
 import WalletPaymentConfirmation from "../../features/user/payment/components/modal/WalletPaymentConfirmation";
 import EventStatusUpdate from "../../components/modal/EventStatusUpdate";
 import BannerFormModal from "../../features/admin/banner/components/BannerFormModal";
-import ForgotPasswordInput from "../../components/auth/emailAuth/forgotPasswordd/ForgotPasswordInput";
+import ForgotPasswordInput from "../../components/auth/emailAuth/forgotPassword/ForgotPasswordInput";
 
 const ModalManager = () => {
   const { modalType, modalData, closeModal } = useModal();
