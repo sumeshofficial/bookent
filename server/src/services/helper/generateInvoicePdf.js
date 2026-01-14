@@ -1,6 +1,7 @@
 import PDFDocument from "pdfkit";
 import { formatDate } from "../../utility/formatDateAndTime.js";
-import { ENV } from "../../config/env.conf.js";
+import path from "path";
+import fs from "fs";
 
 export const generateInvoicePDF = async ({ order, user }) => {
   const doc = new PDFDocument({ size: "A4", margin: 50 });
@@ -19,17 +20,21 @@ export const generateInvoicePDF = async ({ order, user }) => {
     .font("Helvetica")
     .text("BOOKENT Pvt Ltd\nKochi, Kerala\nsupport@bookent.com", 50, 95);
 
-  const logoUrl = ENV.LOGO_URL;
+  const logoPath = path.resolve(
+    process.cwd(),
+    "public/assets",
+    "bookent-logo-black.png"
+  );
 
   try {
-    const response = await fetch(logoUrl);
-    const arrayBuffer = await response.arrayBuffer();
-    const imageBuffer = Buffer.from(arrayBuffer);
-
-    doc.image(imageBuffer, 400, 50, {
-      fit: [120, 60],
-      align: "right",
-    });
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 400, 50, {
+        fit: [120, 60],
+        align: "right",
+      });
+    } else {
+      throw new Error("Logo file not found");
+    }
   } catch (error) {
     console.error("Logo load failed:", error);
     doc
