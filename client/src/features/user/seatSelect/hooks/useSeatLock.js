@@ -30,7 +30,7 @@ export const useSectionLock = (eventId) => {
   }, []);
 
   useEffect(() => {
-    if (!socket || !eventId) return;
+    if (!socket?.on || !eventId) return;
 
     socket.on(SOCKET_EVENTS.CONNECT, connectHandler);
     socket.on(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
@@ -40,26 +40,31 @@ export const useSectionLock = (eventId) => {
       connectHandler();
     }
     return () => {
-      try {
-        if (socket && typeof socket.off === "function") {
-          socket.off(SOCKET_EVENTS.CONNECT, connectHandler);
-          socket.off(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
-          socket.off(SOCKET_EVENTS.SEAT_UPDATE_BULK, seatUpdateBulkHandler);
-        }
-      // eslint-disable-next-line no-unused-vars
-      } catch (e) {
-        // ignore socket.io cleanup errors during reconnect/unmount
-      }
+      socket.off(SOCKET_EVENTS.CONNECT, connectHandler);
+      socket.off(SOCKET_EVENTS.SEAT_UPDATE);
+      socket.off(SOCKET_EVENTS.SEAT_UPDATE_BULK, seatUpdateBulkHandler);
     };
-  }, [socket, eventId, connectHandler, seatUpdateHandler, seatUpdateBulkHandler]);
+  }, [
+    socket,
+    eventId,
+    connectHandler,
+    seatUpdateHandler,
+    seatUpdateBulkHandler,
+  ]);
 
   const lockSection = (sectionId, qty, cb) => {
-    if (!eventId) return;
+    if (!eventId || !socket || !socket.connected) {
+      openModal("seat-lock-error", {
+        open: true,
+        message: "Connection not ready. Please try again.",
+        onClose: () => closeModal(),
+      });
+      return;
+    }
     socket.emit(
       SOCKET_EVENTS.LOCK_SECTION,
       { eventId, sectionId, qty },
       (response) => {
-        console.log(response)
         if (!response.success) {
           openModal("seat-lock-error", {
             open: true,
@@ -71,9 +76,7 @@ export const useSectionLock = (eventId) => {
           });
           return;
         }
-        if (typeof cb === "function") {
-          cb(response?.lockId || null);
-        }
+        cb(response?.lockId || null);
       }
     );
   };
