@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 
 const globalLimiter = rateLimit({
   store: new RedisStore({
-    sendCommand: (...args) => redisClient.call(...args),
+    sendCommand: (...args) => redisClient.sendCommand(args),
   }),
   windowMs: 15 * 60 * 1000,
   max: 1000,
