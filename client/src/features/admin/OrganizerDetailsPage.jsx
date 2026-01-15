@@ -27,9 +27,11 @@ const OrganizerDetailsPage = () => {
     queryKey: ["organizer", id],
     queryFn: () => getOrganizerDetails(id),
   });
-  const organizer = data?.organizer;
+  const organizer = data;
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(() => organizer?.status ?? "");
+  const [selectedStatus, setSelectedStatus] = useState(
+    () => organizer?.status || ""
+  );
   const { openModal, closeModal } = useModal();
 
   const navigate = useNavigate();
@@ -59,13 +61,10 @@ const OrganizerDetailsPage = () => {
       toast.dismiss();
       toast.success("Organizer request updated successfully");
       queryClient.setQueryData(["organizer", id], (oldData) => {
-        if (!oldData?.organizer) return oldData;
+        if (!oldData) return oldData;
         return {
           ...oldData,
-          organizer: {
-            ...oldData.organizer,
-            status: handleRequestMutation.variables.status,
-          },
+          status: handleRequestMutation.variables.status,
         };
       });
     },
@@ -123,7 +122,9 @@ const OrganizerDetailsPage = () => {
                     onClick={() => setDropdownOpen((prev) => !prev)}
                     className="flex items-center gap-2 text-sm hover:bg-gray-100 px-2 py-1 rounded transition"
                   >
-                    <span className="capitalize">{selectedStatus}</span>
+                    <span className="capitalize">
+                      {selectedStatus || organizer.status}
+                    </span>
                     <ChevronDown className="w-4 h-4 text-gray-600" />
                   </button>
 

@@ -13,7 +13,7 @@ const UserDetails = () => {
   const navigate = useNavigate();
 
   const { data, isLoading } = useUserDetails(id);
-  const user = data?.user;
+  const user = data;
 
   if (isLoading) return <UserSkeleton />;
 
