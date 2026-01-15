@@ -8,18 +8,10 @@ import couponRoutes from "./coupon.routes.js";
 import walletRoutes from "./wallet.routes.js";
 import bannerRoutes from "./banner.routes.js";
 import { protect } from "../../middlewares/common/auth.middleware.js";
-import rateLimit from "express-rate-limit";
-
-const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 60,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
 const userRouter = express.Router();
 
-userRouter.use("/auth", authRateLimiter, authRoutes);
+userRouter.use("/auth", authRoutes);
 userRouter.use("/account", protect, accountRoutes);
 userRouter.use("/events", protect, eventRoutes);
 userRouter.use("/checkout", protect, checkoutRoutes);

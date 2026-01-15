@@ -8,7 +8,7 @@ import paypalRoutes from "./routes/paypal.routes.js";
 import passport from "./middlewares/user/passport.js";
 import organizerRoutes from "./routes/organizer/organizer.routes.js";
 import adminRoutes from "./routes/admin/admin.routes.js";
-import { connectRedis } from "./config/redis.conf.js";
+import { connectRedis, redisClient } from "./config/redis.conf.js";
 import s3Router from "./routes/s3.router.js";
 import logger from "./config/logger.js";
 import { errorHandler } from "./middlewares/common/error.handler.js";
@@ -21,6 +21,7 @@ import { initCronJobs } from "./jobs/index.job.js";
 import helmet from "helmet";
 import { helmetConfig } from "./config/security/helmet.config.js";
 import rateLimit from "express-rate-limit";
+import { RedisStore } from "rate-limit-redis";
 dotenv.config();
 
 const app = express();
@@ -43,17 +44,21 @@ app.use((req, res, next) => {
   next();
 });
 
+const globalLimiter = rateLimit({
+  store: new RedisStore({
+    sendCommand: (...args) => redisClient.call(...args),
+  }),
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Middleware
+app.use(globalLimiter);
 app.use(helmet(helmetConfig(ENV)));
 
-// const globalRateLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 300,
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// });
-
-// app.use(globalRateLimiter);
 app.use(express.json());
 app.use(cookieParser());
 app.use(
