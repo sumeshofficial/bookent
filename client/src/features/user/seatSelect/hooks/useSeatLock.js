@@ -53,6 +53,7 @@ export const useSectionLock = (eventId) => {
   ]);
 
   const lockSection = (sectionId, qty, cb) => {
+    console.log(!eventId || !socket || !socket.connected)
     if (!eventId || !socket || !socket.connected) {
       openModal("seat-lock-error", {
         open: true,

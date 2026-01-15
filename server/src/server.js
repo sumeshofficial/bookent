@@ -46,14 +46,14 @@ app.use((req, res, next) => {
 // Middleware
 app.use(helmet(helmetConfig(ENV)));
 
-const globalRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 300,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// const globalRateLimiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 300,
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
 
-app.use(globalRateLimiter);
+// app.use(globalRateLimiter);
 app.use(express.json());
 app.use(cookieParser());
 app.use(
