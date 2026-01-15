@@ -18,7 +18,6 @@ export const useSectionLock = (eventId) => {
     joinedRef.current = true;
 
     socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId }, () => {
-      console.log("ROOM READY");
       setIsRoomReady(true);
     });
   }, [socket, eventId]);
