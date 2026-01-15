@@ -5,18 +5,8 @@ import Event from "../models/event.model.js";
 dotenv.config();
 
 // Create organizer
-export const createOrganizer = async ({
-  userId,
-  paypalEmail,
-  organizationDetails,
-  bankAccountDetails,
-}) => {
-  return Organizer.create({
-    userId,
-    paypalEmail,
-    organizationDetails,
-    bankAccountDetails,
-  });
+export const createOrganizer = async (payload) => {
+  return Organizer.create(payload);
 };
 
 // Check organizer exists

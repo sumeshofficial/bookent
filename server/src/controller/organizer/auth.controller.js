@@ -10,8 +10,6 @@ export const organizerAccountRegister = asyncHandler(async (req, res) => {
   const { userId, organizationDetails, bankAccountDetails, paypalEmail } =
     req.body;
 
-  console.log(req.body);
-
   if (
     !userId ||
     !paypalEmail ||
@@ -28,11 +26,13 @@ export const organizerAccountRegister = asyncHandler(async (req, res) => {
 
   const user = await findUserById(userId);
 
+  console.log(user);
+
   const organization = await createOrganizer({
     userId,
     fullname: user.fullname,
     email: user.email,
-    profileImage: user.profileImage,
+    profileImage: user?.profileImage,
     paypalEmail,
     organizationDetails,
     bankAccountDetails,

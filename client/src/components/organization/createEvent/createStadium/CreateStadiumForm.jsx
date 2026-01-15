@@ -81,27 +81,38 @@ const CreateStadiumInput = ({
     stadiumName && address && city && state && pincode && location
   );
 
-  const fetchCities = useCallback(
-    async (stateCode) => {
-      if (!stateCode) {
-        if (city) setCities([]);
-        return;
-      }
-      try {
-        const data = await getCity(stateCode);
-        setCities(data);
-      } catch (error) {
-        toast.error(
-          error?.response?.data?.error?.message ||
-            error.message ||
-            "Something went wrong"
-        );
-      }
-    },
-    [city]
-  );
+  const fetchCities = useCallback(async (stateCode) => {
+    if (!stateCode) return [];
 
-  if (stateCode) fetchCities(stateCode);
+    try {
+      return await getCity(stateCode);
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.error?.message ||
+          error.message ||
+          "Something went wrong"
+      );
+      return [];
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isEditMode) return;
+    if (!stateCode) return;
+    if (cities.length > 0) return;
+
+    let active = true;
+
+    fetchCities(stateCode).then((data) => {
+      if (active) {
+        setCities(data);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [isEditMode, stateCode, cities.length, fetchCities]);
 
   const debouncedCheck = useMemo(() => {
     return debounce(async (name) => {
@@ -205,7 +216,7 @@ const CreateStadiumInput = ({
                     setValue("state", selected.name, { shouldDirty: true });
                     setValue("stateCode", selected.code, { shouldDirty: true });
 
-                    fetchCities(selected.code);
+                    fetchCities(selected.code).then(setCities);
                   }}
                   className="border text-[.7rem] sm:text-base border-gray-200 rounded-md py-1 px-2 sm:py-3 sm:px-3"
                 >

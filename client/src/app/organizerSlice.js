@@ -27,7 +27,7 @@ export const updateOrganizerProfile = createAsyncThunk(
       if (!id || !data) return;
       const res = await updateOrganizer({ id, data });
 
-      return res.data.organizer;
+      return res.data;
     } catch (error) {
       return rejectWithValue(error.response.data.error);
     }

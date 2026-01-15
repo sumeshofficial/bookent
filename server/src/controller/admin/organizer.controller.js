@@ -94,11 +94,13 @@ export const handleOrganizerRequestController = asyncHandler(
 
     if (status === "rejected") {
       setImmediate(async () => {
-        await sendEmail({
-          to: organizer.email,
-          subject: "Your Organizer Request Has Been Rejected",
-          html: rejectionTemplate(organizer.fullname, reason),
-        });
+        if (organizer?.email) {
+          await sendEmail({
+            to: organizer.email,
+            subject: "Your Organizer Request Has Been Rejected",
+            html: rejectionTemplate(organizer.fullname, reason),
+          });
+        }
       });
     }
   }
