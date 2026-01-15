@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import {
   SOCKET_EVENTS,
   SocketContext,
@@ -10,40 +10,39 @@ export const useSectionLock = (eventId) => {
   const [sections, setSections] = useState({});
   const { openModal, closeModal } = useModal();
 
+  const connectHandler = useCallback(() => {
+    socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId });
+  }, [socket, eventId]);
+
+  const seatUpdateHandler = useCallback((data) => {
+    setSections((prev) => ({
+      ...prev,
+      [data.sectionId]: {
+        status: data.status,
+        qty: Number(data.qty),
+        lockedBy: data.lockedBy || data.bookedBy || data.userId,
+      },
+    }));
+  }, []);
+
+  const seatUpdateBulkHandler = useCallback((lockData) => {
+    setSections(lockData);
+  }, []);
+
   useEffect(() => {
     if (!socket || !eventId) return;
 
-    const seatUpdateHandler = (data) => {
-      setSections((prev) => ({
-        ...prev,
-        [data.sectionId]: {
-          status: data.status,
-          qty: Number(data.qty),
-          lockedBy: data.lockedBy || data.bookedBy || data.userId,
-        },
-      }));
-    };
-
-    const seatUpdateBulkHandler = (lockData) => {
-      setSections(lockData);
-    };
-
-    const connectHandler = () => {
-      socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId });
-    };
-
     socket.on(SOCKET_EVENTS.CONNECT, connectHandler);
-
-    if (socket.connected) {
-      socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId });
-    }
-
     socket.on(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
     socket.on(SOCKET_EVENTS.SEAT_UPDATE_BULK, seatUpdateBulkHandler);
 
+    if (socket.connected) {
+      connectHandler();
+    }
     return () => {
       try {
         if (socket && typeof socket.off === "function") {
+          socket.off(SOCKET_EVENTS.CONNECT, connectHandler);
           socket.off(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
           socket.off(SOCKET_EVENTS.SEAT_UPDATE_BULK, seatUpdateBulkHandler);
         }
@@ -52,7 +51,7 @@ export const useSectionLock = (eventId) => {
         // ignore socket.io cleanup errors during reconnect/unmount
       }
     };
-  }, [socket, eventId]);
+  }, [socket, eventId, connectHandler, seatUpdateHandler, seatUpdateBulkHandler]);
 
   const lockSection = (sectionId, qty, cb) => {
     if (!eventId) return;
@@ -60,6 +59,7 @@ export const useSectionLock = (eventId) => {
       SOCKET_EVENTS.LOCK_SECTION,
       { eventId, sectionId, qty },
       (response) => {
+        console.log(response)
         if (!response.success) {
           openModal("seat-lock-error", {
             open: true,

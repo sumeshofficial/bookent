@@ -136,6 +136,18 @@ const Navbar = () => {
                         <Menu.Item>
                           {({ active }) => (
                             <Link
+                              to="/wallet"
+                              className={`sm:hidden px-4 py-2 text-sm ${
+                                active ? "bg-gray-100" : ""
+                              } text-gray-700`}
+                            >
+                              Your Wallet
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
                               to="/my-tickets"
                               className={`block px-4 py-2 text-sm ${
                                 active ? "bg-gray-100" : ""
@@ -286,9 +298,9 @@ const Navbar = () => {
                   events.map((event) => (
                     <Link
                       key={event.id}
-                      to={`/event/${event.id}`}
+                      to={`/event/${event.slug}`}
                       onClick={() =>
-                        location.pathname === `/event/${event.id}` &&
+                        location.pathname === `/event/${event.slug}` &&
                         setIsSearchOpen(false)
                       }
                       className="p-2 rounded-md hover:bg-gray-100 cursor-pointer transition-opacity duration-700 opacity-0 animate-[fadeIn_0.7s_ease-in-out_forwards]"
