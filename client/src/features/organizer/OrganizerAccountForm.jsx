@@ -156,10 +156,6 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
       updatedOrganizationDetails.state = data.state;
     }
 
-    let paypalEmailUpdated = false;
-    if (!isRejected || data.paypalEmail !== organizer?.paypalEmail) {
-      paypalEmailUpdated = true;
-    }
 
     if (!isRejected || data.beneficiaryName !== originalBank?.beneficiaryName) {
       updatedBankDetails.beneficiaryName = data.beneficiaryName;
@@ -180,7 +176,11 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
     const payload = {
       userId: user._id,
 
-      ...(paypalEmailUpdated && {
+      ...(!isRejected && {
+        paypalEmail: data.paypalEmail,
+      }),
+
+      ...(isRejected && data.paypalEmail !== organizer?.paypalEmail && {
         paypalEmail: data.paypalEmail,
       }),
 
@@ -218,7 +218,7 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
         );
       } else {
         res = await registerOrganizationAccount(payload);
-        dispatch(addOrganizer(res.data));
+        dispatch(addOrganizer(res));
         toast.dismiss();
         toast.success("Registration Successfully");
       }

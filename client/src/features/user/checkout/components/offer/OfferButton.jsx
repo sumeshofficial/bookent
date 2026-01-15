@@ -11,6 +11,7 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
     handleSubmit,
     setValue,
     control,
+    clearErrors,
     formState: { errors },
   } = useForm();
 
@@ -18,6 +19,12 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
     control,
     name: "coupon",
   });
+
+  useEffect(() => {
+    if (!couponCode) {
+      clearErrors("coupon");
+    }
+  }, [couponCode, clearErrors]);
 
   const lockId = sessionStorage.getItem("lockId");
 
@@ -57,6 +64,7 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
     onCouponRemoved();
     sessionStorage.removeItem("appliedCoupon");
     setValue("coupon", "");
+    clearErrors("coupon");
   };
 
   return (
@@ -113,7 +121,7 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
         <p className="text-red-500 text-sm mt-1">{errors.coupon.message}</p>
       )}
 
-      {isError && (
+      {isError && couponCode && activeCoupon && (
         <p className="text-red-500 text-sm mt-1">
           {error?.response?.data?.error?.message || "Invalid coupon"}
         </p>

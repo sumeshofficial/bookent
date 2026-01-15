@@ -38,22 +38,22 @@ await initRedisExpiryListener();
 await initSeatPubSub();
 
 // Logger
-// app.use((req, res, next) => {
-//   logger.http(`${req.method} ${req.url}`);
-//   next();
-// });
+app.use((req, res, next) => {
+  logger.http(`${req.method} ${req.url}`);
+  next();
+});
 
 // Middleware
-// app.use(helmet(helmetConfig(ENV)));
+app.use(helmet(helmetConfig(ENV)));
 
-// const globalRateLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 100,
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// });
+const globalRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-// app.use(globalRateLimiter);
+app.use(globalRateLimiter);
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -64,16 +64,15 @@ app.use(
 );
 app.use(passport.initialize());
 
-// // Routes
-// const authRateLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 20,
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// });
+// Routes
+const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-app.use("/api/v1/user", userRoutes);
-// app.use("/api/v1/user", authRateLimiter, userRoutes);
+app.use("/api/v1/user", authRateLimiter, userRoutes);
 app.use("/api/v1/organizer", organizerRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/s3", s3Router);

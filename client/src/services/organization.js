@@ -2,20 +2,10 @@ import axios from "axios";
 import { ENV } from "../config/env";
 import { api } from "./api/apiSetup";
 
-export const registerOrganizationAccount = async ({
-  bankAccountDetails,
-  organizationDetails,
-  userId,
-}) => {
-  const res = await api.post(
-    "/organizer/auth/register",
-    {
-      bankAccountDetails,
-      organizationDetails,
-      userId,
-    },
-    { withCredentials: true }
-  );
+export const registerOrganizationAccount = async (payload) => {
+  const res = await api.post("/organizer/auth/register", payload, {
+    withCredentials: true,
+  });
 
   return res.data;
 };

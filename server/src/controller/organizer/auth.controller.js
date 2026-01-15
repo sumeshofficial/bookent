@@ -10,6 +10,8 @@ export const organizerAccountRegister = asyncHandler(async (req, res) => {
   const { userId, organizationDetails, bankAccountDetails, paypalEmail } =
     req.body;
 
+  console.log(req.body);
+
   if (
     !userId ||
     !paypalEmail ||
