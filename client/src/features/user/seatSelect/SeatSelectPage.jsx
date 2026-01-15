@@ -22,7 +22,7 @@ const SeatSelectPage = () => {
 
   const [selectedShape, setSelectedShape] = useState(null);
 
-  const { lockSection, sections } = useSectionLock(event?._id);
+  const { lockSection, sections } = useSectionLock(event?._id ?? null);
 
   return (
     <>

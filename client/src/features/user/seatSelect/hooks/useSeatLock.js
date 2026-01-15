@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useCallback } from "react";
+import { useContext, useEffect, useState, useCallback, useRef } from "react";
 import {
   SOCKET_EVENTS,
   SocketContext,
@@ -8,10 +8,19 @@ import {
 export const useSectionLock = (eventId) => {
   const socket = useContext(SocketContext);
   const [sections, setSections] = useState({});
+  const [isRoomReady, setIsRoomReady] = useState(false);
   const { openModal, closeModal } = useModal();
+  const joinedRef = useRef(false);
 
   const connectHandler = useCallback(() => {
-    socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId });
+    if (!socket || !eventId) return;
+    if (joinedRef.current) return;
+    joinedRef.current = true;
+
+    socket.emit(SOCKET_EVENTS.JOIN_EVENT, { eventId }, () => {
+      console.log("ROOM READY");
+      setIsRoomReady(true);
+    });
   }, [socket, eventId]);
 
   const seatUpdateHandler = useCallback((data) => {
@@ -30,19 +39,22 @@ export const useSectionLock = (eventId) => {
   }, []);
 
   useEffect(() => {
-    if (!socket?.on || !eventId) return;
+    if (!socket || !eventId) return;
 
-    socket.on(SOCKET_EVENTS.CONNECT, connectHandler);
     socket.on(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
     socket.on(SOCKET_EVENTS.SEAT_UPDATE_BULK, seatUpdateBulkHandler);
 
+    const currentConnectHandler = connectHandler;
     if (socket.connected) {
-      connectHandler();
+      currentConnectHandler();
+    } else {
+      socket.once(SOCKET_EVENTS.CONNECT, currentConnectHandler);
     }
+
     return () => {
-      socket.off(SOCKET_EVENTS.CONNECT, connectHandler);
       socket.off(SOCKET_EVENTS.SEAT_UPDATE);
-      socket.off(SOCKET_EVENTS.SEAT_UPDATE_BULK, seatUpdateBulkHandler);
+      socket.off(SOCKET_EVENTS.SEAT_UPDATE_BULK);
+      socket.off(SOCKET_EVENTS.CONNECT);
     };
   }, [
     socket,
@@ -52,13 +64,27 @@ export const useSectionLock = (eventId) => {
     seatUpdateBulkHandler,
   ]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleDisconnect = () => {
+      setIsRoomReady(false);
+      joinedRef.current = false;
+    };
+
+    socket.on("disconnect", handleDisconnect);
+    return () => socket.off("disconnect", handleDisconnect);
+  }, [socket]);
+
   const lockSection = (sectionId, qty, cb) => {
-    console.log(!eventId || !socket || !socket.connected)
-    if (!eventId || !socket || !socket.connected) {
+    if (!eventId || !socket || !isRoomReady) {
       openModal("seat-lock-error", {
         open: true,
         message: "Connection not ready. Please try again.",
-        onClose: () => closeModal(),
+        onClose: () => {
+          closeModal();
+          window.location.reload();
+        },
       });
       return;
     }
@@ -83,7 +109,9 @@ export const useSectionLock = (eventId) => {
   };
 
   const releaseSection = (lockId) => {
-    socket.emit(SOCKET_EVENTS.RELEASE_SECTION, { lockId });
+    if (socket?.connected) {
+      socket.emit(SOCKET_EVENTS.RELEASE_SECTION, { lockId });
+    }
   };
 
   const confirmBooking = (lockIds) => {

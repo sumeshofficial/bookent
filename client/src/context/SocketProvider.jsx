@@ -33,13 +33,15 @@ export const SocketProvider = ({ children }) => {
 
     socket.connect();
 
-    socket.on(SOCKET_EVENTS.USER_BLOCKED, (data) => {
+    const userBlockedHandler = (data) => {
       toast.error(data.message || "You have been blocked.");
       handleLogout();
-    });
+    };
+
+    socket.on(SOCKET_EVENTS.USER_BLOCKED, userBlockedHandler);
 
     return () => {
-      socket.off(SOCKET_EVENTS.USER_BLOCKED);
+      socket.off(SOCKET_EVENTS.USER_BLOCKED, userBlockedHandler);
       socket.disconnect();
     };
   }, [socket, handleLogout]);

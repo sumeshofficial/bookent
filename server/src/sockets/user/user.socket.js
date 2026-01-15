@@ -7,7 +7,7 @@ import {
 import { SOCKET_EVENTS } from "../../utility/constants/constants.js";
 
 export default function userSocketHandlers(io, socket) {
-  socket.on(SOCKET_EVENTS.JOIN_EVENT, async ({ eventId }) => {
+  socket.on(SOCKET_EVENTS.JOIN_EVENT, async ({ eventId }, ack) => {
     if (socket.currentEvent && socket.currentEvent !== eventId) {
       socket.leave(socket.currentEvent);
     }
@@ -21,6 +21,10 @@ export default function userSocketHandlers(io, socket) {
     socket.emit(SOCKET_EVENTS.SEAT_UPDATE_BULK, existingLocks);
 
     socket.currentEvent = eventId;
+
+    if (ack) {
+      ack({ success: true });
+    }
   });
 
   // 2. LOCK SECTION
