@@ -225,7 +225,7 @@ export const ERRORS = {
   INVALID_CREDENTIALS: {
     CODE: "INVALID_CREDENTIALS",
     MSG: "Invalid email or password",
-  }
+  },
 };
 
 // Response Messages
