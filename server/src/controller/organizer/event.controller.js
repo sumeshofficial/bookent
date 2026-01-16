@@ -12,11 +12,7 @@ import {
 } from "../../services/s3.service.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import {
-  checkOrganizer,
-  deleteEventService,
   fetchEventsWithOrganizerId,
-  findEvent,
-  updateEvent,
 } from "../../services/organizer.service.js";
 import { redisClient } from "../../config/redis.conf.js";
 import {
@@ -24,12 +20,18 @@ import {
   finishCreateEvent,
 } from "../../services/organizer/event.service.js";
 import { AppError, asyncHandler, sendResponse } from "../../utility/helpers.js";
-import { findEventByOrganizerIdAndEventId } from "../../repositories/organizer/event.repository.js";
+import {
+  deleteEventService,
+  findEvent,
+  findEventByOrganizerIdAndEventId,
+  updateEvent,
+} from "../../repositories/organizer/event.repository.js";
 import { isSlugExists } from "../../utility/event.utils.js";
 import Event from "../../models/event.model.js";
 import { ENV } from "../../config/env.conf.js";
 import { ERRORS } from "../../utility/constants/constants.js";
 import { validateDailyEventLimit } from "../../services/organizer/event-limit.service.js";
+import { checkOrganizer } from "../../repositories/organizer/organizer.repository.js";
 
 dotenv.config();
 

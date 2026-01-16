@@ -2,11 +2,11 @@ import Stadium from "../../models/stadium.model.js";
 import {
   createStadiumRepo,
   softDeleteStadiumService,
+  updateStadiumService,
 } from "../../repositories/organizer/stadium.repository.js";
 import { isSlugExists } from "../../utility/event.utils.js";
 import { validateOrganizer } from "./helper/validateOrganizer.helper.js";
 import { validateStadium } from "./helper/stadium/validateStadium.helper.js";
-import { updateStadiumService } from "../organizer.service.js";
 import { deleteObject } from "../s3.service.js";
 import { buildShapesUpdate } from "./helper/stadium/buildShapesUpdate.helper.js";
 import { buildStadiumDetails } from "./helper/stadium/buildStadiumDetails.helper.js";

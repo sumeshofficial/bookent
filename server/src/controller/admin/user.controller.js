@@ -1,5 +1,5 @@
+import { findUserById } from "../../repositories/user/user.repository.js";
 import { updateUserStatusService } from "../../services/admin/user.service.js";
-import { findUserById } from "../../services/auth.service.js";
 import { getAllUsers } from "../../services/user.service.js";
 import { ERRORS } from "../../utility/constants/constants.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";

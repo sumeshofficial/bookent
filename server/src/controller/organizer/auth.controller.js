@@ -1,5 +1,5 @@
-import { findUserById } from "../../services/auth.service.js";
-import { createOrganizer } from "../../services/organizer.service.js";
+import { createOrganizer } from "../../repositories/organizer/organizer.repository.js";
+import { findUserById } from "../../repositories/user/user.repository.js";
 import { sendOtp } from "../../services/organizer/auth.service.js";
 import { ERRORS } from "../../utility/constants/constants.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";

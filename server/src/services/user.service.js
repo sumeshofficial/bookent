@@ -1,22 +1,14 @@
 import dotenv from "dotenv";
-import User from "../models/user.model.js";
 import axios from "axios";
-import Event from "../models/event.model.js";
 import { ENV } from "../config/env.conf.js";
+import {
+  countUsers,
+  getAllUsersService,
+} from "../repositories/admin/user.respository.js";
+import { findEvents } from "../repositories/user/event.repository.js";
 dotenv.config();
 
 const GOOGLE_MAP_URI = ENV.GOOGLE_MAP_URI;
-
-// Update user
-export const updateUserService = async ({ id, data }) => {
-  const updatedUser = await User.findOneAndUpdate(
-    { _id: id },
-    { $set: data },
-    { new: true }
-  );
-
-  return updatedUser;
-};
 
 // Get all user
 export const getAllUsers = async ({ limit, skip, search, sort, status }) => {
@@ -44,9 +36,14 @@ export const getAllUsers = async ({ limit, skip, search, sort, status }) => {
     sortOption = { spending: 1 };
   }
 
-  const users = await User.find(query).sort(sortOption).skip(skip).limit(limit);
+  const users = await getAllUsersService({
+    query,
+    sortOption,
+    skip,
+    limit,
+  });
 
-  const totalUsers = await User.countDocuments({ ...query, role: "user" });
+  const totalUsers = await countUsers({ ...query, role: "user" });
   return { totalUsers, users };
 };
 
@@ -75,40 +72,5 @@ export const findEventsForUser = async (searchQuery = "") => {
     { stadiumName: regex },
     { city: regex },
   ];
-  return await Event.find({
-    $or: search,
-    eventStatus: "Published",
-    isDeleted: false,
-  })
-    .populate("stadium")
-    .sort({ createdAt: -1 })
-    .lean();
-};
-
-export const filterAndSortService = async ({
-  query,
-  sortQuery,
-  skip,
-  limit,
-}) => {
-  const events = await Event.find(query)
-    .populate("stadium")
-    .sort(sortQuery)
-    .skip(skip)
-    .limit(limit)
-    .lean();
-
-  return events;
-};
-
-// Event details
-export const eventDetails = async (eventSlug) => {
-  return await Event.findOne({
-    slug: eventSlug,
-    eventStatus: { $nin: ["Draft", "Completed"] },
-    isDeleted: false,
-  })
-    .populate("stadium")
-    .populate("organizer")
-    .lean();
+  return await findEvents(search);
 };

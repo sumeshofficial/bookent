@@ -35,3 +35,33 @@ export const softDeleteStadiumService = async (stadiumId, organizerId) => {
     }
   );
 };
+
+export const findStadiums = async () => {
+  return Stadium.find({ isDeleted: false }).lean();
+};
+
+export const isStadiumExists = async (query) => {
+  return Stadium.exists(query);
+};
+
+export const getStadiums = async ({ query, sortOption, skip, limit }) => {
+  return Stadium.find(query).sort(sortOption).skip(skip).limit(limit).lean();
+};
+
+export const countStadiums = async (query) => {
+  return Stadium.countDocuments(query);
+};
+
+// Find stadium
+export const findStadium = async (organizerId, stadiumSlug) => {
+  return Stadium.findOne({
+    organizerId,
+    slug: stadiumSlug,
+    isDeleted: false,
+  }).lean();
+};
+
+// Update stadium
+export const updateStadiumService = async (stadiumId, data) => {
+  return Stadium.findByIdAndUpdate(stadiumId, { $set: data }, { new: true });
+};

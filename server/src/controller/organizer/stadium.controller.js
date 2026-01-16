@@ -1,10 +1,11 @@
 import logger from "../../config/logger.js";
-import { findOrganizerById } from "../../services/auth.service.js";
 import {
   checkOrganizer,
+  findOrganizerById,
+} from "../../repositories/organizer/organizer.repository.js";
+import { findStadium, findStadiums } from "../../repositories/organizer/stadium.repository.js";
+import {
   findAllStadiumsWithOrgnaizerId,
-  findStadium,
-  findStadiums,
   stadiumExists,
 } from "../../services/organizer.service.js";
 import {

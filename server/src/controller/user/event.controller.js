@@ -1,9 +1,7 @@
 import logger from "../../config/logger.js";
 import { getObjectURL } from "../../services/s3.service.js";
 import {
-  filterAndSortService,
   findEventsForUser,
-  eventDetails,
 } from "../../services/user.service.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { getHomeEventsService } from "../../services/user/event/event.service.js";
@@ -11,6 +9,8 @@ import { asyncHandler, sendResponse } from "../../utility/helpers.js";
 import { validateEventAvailability } from "../../utility/helpers.js";
 import { checkOrganizer } from "../../repositories/organizer/organizer.repository.js";
 import { getEventBookings } from "../../services/organizer/event.service.js";
+import { filterAndSortService } from "../../repositories/user/event.repository.js";
+import { eventDetails } from "../../repositories/admin/event.repository.js";
 
 // Home Page Events List controller
 export const getHomeEventSectionsController = asyncHandler(async (req, res) => {

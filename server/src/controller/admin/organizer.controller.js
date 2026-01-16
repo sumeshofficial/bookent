@@ -1,5 +1,5 @@
 import logger from "../../config/logger.js";
-import { findOrganizerById } from "../../services/auth.service.js";
+import { findOrganizerById } from "../../repositories/organizer/organizer.repository.js";
 import {
   rejectionTemplate,
   sendEmail,

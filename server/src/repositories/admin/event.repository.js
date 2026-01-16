@@ -25,7 +25,7 @@ export const fetchAllEvents = async (filters = {}) => {
 };
 
 export const fetchEvent = async (eventSlug) => {
-  const event = await Event.findOne({
+  return Event.findOne({
     slug: eventSlug,
   })
     .populate({
@@ -33,10 +33,16 @@ export const fetchEvent = async (eventSlug) => {
       select: "shapes.title stadiumDetails.stadiumName",
     })
     .lean();
+};
 
-  if (!event) {
-    return null;
-  }
-
-  return event;
+// Event details
+export const eventDetails = async (eventSlug) => {
+  return await Event.findOne({
+    slug: eventSlug,
+    eventStatus: { $nin: ["Draft", "Completed"] },
+    isDeleted: false,
+  })
+    .populate("stadium")
+    .populate("organizer")
+    .lean();
 };

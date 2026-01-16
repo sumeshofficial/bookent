@@ -1,9 +1,13 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import RefreshToken from "../models/refreshToken.model.js";
 import { v4 as uuidv4 } from "uuid";
 import { getRedisData, storeInRedis } from "./redis.service.js";
 import { ENV } from "../config/env.conf.js";
+import {
+  createRefreshToken,
+  deleteRefreshToken,
+  findRefreshToken,
+} from "../repositories/refreshToken/refreshToken.repository.js";
 dotenv.config();
 
 const userRefreshTokenExpiresIn = ENV.JWT_USER_REFRESH_TOKEN_EXPIRES_IN;
@@ -26,19 +30,14 @@ export const generateRefreshToken = async ({ userId, role }) => {
   const token = jwt.sign({ userId, role, tokenId }, ENV.JWT_REFRESH_SECRET, {
     expiresIn,
   });
-  await RefreshToken.create({
-    userId,
-    tokenId,
-  });
+  await createRefreshToken(userId, tokenId);
   return token;
 };
 
 // Verify refresh Token
 export const verifyRefreshToken = async (token) => {
   const payload = jwt.verify(token, ENV.JWT_REFRESH_SECRET);
-  const dbToken = await RefreshToken.findOne({
-    tokenId: payload.tokenId,
-  });
+  const dbToken = await findRefreshToken(payload.tokenId);
   if (!dbToken) {
     throw new Error("Invalid refresh token");
   }
@@ -47,7 +46,7 @@ export const verifyRefreshToken = async (token) => {
 
 // Revoke Refresh Token
 export const revokeRefreshToken = async (tokenId) => {
-  await RefreshToken.deleteOne({ tokenId });
+  await deleteRefreshToken(tokenId);
 };
 
 // Add token to blacklist

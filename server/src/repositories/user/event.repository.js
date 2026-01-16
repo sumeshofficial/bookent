@@ -55,3 +55,30 @@ export const makeTicketSold = async (eventId, seat, session) => {
     { session }
   );
 };
+
+export const findEvents = async (search) => {
+  return Event.find({
+    $or: search,
+    eventStatus: "Published",
+    isDeleted: false,
+  })
+    .populate("stadium")
+    .sort({ createdAt: -1 })
+    .lean();
+};
+
+export const filterAndSortService = async ({
+  query,
+  sortQuery,
+  skip,
+  limit,
+}) => {
+  const events = await Event.find(query)
+    .populate("stadium")
+    .sort(sortQuery)
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  return events;
+};

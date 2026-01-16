@@ -62,3 +62,40 @@ export const findEvents = async (organizerId) => {
     organizer: organizerId,
   });
 };
+
+export const aggregateEvents = async (aggregatePipeline) => {
+  return Event.aggregate(aggregatePipeline);
+};
+
+export const countDocuments = async (query) => {
+  return Event.countDocuments({ ...query, isDeleted: false });
+};
+
+export const findEvent = async (organizerId, eventSlug) => {
+  return Event.findOne({
+    slug: eventSlug,
+    organizer: organizerId,
+    isDeleted: false,
+  });
+};
+
+export const updateEvent = async (eventId, newData) => {
+  return Event.findByIdAndUpdate(eventId, { $set: newData }, { new: true });
+};
+
+export const eventExists = async (eventId) => {
+  return Event.exists({ _id: eventId, isDeleted: false });
+};
+
+// Delete Event
+export const deleteEventService = async (organizerId, eventId) => {
+  return await Event.updateOne(
+    { organizer: organizerId, _id: eventId },
+    {
+      $set: {
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
+    }
+  );
+};

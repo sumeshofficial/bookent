@@ -1,8 +1,8 @@
 import { findEventByOrganizerIdAndEventId } from "../../../../repositories/organizer/event.repository.js";
+import { checkOrganizer } from "../../../../repositories/organizer/organizer.repository.js";
 import { ERRORS } from "../../../../utility/constants/constants.js";
 import { STATUS_CODE } from "../../../../utility/constants/statusCode.js";
 import { AppError } from "../../../../utility/helpers.js";
-import { checkOrganizer } from "../../../organizer.service.js";
 
 export const validateOrganizerAndEvent = async ({ userId, eventId }) => {
   const organizer = await checkOrganizer({ userId });

@@ -1,5 +1,5 @@
 import logger from "../../config/logger.js";
-import { checkOrganizer } from "../../services/organizer.service.js";
+import { checkOrganizer } from "../../repositories/organizer/organizer.repository.js";
 import { getDashboard } from "../../services/organizer/dashboard/dashboard.service.js";
 import { getObjectURL } from "../../services/s3.service.js";
 import { ERRORS } from "../../utility/constants/constants.js";

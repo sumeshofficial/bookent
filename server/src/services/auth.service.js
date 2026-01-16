@@ -1,45 +1,17 @@
-import User from "../models/user.model.js";
 import dotenv from "dotenv";
 dotenv.config();
 import jwt from "jsonwebtoken";
-import Organizer from "../models/organizer.model.js";
 import {
   blacklistToken,
   revokeRefreshToken,
   verifyRefreshToken,
 } from "./token.service.js";
 import { ENV } from "../config/env.conf.js";
-
-// Check user is already exists
-export const isUserExists = async (email) => {
-  return await User.exists({ email });
-};
-
-// Find user
-export const finduser = async (email) => {
-  const user = await User.findOne({ email }).select("+password");
-  return user;
-};
-
-// Create a new user
-export const createUser = async ({ ...data }) => {
-  const user = await User.create(data);
-  return user;
-};
-
-// Update password
-export const updatePassword = async ({ email, password }) => {
-  const user = await User.findOne({ email }).select("+password");
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  user.password = password;
-  await user.save();
-
-  return user;
-};
+import {
+  createUser,
+  findUserByEmail,
+  findUserById,
+} from "../repositories/user/user.repository.js";
 
 // handling google authentication
 export const handleGoogleAuth = async (profile) => {
@@ -49,7 +21,7 @@ export const handleGoogleAuth = async (profile) => {
   const role = profile.role;
   const googleId = profile.id;
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await findUserByEmail(email);
 
   if (existingUser && existingUser?.authProvider !== "google") {
     throw new Error("User already exists. Please login instead.");
@@ -59,7 +31,7 @@ export const handleGoogleAuth = async (profile) => {
     return existingUser;
   }
 
-  return await User.create({
+  return await createUser({
     fullname: displayName,
     email,
     role,
@@ -70,36 +42,16 @@ export const handleGoogleAuth = async (profile) => {
   });
 };
 
-// Checking the user is still active
-export const findUserById = async (id) => {
-  return await User.findById(id);
-};
-
-// Find user by email
-export const findUserByEmail = async (email) => {
-  return await User.findOne({ email });
-};
-
-// Find organizer by id
-export const findOrganizerById = async (id) => {
-  return await Organizer.findById(id);
-};
-
 // Verify Token and Get User
 export const verifyTokenAndGetUser = async (token) => {
   const decoded = jwt.verify(token, ENV.JWT_SECRET);
 
-  const user = await User.findById(decoded.id).select("-password").lean();
+  const user = await findUserById(decoded.id);
   if (!user) {
     throw new Error("User not found");
   }
 
   return user;
-};
-
-// Find Admin
-export const findAdmin = async ({ email }) => {
-  return await User.findOne({ email });
 };
 
 // logout.service.js

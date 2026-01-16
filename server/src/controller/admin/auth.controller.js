@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { finduser, handleLogout } from "../../services/auth.service.js";
+import { handleLogout } from "../../services/auth.service.js";
 import { sendTokens } from "../../utility/sendTokens.js";
 import {
   revokeRefreshToken,
@@ -8,6 +8,7 @@ import {
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import logger from "../../config/logger.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";
+import { finduser } from "../../repositories/user/user.repository.js";
 dotenv.config();
 
 // Generate RefreshAccessToken for admin
