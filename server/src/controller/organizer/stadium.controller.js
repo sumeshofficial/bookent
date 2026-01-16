@@ -263,7 +263,7 @@ export const getStadium = async (req, res) => {
 export const checkStadiumName = async (req, res) => {
   try {
     const { name, stadiumId = "" } = req.query;
-    const organizer = await checkOrganizer({ userId: req.user._id });
+    const organizer = await checkOrganizer(req.user._id);
 
     if (!name) {
       return res

@@ -19,7 +19,7 @@ export const organizerDashboard = asyncHandler(async (req, res) => {
     );
   }
 
-  const organizer = await checkOrganizer({ userId });
+  const organizer = await checkOrganizer(userId);
 
   if (organizer?.profileImage && organizer.profileImage.includes("uploads")) {
     const url = await getObjectURL(organizer.profileImage);
