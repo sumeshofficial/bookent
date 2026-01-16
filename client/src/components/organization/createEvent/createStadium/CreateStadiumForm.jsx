@@ -38,7 +38,7 @@ const CreateStadiumInput = ({
       "stateCode",
       "pincode",
       "location",
-      "stadiumLayout",
+      "stadiumLayout.layoutImage",
     ],
   });
 
@@ -50,33 +50,25 @@ const CreateStadiumInput = ({
     stateCode,
     pincode,
     location,
-    stadiumLayout,
+    stadiumLayoutImage,
   ] = values;
 
   const previewUrl = useMemo(() => {
-    if (
-      stadiumLayout?.layoutImage &&
-      typeof stadiumLayout.layoutImage === "string" &&
-      stadiumLayout.layoutImage.includes("https")
-    ) {
-      return stadiumLayout.layoutImage;
+    if (!stadiumLayoutImage) return null;
+
+    if (typeof stadiumLayoutImage === "string") {
+      return stadiumLayoutImage;
     }
 
-    if (stadiumLayout?.layoutImage instanceof File) {
-      console.log(stadiumLayout.layoutImage)
-      return URL.createObjectURL(stadiumLayout.layoutImage);
+    if (
+      stadiumLayoutImage instanceof Blob ||
+      stadiumLayoutImage instanceof File
+    ) {
+      return URL.createObjectURL(stadiumLayoutImage);
     }
 
     return null;
-  }, [stadiumLayout]);
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl && previewUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
+  }, [stadiumLayoutImage]);
 
   const isValid = Boolean(
     stadiumName && address && city && state && pincode && location
@@ -98,7 +90,6 @@ const CreateStadiumInput = ({
   }, []);
 
   useEffect(() => {
-    if (!isEditMode) return;
     if (!stateCode) return;
     if (cities.length > 0) return;
 
@@ -299,7 +290,7 @@ const CreateStadiumInput = ({
           )}
         </div>
 
-         <StadiumLayout setCurrentPage={setCurrentPage} />
+        {isValid && <StadiumLayout setCurrentPage={setCurrentPage} />}
 
         {!isValid && (
           <p className="text-[0.5rem] sm:text-xs text-yellow-500 italic mt-2">
