@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5Qrcode } from "html5-qrcode";
 import toast from "react-hot-toast";
 
 export const useTicketScanner = ({
@@ -9,85 +9,82 @@ export const useTicketScanner = ({
   verifyTicket,
   eventId,
 }) => {
-  const scannerRef = useRef(null);
+  const qrRef = useRef(null);
   const hasScannedRef = useRef(false);
-  const startedRef = useRef(false);
+  const isRunningRef = useRef(false);
 
-  const startScanner = useCallback(() => {
+  const stopScanner = async () => {
+    if (qrRef.current && isRunningRef.current) {
+      try {
+        await qrRef.current.stop();
+      } catch {
+        /* empty */
+      }
+
+      try {
+        await qrRef.current.clear();
+      } catch {
+        /* empty */
+      }
+
+      isRunningRef.current = false;
+      qrRef.current = null;
+    }
+  };
+
+  const startScanner = useCallback(async () => {
+    if (qrRef.current || isRunningRef.current) return;
+
     const element = document.getElementById("qr-reader");
     if (!element) return;
 
-    const scanner = new Html5QrcodeScanner(
-      "qr-reader",
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        rememberLastUsedCamera: true,
-      },
-      false
-    );
+    const qr = new Html5Qrcode("qr-reader");
+    qrRef.current = qr;
 
-    scannerRef.current = scanner;
+    try {
+      await qr.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        async (decodedText) => {
+          if (hasScannedRef.current) return;
+          hasScannedRef.current = true;
 
-    scanner.render(
-      (decodedText) => {
-        if (hasScannedRef.current) return;
-        hasScannedRef.current = true;
+          onLoading();
 
-        onLoading();
+          await stopScanner();
 
-        verifyTicket(
-          { qrData: decodedText, eventId },
-          {
-            onSuccess: (data) => {
-              onSuccess(data);
-            },
-            onError: (err) => {
-              onError(
-                err?.response?.data?.error?.message || "Verification failed"
-              );
-            },
-            onSettled: () => {
-              scannerRef.current?.clear().catch(() => {});
-              scannerRef.current = null;
-            },
-          }
-        );
-      },
-      (error) => {
-        if (
-          error?.includes("NotFoundException") ||
-          error?.includes("No barcode or QR code detected")
-        ) {
-          return;
+          verifyTicket(
+            { qrData: decodedText, eventId },
+            {
+              onSuccess,
+              onError: (err) =>
+                onError(
+                  err?.response?.data?.error?.message || "Verification failed"
+                ),
+            }
+          );
         }
-        toast.warn(`QR error: ${error.message}`);
-      }
-    );
+      );
+
+      isRunningRef.current = true;
+    } catch (err) {
+      toast.error(err.message || "Camera access failed");
+    }
   }, [eventId, onError, onLoading, onSuccess, verifyTicket]);
 
   useEffect(() => {
-    if (startedRef.current) return;
-    startedRef.current = true;
-
-    let rafId;
-
-    rafId = requestAnimationFrame(startScanner);
+    startScanner();
 
     return () => {
-      cancelAnimationFrame(rafId);
-      scannerRef.current?.clear().catch(() => {});
-      scannerRef.current = null;
-      startedRef.current = false;
+      stopScanner();
       hasScannedRef.current = false;
     };
   }, [startScanner]);
 
-  const scanAgain = () => {
+  const scanAgain = async () => {
     hasScannedRef.current = false;
-    scannerRef.current?.clear().catch(() => {});
-    scannerRef.current = null;
-    requestAnimationFrame(startScanner);
+    await stopScanner();
+    startScanner();
   };
 
   return { scanAgain };
