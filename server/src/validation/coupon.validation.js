@@ -47,7 +47,7 @@ export const createCouponSchema = z
 
     isActive: z.boolean().default(true),
   })
-  .refine((data) => data.expiryDate > data.startDate, {
+  .refine((data) => data.expiryDate >= data.startDate, {
     message: "Expiry date must be after start date",
     path: ["expiryDate"],
   })

@@ -1,7 +1,8 @@
 import logger from "../../config/logger.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 
-export const errorHandler = (err, req, res) => {
+// eslint-disable-next-line no-unused-vars
+export const errorHandler = (err, req, res, _next) => {
   logger.error(err.stack);
   const statusCode = err.status || STATUS_CODE.SERVER_ERROR;
   const code = err.code || "SERVER_ERROR";
