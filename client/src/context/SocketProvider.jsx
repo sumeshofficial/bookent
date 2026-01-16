@@ -6,6 +6,7 @@ import { logoutOrganizer } from "../app/organizerSlice";
 import { logout } from "../services/auth";
 import toast from "react-hot-toast";
 import { SOCKET_EVENTS, SocketContext } from "../utils/constants";
+import PropTypes from "prop-types";
 
 export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
@@ -49,4 +50,8 @@ export const SocketProvider = ({ children }) => {
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );
+};
+
+SocketProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };

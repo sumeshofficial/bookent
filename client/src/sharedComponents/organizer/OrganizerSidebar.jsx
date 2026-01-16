@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import {
   ChevronDown,
   ChevronRight,
@@ -163,6 +164,11 @@ const OrganizerSidebar = ({ setSidebarOpen, sidebarOpen }) => {
       )}
     </div>
   );
+};
+
+OrganizerSidebar.propTypes = {
+  setSidebarOpen: PropTypes.func.isRequired,
+  sidebarOpen: PropTypes.bool.isRequired,
 };
 
 export default OrganizerSidebar;

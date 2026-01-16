@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { formatDate, formatTime } from "../../checkout/utils/dateTimeFormatter";
 import TicketPricing from "./TicketPricing";
@@ -92,6 +93,27 @@ const TicketHeader = ({
       </div>
     </>
   );
+};
+
+TicketHeader.propTypes = {
+  pricing: PropTypes.object.isRequired,
+  eventDetails: PropTypes.shape({
+    thumbnailImage: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+  }).isRequired,
+  event: PropTypes.shape({
+    matchTime: PropTypes.string.isRequired,
+    matchDate: PropTypes.string.isRequired,
+    stadiumAddress: PropTypes.string.isRequired,
+    postponeDetails: PropTypes.object,
+    cancelDetails: PropTypes.object,
+  }).isRequired,
+  seat: PropTypes.shape({
+    qty: PropTypes.number.isRequired,
+    category: PropTypes.string.isRequired,
+  }).isRequired,
+  status: PropTypes.string.isRequired,
+  ticketId: PropTypes.string.isRequired,
 };
 
 export default TicketHeader;

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useModal } from "../../../../../../utils/constants";
 import { useCouponDelete } from "../../../hooks/useCouponDelete";
 import { useCouponUpdate } from "../../../hooks/useCouponUpdate";
@@ -75,6 +76,16 @@ const CouponMobileCard = ({ coupons = [], isLoading }) => {
       ))}
     </div>
   );
+};
+
+CouponMobileCard.propTypes = {
+  coupons: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      isActive: PropTypes.bool.isRequired,
+    })
+  ),
+  isLoading: PropTypes.bool,
 };
 
 export default CouponMobileCard;

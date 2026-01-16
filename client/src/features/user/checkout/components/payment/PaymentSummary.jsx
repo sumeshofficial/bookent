@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import PaymentDropdown from "./PaymentDropdown";
 import PriceRow from "./PriceRow";
 
@@ -26,6 +27,16 @@ const PaymentSummary = ({ fees }) => {
       )}
     </div>
   );
+};
+
+PaymentSummary.propTypes = {
+  fees: PropTypes.shape({
+    orderAmount: PropTypes.number.isRequired,
+    bookingFee: PropTypes.number.isRequired,
+    baseFee: PropTypes.number.isRequired,
+    gst: PropTypes.number.isRequired,
+    discount: PropTypes.number,
+  }).isRequired,
 };
 
 export default PaymentSummary;

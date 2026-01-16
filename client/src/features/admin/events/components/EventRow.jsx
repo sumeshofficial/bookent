@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
 const EventRow = ({ event }) => {
@@ -23,7 +23,9 @@ const EventRow = ({ event }) => {
       <td className="p-3 font-medium">{event.eventTitle}</td>
       <td className="p-3">{event.sportType}</td>
       <td className="p-3">{event.stadiumName}</td>
-      <td className="p-3">{new Date(event.matchDate).toLocaleDateString()}</td>
+      <td className="p-3">
+        {new Date(event.matchDate).toLocaleDateString()}
+      </td>
       <td className="p-3">
         ${event.minPrice} - ${event.maxPrice}
       </td>
@@ -40,6 +42,22 @@ const EventRow = ({ event }) => {
       </td>
     </tr>
   );
+};
+
+EventRow.propTypes = {
+  event: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    eventTitle: PropTypes.string.isRequired,
+    sportType: PropTypes.string.isRequired,
+    stadiumName: PropTypes.string.isRequired,
+    matchDate: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Date),
+    ]).isRequired,
+    minPrice: PropTypes.number.isRequired,
+    maxPrice: PropTypes.number.isRequired,
+    eventStatus: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default EventRow;

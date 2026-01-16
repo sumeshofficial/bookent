@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -178,6 +179,14 @@ const BasicInfo = ({ register, errors, setValue, watch }) => {
       </div>
     </div>
   );
+};
+
+
+BasicInfo.propTypes = {
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object,
+  setValue: PropTypes.func.isRequired,
+  watch: PropTypes.func.isRequired,
 };
 
 export default BasicInfo;

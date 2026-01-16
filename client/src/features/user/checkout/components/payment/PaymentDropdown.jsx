@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
@@ -33,6 +34,17 @@ const PaymentDropdown = ({ label, value, items = [] }) => {
       )}
     </div>
   );
+};
+
+PaymentDropdown.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    })
+  ),
 };
 
 export default PaymentDropdown;

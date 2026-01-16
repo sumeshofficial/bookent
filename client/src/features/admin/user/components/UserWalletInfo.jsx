@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Wallet } from "lucide-react";
 
 const UserWalletInfo = ({ wallet = 0 }) => {
@@ -19,6 +20,14 @@ const UserWalletInfo = ({ wallet = 0 }) => {
       </div>
     </div>
   );
+};
+
+UserWalletInfo.propTypes = {
+  wallet: PropTypes.number,
+};
+
+UserWalletInfo.defaultProps = {
+  wallet: 0,
 };
 
 export default UserWalletInfo;

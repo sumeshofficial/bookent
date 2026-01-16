@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Pencil, Trash2 } from "lucide-react";
 
 const BannerActions = ({ onEdit, onDelete }) => {
@@ -22,6 +23,11 @@ const BannerActions = ({ onEdit, onDelete }) => {
       </button>
     </div>
   );
+};
+
+BannerActions.propTypes = {
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default BannerActions;

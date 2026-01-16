@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const InputField = ({
   type = "text",
   className = "",
@@ -32,6 +34,16 @@ const InputField = ({
       )}
     </div>
   );
+};
+
+InputField.propTypes = {
+  type: PropTypes.string,
+  className: PropTypes.string,
+  errors: PropTypes.object,
+  register: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired,
+  rule: PropTypes.object,
+  placeholder: PropTypes.string,
 };
 
 export default InputField;

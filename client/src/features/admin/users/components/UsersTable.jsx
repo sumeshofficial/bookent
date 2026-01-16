@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import UserRow from "./UserRow";
 import UsersSkeleton from "./UsersSkeleton";
 
@@ -44,6 +45,12 @@ const UsersTable = ({ users, isLoading, onToggleStatus }) => {
       </table>
     </div>
   );
+};
+
+UsersTable.propTypes = {
+  users: PropTypes.arrayOf(PropTypes.object).isRequired,
+  isLoading: PropTypes.bool,
+  onToggleStatus: PropTypes.func.isRequired,
 };
 
 export default UsersTable;

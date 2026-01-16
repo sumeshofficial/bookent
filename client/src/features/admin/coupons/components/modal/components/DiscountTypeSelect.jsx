@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import FormField from "./FormField";
 
 const DiscountTypeSelect = ({ value, onChange }) => {
@@ -14,6 +15,11 @@ const DiscountTypeSelect = ({ value, onChange }) => {
       </select>
     </FormField>
   );
+};
+
+DiscountTypeSelect.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default DiscountTypeSelect;

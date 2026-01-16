@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ShieldCheck, ShieldX, MailCheck } from "lucide-react";
 
 const UserAccountStatus = ({ user }) => {
@@ -46,6 +47,14 @@ const UserAccountStatus = ({ user }) => {
       </div>
     </div>
   );
+};
+
+UserAccountStatus.propTypes = {
+  user: PropTypes.shape({
+    isActive: PropTypes.bool.isRequired,
+    isVerified: PropTypes.bool.isRequired,
+    role: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default UserAccountStatus;

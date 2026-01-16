@@ -1,4 +1,5 @@
 import OfferButton from "./OfferButton";
+import PropTypes from "prop-types";
 
 const OffersSection = ({ grandTotal, onCouponApplied, onCouponRemoved }) => {
   return (
@@ -12,6 +13,12 @@ const OffersSection = ({ grandTotal, onCouponApplied, onCouponRemoved }) => {
       />
     </div>
   );
+};
+
+OffersSection.propTypes = {
+  grandTotal: PropTypes.number.isRequired,
+  onCouponApplied: PropTypes.func.isRequired,
+  onCouponRemoved: PropTypes.func.isRequired,
 };
 
 export default OffersSection;

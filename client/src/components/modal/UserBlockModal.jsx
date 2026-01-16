@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const UserBlockModal = ({ onClose, user, onConfirm }) => {
   const isBlocked = user?.status === "blocked";
 
@@ -37,6 +39,15 @@ const UserBlockModal = ({ onClose, user, onConfirm }) => {
       </div>
     </div>
   );
+};
+
+UserBlockModal.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    email: PropTypes.string,
+    status: PropTypes.string,
+  }),
 };
 
 export default UserBlockModal;

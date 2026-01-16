@@ -1,7 +1,7 @@
+import PropTypes from "prop-types";
 import { ACTIONS } from "../../../../../utils/constants";
 import {
   CircleIcon,
-  CornerDownLeft,
   ImagePlus,
   MousePointer,
   RectangleHorizontal,
@@ -91,6 +91,15 @@ const Controllers = ({
       </div>
     </div>
   );
+};
+
+Controllers.propTypes = {
+  setAction: PropTypes.func.isRequired,
+  action: PropTypes.string.isRequired,
+  updateColor: PropTypes.func.isRequired,
+  fillColor: PropTypes.string.isRequired,
+  setImageUrl: PropTypes.func.isRequired,
+  setImageFile: PropTypes.func.isRequired,
 };
 
 export default Controllers;

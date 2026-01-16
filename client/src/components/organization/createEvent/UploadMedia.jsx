@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import CropImage from "../CropImage";
 
 const UploadMedia = ({ errors, watch, setValue }) => {
@@ -24,6 +25,12 @@ const UploadMedia = ({ errors, watch, setValue }) => {
       />
     </div>
   );
+};
+
+UploadMedia.propTypes = {
+  errors: PropTypes.object,
+  watch: PropTypes.func.isRequired,
+  setValue: PropTypes.func.isRequired,
 };
 
 export default UploadMedia;

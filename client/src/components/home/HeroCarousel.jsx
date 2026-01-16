@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -85,4 +86,17 @@ const HeroCarousel = ({ banners = [], loading = false }) => {
   );
 };
 
+HeroCarousel.propTypes = {
+  banners: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      image: PropTypes.string.isRequired,
+      mobileImage: PropTypes.string,
+      title: PropTypes.string,
+    })
+  ),
+  loading: PropTypes.bool,
+};
+
 export default HeroCarousel;
+

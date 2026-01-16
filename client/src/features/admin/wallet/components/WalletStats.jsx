@@ -1,4 +1,5 @@
 import { ArrowDownLeft, ArrowUpRight, WalletIcon } from "lucide-react";
+import PropTypes from "prop-types";
 
 const WalletStats = ({ summary }) => {
   const stats = [
@@ -34,6 +35,14 @@ const WalletStats = ({ summary }) => {
       ))}
     </div>
   );
+};
+
+WalletStats.propTypes = {
+  summary: PropTypes.shape({
+    balance: PropTypes.number.isRequired,
+    totalCredit: PropTypes.number.isRequired,
+    totalDebit: PropTypes.number.isRequired,
+  }).isRequired,
 };
 
 export default WalletStats;

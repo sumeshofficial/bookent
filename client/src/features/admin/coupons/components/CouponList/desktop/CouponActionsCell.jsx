@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Pencil, Trash2 } from "lucide-react";
 
 const CouponActionsCell = ({
@@ -36,6 +37,16 @@ const CouponActionsCell = ({
       </div>
     </td>
   );
+};
+
+CouponActionsCell.propTypes = {
+  coupon: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+  }).isRequired,
+  onEdit: PropTypes.func.isRequired,
+  openModal: PropTypes.func.isRequired,
+  deleteCoupon: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
 };
 
 export default CouponActionsCell;

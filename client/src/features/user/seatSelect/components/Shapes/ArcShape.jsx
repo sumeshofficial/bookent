@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const ArcShape = ({
   shape,
   isDisabled,
@@ -52,10 +54,10 @@ const ArcShape = ({
             isDisabled
               ? "#d1d5db"
               : !selectedShape
-                ? shape.fillColor
-                : isSelected
-                  ? shape.fillColor
-                  : "#d1d5db"
+              ? shape.fillColor
+              : isSelected
+              ? shape.fillColor
+              : "#d1d5db"
           }
           strokeWidth={thickness}
           strokeOpacity={shape.fillOpacity ?? 0.6}
@@ -109,6 +111,34 @@ const ArcShape = ({
       </g>
     </>
   );
+};
+
+ArcShape.propTypes = {
+  shape: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+
+    outerRadius: PropTypes.number,
+    outerRadiusX: PropTypes.number,
+    outerRadiusY: PropTypes.number,
+
+    innerRadius: PropTypes.number,
+    innerRadiusX: PropTypes.number,
+    innerRadiusY: PropTypes.number,
+
+    angle: PropTypes.number,
+    rotation: PropTypes.number,
+
+    fillColor: PropTypes.string.isRequired,
+    fillOpacity: PropTypes.number,
+  }).isRequired,
+
+  isDisabled: PropTypes.bool.isRequired,
+  isSelected: PropTypes.bool.isRequired,
+  selectedShape: PropTypes.object,
+  setSelectedShape: PropTypes.func.isRequired,
 };
 
 export default ArcShape;

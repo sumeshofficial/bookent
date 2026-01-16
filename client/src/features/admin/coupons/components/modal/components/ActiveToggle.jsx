@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 const ActiveToggle = ({ checked, onChange }) => {
   return (
     <div className="md:col-span-2 flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
@@ -13,6 +15,11 @@ const ActiveToggle = ({ checked, onChange }) => {
       </span>
     </div>
   );
+};
+
+ActiveToggle.propTypes = {
+  checked: PropTypes.bool.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default ActiveToggle;

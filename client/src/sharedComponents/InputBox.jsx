@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
@@ -57,4 +58,15 @@ const InputBox = ({
   );
 };
 
+InputBox.propTypes = {
+  label: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
+  validation: PropTypes.object,
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object,
+};
+
 export default InputBox;
+

@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const GrandTotal = ({ amount }) => {
   return (
     <div className="pt-4 border-t flex justify-between text-lg font-semibold">
@@ -5,6 +7,10 @@ const GrandTotal = ({ amount }) => {
       <span>$ {amount}</span>
     </div>
   );
+};
+
+GrandTotal.propTypes = {
+  amount: PropTypes.number.isRequired,
 };
 
 export default GrandTotal;

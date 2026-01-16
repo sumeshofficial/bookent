@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const CouponInfo = ({ coupon }) => {
   return (
     <>
@@ -47,6 +49,21 @@ const CouponInfo = ({ coupon }) => {
       </div>
     </>
   );
+};
+
+CouponInfo.propTypes = {
+  coupon: PropTypes.shape({
+    description: PropTypes.string,
+    discountType: PropTypes.oneOf(["PERCENTAGE", "FLAT"]).isRequired,
+    discountValue: PropTypes.number.isRequired,
+    maxDiscountAmount: PropTypes.number,
+    minOrderAmount: PropTypes.number.isRequired,
+    usedCount: PropTypes.number.isRequired,
+    usageLimit: PropTypes.number,
+    perUserLimit: PropTypes.number.isRequired,
+    startDate: PropTypes.string.isRequired,
+    expiryDate: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default CouponInfo;

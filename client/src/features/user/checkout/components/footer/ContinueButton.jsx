@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { verifySeatLock } from "../../../../../services/user.js";
@@ -51,4 +52,10 @@ const ContinueButton = ({ eventSlug, isLoading }) => {
   );
 };
 
+ContinueButton.propTypes = {
+  eventSlug: PropTypes.string.isRequired,
+  isLoading: PropTypes.bool,
+};
+
 export default ContinueButton;
+

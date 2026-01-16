@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const EventPricing = ({
   minPrice,
   maxPrice,
@@ -42,6 +44,27 @@ const EventPricing = ({
       </div>
     </div>
   );
+};
+
+EventPricing.propTypes = {
+  minPrice: PropTypes.number.isRequired,
+  maxPrice: PropTypes.number.isRequired,
+
+  ticketSetup: PropTypes.arrayOf(
+    PropTypes.shape({
+      sectionId: PropTypes.string.isRequired,
+      seatPrice: PropTypes.number.isRequired,
+      perUserLimit: PropTypes.number.isRequired,
+      availableTickets: PropTypes.number.isRequired,
+      totalTickets: PropTypes.number.isRequired,
+    })
+  ),
+
+  shapes: PropTypes.arrayOf(
+    PropTypes.shape({
+      title: PropTypes.string,
+    })
+  ),
 };
 
 export default EventPricing;

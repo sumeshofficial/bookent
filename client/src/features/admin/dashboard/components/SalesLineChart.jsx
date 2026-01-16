@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import {
   AreaChart,
   Area,
@@ -36,5 +37,15 @@ const SalesLineChart = ({ data }) => (
     </ResponsiveContainer>
   </div>
 );
+
+SalesLineChart.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      month: PropTypes.string.isRequired,
+      sales: PropTypes.number.isRequired,
+      revenue: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+};
 
 export default SalesLineChart;

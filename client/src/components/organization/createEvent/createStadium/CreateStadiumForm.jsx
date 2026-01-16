@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect, useMemo, useCallback } from "react";
 import StadiumLayout from "../selectStadium/StadiumLayout";
 import { useState } from "react";
@@ -348,6 +349,20 @@ const CreateStadiumInput = ({
       </form>
     </div>
   );
+};
+
+CreateStadiumInput.propTypes = {
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object,
+  setCurrentPage: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  isSubmitting: PropTypes.bool,
+  isEditMode: PropTypes.bool,
+  control: PropTypes.object.isRequired,
+  setValue: PropTypes.func.isRequired,
+  stadiumData: PropTypes.object,
+  dirtyFields: PropTypes.object,
 };
 
 export default CreateStadiumInput;

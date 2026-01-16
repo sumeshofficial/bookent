@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
+import PropTypes from "prop-types";
 import BannerImageInput from "./BannerImageInput";
 import BannerFormFields from "./BannerFormFields";
 import BannerFormActions from "./BannerFormActions";
@@ -100,6 +101,14 @@ const BannerFormModal = ({
       <BannerFormActions onClose={onClose} isCreating={isCreating} />
     </form>
   );
+};
+
+BannerFormModal.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  initialData: PropTypes.object,
+  isCreating: PropTypes.bool.isRequired,
+  isEdit: PropTypes.bool,
 };
 
 export default BannerFormModal;

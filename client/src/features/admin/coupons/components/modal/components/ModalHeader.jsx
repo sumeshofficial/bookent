@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { X } from "lucide-react";
 
 const ModalHeader = ({ onClose }) => {
@@ -13,6 +14,10 @@ const ModalHeader = ({ onClose }) => {
       </button>
     </div>
   );
+};
+
+ModalHeader.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
 export default ModalHeader;

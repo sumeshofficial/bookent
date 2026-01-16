@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import img from "../../assets/error-illustration.png";
 
 const SeatLockErrorModal = ({ open, onClose, message }) => {
@@ -32,6 +33,12 @@ const SeatLockErrorModal = ({ open, onClose, message }) => {
       </div>
     </div>
   );
+};
+
+SeatLockErrorModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  message: PropTypes.string,
 };
 
 export default SeatLockErrorModal;

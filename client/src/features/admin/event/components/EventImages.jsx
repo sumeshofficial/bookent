@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 const EventImages = ({ bannerImage }) => {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden mx-auto max-w-3xl">
@@ -10,6 +12,10 @@ const EventImages = ({ bannerImage }) => {
       </div>
     </div>
   );
+};
+
+EventImages.propTypes = {
+  bannerImage: PropTypes.string.isRequired,
 };
 
 export default EventImages;

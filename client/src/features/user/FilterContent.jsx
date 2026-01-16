@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import PropTypes from "prop-types";
 
 const FilterContent = ({
   dateFilters,
@@ -72,4 +73,13 @@ const FilterContent = ({
   </div>
 );
 
+FilterContent.propTypes = {
+  dateFilters: PropTypes.arrayOf(PropTypes.string).isRequired,
+  categoryFilters: PropTypes.arrayOf(PropTypes.string).isRequired,
+  priceFilters: PropTypes.arrayOf(PropTypes.string).isRequired,
+  toggleFilter: PropTypes.func.isRequired,
+  isFilterSelected: PropTypes.func.isRequired,
+};
+
 export default FilterContent;
+

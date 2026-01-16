@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { formatDate } from "../../../../utils/constants";
 
 const RecentOrdersTable = ({ orders = [] }) => (
@@ -57,5 +58,20 @@ const RecentOrdersTable = ({ orders = [] }) => (
     </div>
   </div>
 );
+
+RecentOrdersTable.propTypes = {
+  orders: PropTypes.arrayOf(
+    PropTypes.shape({
+      orderId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+      createdAt: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.instanceOf(Date),
+      ]).isRequired,
+      amount: PropTypes.number.isRequired,
+      status: PropTypes.string.isRequired,
+    })
+  ),
+};
 
 export default RecentOrdersTable;

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import QRCode from "react-qr-code";
 import { formatDate, formatTime } from "../../checkout/utils/dateTimeFormatter";
 import TicketPricing from "../../myTickets/components/TicketPricing";
@@ -71,6 +72,33 @@ const TicketDetails = ({ data }) => {
       {status === "CONFIRMED" && <InvoiceActions orderId={bookingId} />}
     </div>
   );
+};
+
+TicketDetails.propTypes = {
+  data: PropTypes.shape({
+    event: PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      date: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      time: PropTypes.string.isRequired,
+      venue: PropTypes.string.isRequired,
+    }).isRequired,
+    qty: PropTypes.number.isRequired,
+    section: PropTypes.string.isRequired,
+    pricing: PropTypes.object.isRequired,
+    qrData: PropTypes.string,
+    bookingId: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    postponeDetails: PropTypes.shape({
+      isPostponed: PropTypes.bool,
+      oldMatchDate: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      newMatchDate: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      reason: PropTypes.string,
+    }),
+    cancelDetails: PropTypes.shape({
+      isCancelled: PropTypes.bool,
+      reason: PropTypes.string,
+    }),
+  }).isRequired,
 };
 
 export default TicketDetails;

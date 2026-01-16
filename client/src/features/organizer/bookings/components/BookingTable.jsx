@@ -1,5 +1,6 @@
 import BookingRow from "./BookingRow";
 import Pagination from "../../../../sharedComponents/Pagination";
+import PropTypes from "prop-types";
 
 const BookingTable = ({ bookings, meta }) => {
   return (
@@ -27,6 +28,18 @@ const BookingTable = ({ bookings, meta }) => {
       <Pagination meta={meta} />
     </div>
   );
+};
+
+BookingTable.propTypes = {
+  bookings: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  meta: PropTypes.shape({
+    totalPages: PropTypes.number,
+    page: PropTypes.number,
+  }).isRequired,
 };
 
 export default BookingTable;

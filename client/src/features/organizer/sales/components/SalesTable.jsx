@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 const SalesTable = ({ data }) => {
   return (
     <div className="overflow-x-auto bg-white shadow rounded">
@@ -45,4 +46,22 @@ const SalesTable = ({ data }) => {
   );
 };
 
+SalesTable.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      orderId: PropTypes.string.isRequired,
+      createdAt: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.instanceOf(Date)
+      ]).isRequired,
+      grossTicketSales: PropTypes.number.isRequired,
+      refundedAmount: PropTypes.number,
+      refundStatus: PropTypes.string,
+      organizerNetRevenue: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+};
+
 export default SalesTable;
+

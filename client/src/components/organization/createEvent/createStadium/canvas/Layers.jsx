@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, Eye, EyeOff, Trash } from "lucide-react";
+import PropTypes from "prop-types";
 
 const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
   const selectedShape = shapes.find((s) => s.id === selectedId);
@@ -310,6 +311,30 @@ const Layers = ({ setShapes, shapes, deselectAll, selectedId }) => {
       )}
     </div>
   );
+};
+
+Layers.propTypes = {
+  setShapes: PropTypes.func.isRequired,
+  shapes: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      title: PropTypes.string,
+      type: PropTypes.string,
+      visible: PropTypes.bool,
+      capacity: PropTypes.number,
+      zIndex: PropTypes.number,
+      outerRadius: PropTypes.number,
+      outerRadiusX: PropTypes.number,
+      outerRadiusY: PropTypes.number,
+      innerRadius: PropTypes.number,
+      innerRadiusX: PropTypes.number,
+      innerRadiusY: PropTypes.number,
+      angle: PropTypes.number,
+      startAngle: PropTypes.number,
+    })
+  ).isRequired,
+  deselectAll: PropTypes.func.isRequired,
+  selectedId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default Layers;

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 const UserPreferences = ({ preferences = {} }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -26,6 +27,15 @@ const UserPreferences = ({ preferences = {} }) => {
       </div>
     </div>
   );
+};
+
+UserPreferences.propTypes = {
+  preferences: PropTypes.shape({
+    sport: PropTypes.string,
+    venue: PropTypes.string,
+    matchTime: PropTypes.string,
+    priceRange: PropTypes.string,
+  }),
 };
 
 export default UserPreferences;

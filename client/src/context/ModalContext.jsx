@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ModalContext } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { clearError } from "../app/userSlice";
+import PropTypes from "prop-types";
 
 const ModalProvider = ({ children }) => {
   const [modalType, setModalType] = useState(null);
@@ -32,6 +33,10 @@ const ModalProvider = ({ children }) => {
       {children}
     </ModalContext.Provider>
   );
+};
+
+ModalProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default ModalProvider;

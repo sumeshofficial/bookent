@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useCoupon } from "../../hooks/useCoupon";
@@ -136,4 +137,10 @@ const OfferButton = ({ onCouponApplied, onCouponRemoved }) => {
   );
 };
 
+OfferButton.propTypes = {
+  onCouponApplied: PropTypes.func.isRequired,
+  onCouponRemoved: PropTypes.func.isRequired,
+};
+
 export default OfferButton;
+

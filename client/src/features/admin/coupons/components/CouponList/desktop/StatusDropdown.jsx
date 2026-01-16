@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import PropTypes from "prop-types";
 
 const StatusDropdown = ({ onChange, buttonRect, onClose }) => {
   if (!buttonRect) return null;
@@ -36,6 +37,18 @@ const StatusDropdown = ({ onChange, buttonRect, onClose }) => {
     </div>,
     document.body
   );
+};
+
+StatusDropdown.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  buttonRect: PropTypes.shape({
+    top: PropTypes.number,
+    left: PropTypes.number,
+    bottom: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+  }),
 };
 
 export default StatusDropdown;

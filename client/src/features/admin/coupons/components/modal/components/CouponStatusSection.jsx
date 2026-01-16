@@ -1,4 +1,5 @@
 import ActiveToggle from "./ActiveToggle";
+import PropTypes from "prop-types";
 
 const CouponStatusSection = ({ isActive, setValue }) => {
   return (
@@ -7,6 +8,11 @@ const CouponStatusSection = ({ isActive, setValue }) => {
       onChange={(e) => setValue("isActive", e.target.checked)}
     />
   );
+};
+
+CouponStatusSection.propTypes = {
+  isActive: PropTypes.bool.isRequired,
+  setValue: PropTypes.func.isRequired,
 };
 
 export default CouponStatusSection;

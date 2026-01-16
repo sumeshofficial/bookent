@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import {
   Circle,
   Rect,
@@ -325,6 +326,39 @@ const ShapeWithTransformer = ({
       )}
     </>
   );
+};
+
+ShapeWithTransformer.propTypes = {
+  shape: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    type: PropTypes.oneOf(["rect", "circle", "image", "arc"]).isRequired,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    radius: PropTypes.number,
+    rotation: PropTypes.number,
+    offsetX: PropTypes.number,
+    offsetY: PropTypes.number,
+    fillColor: PropTypes.string,
+    fillOpacity: PropTypes.number,
+    imageUrl: PropTypes.string,
+    title: PropTypes.string,
+    capacity: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    outerRadius: PropTypes.number,
+    innerRadius: PropTypes.number,
+    outerRadiusX: PropTypes.number,
+    outerRadiusY: PropTypes.number,
+    innerRadiusX: PropTypes.number,
+    innerRadiusY: PropTypes.number,
+    angle: PropTypes.number,
+    startAngle: PropTypes.number,
+  }).isRequired,
+  isSelected: PropTypes.bool.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  onDragEnd: PropTypes.func.isRequired,
+  isDraggable: PropTypes.bool,
+  onResize: PropTypes.func.isRequired,
 };
 
 export default ShapeWithTransformer;

@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const WalletSummary = ({ summary }) => {
   if (!summary) return null;
 
@@ -25,6 +27,14 @@ const WalletSummary = ({ summary }) => {
       </div>
     </div>
   );
+};
+
+WalletSummary.propTypes = {
+  summary: PropTypes.shape({
+    totalCredit: PropTypes.number.isRequired,
+    totalDebit: PropTypes.number.isRequired,
+    balance: PropTypes.number.isRequired,
+  }),
 };
 
 export default WalletSummary;

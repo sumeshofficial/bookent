@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Calendar, Clock, MapPin } from "lucide-react";
 import { Hourglass, Users, Languages } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -204,8 +205,8 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
                   {isSoldOut
                     ? "Sold Out"
                     : isCancelled
-                      ? "Cancelled"
-                      : "Book Now"}
+                    ? "Cancelled"
+                    : "Book Now"}
                 </button>
               </div>
             </div>
@@ -223,6 +224,35 @@ const EventDetails = ({ event, recommendedEvents, isEventsLoading }) => {
       </div>
     </div>
   );
+};
+
+EventDetails.propTypes = {
+  event: PropTypes.shape({
+    eventTitle: PropTypes.string.isRequired,
+    eventDescription: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    minPrice: PropTypes.number,
+    matchDate: PropTypes.string,
+    matchTime: PropTypes.string,
+    gateOpenTime: PropTypes.string,
+    matchDuration: PropTypes.number,
+    ageRestriction: PropTypes.string,
+    termsAndConditions: PropTypes.string,
+    stadiumName: PropTypes.string,
+    stadiumAddress: PropTypes.string,
+    bannerImage: PropTypes.string,
+    soldTickets: PropTypes.number,
+    totalTickets: PropTypes.number,
+    availableTickets: PropTypes.number,
+    eventStatus: PropTypes.string,
+    stadium: PropTypes.shape({
+      stadiumDetails: PropTypes.shape({
+        location: PropTypes.string,
+      }),
+    }),
+  }).isRequired,
+  recommendedEvents: PropTypes.arrayOf(PropTypes.object),
+  isEventsLoading: PropTypes.bool,
 };
 
 export default EventDetails;

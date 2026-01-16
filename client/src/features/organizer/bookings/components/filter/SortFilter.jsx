@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const SortFilter = ({ value, onChange }) => (
   <div>
     <label className="block text-xs text-gray-500 mb-1">Sort By</label>
@@ -13,5 +15,10 @@ const SortFilter = ({ value, onChange }) => (
     </select>
   </div>
 );
+
+SortFilter.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default SortFilter;

@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import PropTypes from "prop-types";
 
 const ConfirmBackModal = ({ open, onConfirm, onCancel }) => {
   if (!open) return null;
@@ -35,6 +36,12 @@ const ConfirmBackModal = ({ open, onConfirm, onCancel }) => {
       </div>
     </div>
   );
+};
+
+ConfirmBackModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default ConfirmBackModal;

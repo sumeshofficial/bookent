@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useModal } from "../../../../utils/constants";
@@ -52,6 +53,17 @@ const UsersMobileCard = ({ user, onToggle }) => {
       </div>
     </div>
   );
+};
+
+UsersMobileCard.propTypes = {
+  user: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    fullname: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    wallet: PropTypes.number.isRequired,
+    status: PropTypes.string.isRequired,
+  }).isRequired,
+  onToggle: PropTypes.func.isRequired,
 };
 
 export default UsersMobileCard;

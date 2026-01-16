@@ -2,6 +2,7 @@ import { useDispatch } from "react-redux";
 import { addError, addUser, clearError } from "../../../app/userSlice";
 import { useModal } from "../../../utils/constants";
 import { ENV } from "../../../config/env";
+import PropTypes from "prop-types";
 
 const GoogleButton = ({ role = "user" }) => {
   const { closeModal } = useModal();
@@ -66,6 +67,10 @@ const GoogleButton = ({ role = "user" }) => {
       </span>
     </button>
   );
+};
+
+GoogleButton.propTypes = {
+  role: PropTypes.oneOf(["user", "organizer", "admin"]),
 };
 
 export default GoogleButton;

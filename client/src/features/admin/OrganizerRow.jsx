@@ -1,6 +1,7 @@
 import React from "react";
 import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const OrganizerRow = React.memo(({ org }) => {
   return (
@@ -23,8 +24,8 @@ const OrganizerRow = React.memo(({ org }) => {
             org.status === "approved"
               ? "bg-green-100 text-green-700"
               : org.status === "rejected"
-                ? "bg-red-100 text-red-700"
-                : "bg-yellow-100 text-yellow-700"
+              ? "bg-red-100 text-red-700"
+              : "bg-yellow-100 text-yellow-700"
           }`}
         >
           {org.status}
@@ -50,5 +51,22 @@ const OrganizerRow = React.memo(({ org }) => {
     </tr>
   );
 });
+
+OrganizerRow.propTypes = {
+  org: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    isVerified: PropTypes.bool.isRequired,
+    organizationDetails: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      address: PropTypes.string.isRequired,
+      state: PropTypes.string.isRequired,
+    }).isRequired,
+    bankAccountDetails: PropTypes.shape({
+      beneficiaryName: PropTypes.string.isRequired,
+      bankName: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
 
 export default OrganizerRow;

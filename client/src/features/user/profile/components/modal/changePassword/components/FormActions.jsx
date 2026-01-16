@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 const FormActions = ({ onCancel, isPending, isValid }) => {
   return (
     <div className="flex justify-end gap-3 mt-6 border-t pt-4">
@@ -20,6 +21,13 @@ const FormActions = ({ onCancel, isPending, isValid }) => {
       </button>
     </div>
   );
+};
+
+
+FormActions.propTypes = {
+  onCancel: PropTypes.func.isRequired,
+  isPending: PropTypes.bool.isRequired,
+  isValid: PropTypes.bool.isRequired,
 };
 
 export default FormActions;

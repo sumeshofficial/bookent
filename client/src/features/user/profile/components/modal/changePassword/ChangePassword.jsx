@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import ModalCloseButton from "./components/ModalCloseButton";
 import FormActions from "./components/FormActions";
 import FormInput from "./components/FormInput";
@@ -84,4 +85,9 @@ const ChangePassword = ({ onClose }) => {
   );
 };
 
+ChangePassword.propTypes = {
+  onClose: PropTypes.func.isRequired,
+};
+
 export default ChangePassword;
+

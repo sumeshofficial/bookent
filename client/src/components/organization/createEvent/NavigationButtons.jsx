@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import PropTypes from "prop-types";
 
 const NavigationButtons = ({
   currentStep = 1,
@@ -55,6 +56,14 @@ const NavigationButtons = ({
       </div>
     </div>
   );
+};
+
+NavigationButtons.propTypes = {
+  currentStep: PropTypes.number,
+  handleNextStep: PropTypes.func.isRequired,
+  handlePreviousStep: PropTypes.func.isRequired,
+  isSubmitting: PropTypes.bool,
+  dirtyFields: PropTypes.object,
 };
 
 export default NavigationButtons;

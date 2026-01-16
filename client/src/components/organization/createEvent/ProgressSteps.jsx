@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Check } from "lucide-react";
 import React from "react";
 
@@ -57,4 +58,9 @@ const ProgressSteps = ({ currentStep = 1 }) => {
   );
 };
 
+ProgressSteps.propTypes = {
+  currentStep: PropTypes.number,
+};
+
 export default ProgressSteps;
+

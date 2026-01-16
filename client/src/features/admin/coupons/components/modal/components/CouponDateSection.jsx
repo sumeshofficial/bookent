@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import DateField from "./DateField";
 
 const CouponDateSection = ({ register, errors, getValues }) => {
@@ -27,6 +28,15 @@ const CouponDateSection = ({ register, errors, getValues }) => {
       />
     </>
   );
+};
+
+CouponDateSection.propTypes = {
+  register: PropTypes.func.isRequired,
+  getValues: PropTypes.func.isRequired,
+  errors: PropTypes.shape({
+    startDate: PropTypes.object,
+    expiryDate: PropTypes.object,
+  }).isRequired,
 };
 
 export default CouponDateSection;

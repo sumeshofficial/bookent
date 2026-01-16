@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
@@ -34,6 +35,21 @@ const EventCard = ({ event }) => {
       </p>
     </div>
   );
+};
+
+EventCard.propTypes = {
+  event: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    thumbnailImage: PropTypes.string,
+    eventTitle: PropTypes.string,
+    matchDate: PropTypes.string,
+    stadiumName: PropTypes.string,
+    stadium: PropTypes.shape({
+      stadiumDetails: PropTypes.shape({
+        city: PropTypes.string,
+      }),
+    }),
+  }).isRequired,
 };
 
 export default EventCard;

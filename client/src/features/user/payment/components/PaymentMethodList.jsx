@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import PaymentOptionCard from "./PaymentOptionCard";
 
 const PaymentMethodList = ({ methods }) => {
@@ -13,6 +14,17 @@ const PaymentMethodList = ({ methods }) => {
       ))}
     </div>
   );
+};
+
+PaymentMethodList.propTypes = {
+  methods: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      logo: PropTypes.string,
+      title: PropTypes.string.isRequired,
+      onClick: PropTypes.func,
+    })
+  ).isRequired,
 };
 
 export default PaymentMethodList;

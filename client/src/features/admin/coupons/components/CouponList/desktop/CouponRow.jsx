@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import CouponInfoCell from "./CouponInfoCell";
 import CouponStatusCell from "./CouponStatusCell";
 import CouponActionsCell from "./CouponActionsCell";
@@ -52,6 +53,17 @@ const CouponRow = ({
       />
     </tr>
   );
+};
+
+CouponRow.propTypes = {
+  coupon: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+  }).isRequired,
+  updateCoupon: PropTypes.func.isRequired,
+  deleteCoupon: PropTypes.func.isRequired,
+  openModal: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  isUpdating: PropTypes.bool,
 };
 
 export default CouponRow;

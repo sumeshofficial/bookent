@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronDown, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -205,6 +206,13 @@ const VenueAndTicket = ({ register, errors, watch, setValue }) => {
       </div>
     </div>
   );
+};
+
+VenueAndTicket.propTypes = {
+  register: PropTypes.func.isRequired,
+  watch: PropTypes.func.isRequired,
+  setValue: PropTypes.func.isRequired,
+  errors: PropTypes.object,
 };
 
 export default VenueAndTicket;

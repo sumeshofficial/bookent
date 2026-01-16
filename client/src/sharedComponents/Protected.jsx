@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../app/userSlice";
@@ -16,6 +17,10 @@ const Protected = ({ children }) => {
   }
 
   return children;
+};
+
+Protected.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default Protected;

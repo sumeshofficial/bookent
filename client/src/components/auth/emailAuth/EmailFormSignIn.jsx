@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import InputBox from "../../../sharedComponents/InputBox";
 import { useContextForm, useModal } from "../../../utils/constants";
 
@@ -55,6 +56,10 @@ const EmailFormSignIn = ({ onSubmit }) => {
       </div>
     </form>
   );
+};
+
+EmailFormSignIn.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default EmailFormSignIn;

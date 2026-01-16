@@ -1,4 +1,14 @@
+import PropTypes from "prop-types";
+
 const SalesTable = ({ data }) => {
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white shadow rounded p-6 text-center text-gray-500">
+        No sales data available
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-auto bg-white shadow rounded">
       <table className="w-full text-sm">
@@ -47,6 +57,7 @@ const SalesTable = ({ data }) => {
                   <span className="text-green-600">—</span>
                 )}
               </td>
+
               <td className="p-3 text-right font-semibold text-green-600">
                 ${row.platformNetRevenue.toFixed(2)}
               </td>
@@ -56,6 +67,22 @@ const SalesTable = ({ data }) => {
       </table>
     </div>
   );
+};
+
+SalesTable.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      orderId: PropTypes.string.isRequired,
+      createdAt: PropTypes.string.isRequired,
+      grossTicketSales: PropTypes.number.isRequired,
+      discount: PropTypes.number.isRequired,
+      platformGrossFee: PropTypes.number.isRequired,
+      gatewayFee: PropTypes.number.isRequired,
+      refundStatus: PropTypes.string,
+      platformNetRevenue: PropTypes.number.isRequired,
+    })
+  ).isRequired,
 };
 
 export default SalesTable;

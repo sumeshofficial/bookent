@@ -1,4 +1,5 @@
 import { Pencil } from "lucide-react";
+import PropTypes from "prop-types";
 
 const StadiumLayout = ({ setCurrentPage }) => {
   return (
@@ -17,6 +18,10 @@ const StadiumLayout = ({ setCurrentPage }) => {
       </div>
     </>
   );
+};
+
+StadiumLayout.propTypes = {
+  setCurrentPage: PropTypes.func.isRequired,
 };
 
 export default StadiumLayout;

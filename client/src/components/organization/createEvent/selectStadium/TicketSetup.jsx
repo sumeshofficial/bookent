@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect } from "react";
 
 const TicketSetup = ({
@@ -117,6 +118,16 @@ const TicketSetup = ({
       </div>
     </>
   );
+};
+
+TicketSetup.propTypes = {
+  title: PropTypes.string.isRequired,
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object,
+  index: PropTypes.number.isRequired,
+  capacity: PropTypes.number.isRequired,
+  setValue: PropTypes.func.isRequired,
+  id: PropTypes.string,
 };
 
 export default TicketSetup;

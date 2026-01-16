@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronDown } from "lucide-react";
 
 const PublishAndPreview = ({ register, errors, watch }) => {
@@ -184,6 +185,12 @@ const PublishAndPreview = ({ register, errors, watch }) => {
       </div>
     </div>
   );
+};
+
+PublishAndPreview.propTypes = {
+  register: PropTypes.func.isRequired,
+  watch: PropTypes.func.isRequired,
+  errors: PropTypes.object,
 };
 
 export default PublishAndPreview;

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import FormField from "./FormField";
 
 const DateField = ({ label, error, ...field }) => {
@@ -22,6 +23,11 @@ const DateField = ({ label, error, ...field }) => {
       </div>
     </FormField>
   );
+};
+
+DateField.propTypes = {
+  label: PropTypes.string.isRequired,
+  error: PropTypes.string,
 };
 
 export default DateField;

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { VERIFY_STATUS } from "../constants/verify.constants";
 
@@ -55,6 +56,17 @@ const VerifyResult = ({ status, message, ticketData, onReset }) => {
   }
 
   return null;
+};
+
+VerifyResult.propTypes = {
+  status: PropTypes.oneOf(Object.values(VERIFY_STATUS)).isRequired,
+  message: PropTypes.string,
+  ticketData: PropTypes.shape({
+    eventTitle: PropTypes.string,
+    userName: PropTypes.string,
+    seatInfo: PropTypes.string,
+  }),
+  onReset: PropTypes.func.isRequired,
 };
 
 export default VerifyResult;

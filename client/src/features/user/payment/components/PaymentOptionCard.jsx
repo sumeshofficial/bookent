@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronRight } from "lucide-react";
 
 const PaymentOptionCard = ({ logo, title, onClick = null }) => {
@@ -14,6 +15,12 @@ const PaymentOptionCard = ({ logo, title, onClick = null }) => {
       <ChevronRight className="w-5 h-5" />
     </button>
   );
+};
+
+PaymentOptionCard.propTypes = {
+  logo: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  onClick: PropTypes.func,
 };
 
 export default PaymentOptionCard;

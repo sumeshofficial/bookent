@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { formatDate, formatTime } from "../../utils/dateTimeFormatter";
 
 const TicketCard = ({ data, isLoading }) => {
@@ -43,6 +44,18 @@ const TicketCard = ({ data, isLoading }) => {
       )}
     </div>
   );
+};
+
+TicketCard.propTypes = {
+  data: PropTypes.shape({
+    title: PropTypes.string,
+    count: PropTypes.number,
+    date: PropTypes.string,
+    time: PropTypes.string,
+    venue: PropTypes.string,
+    section: PropTypes.string,
+  }),
+  isLoading: PropTypes.bool.isRequired,
 };
 
 export default TicketCard;

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { X, Wallet } from "lucide-react";
 import { usePaymentMethods } from "../../hooks/usePaymentMethods";
 
@@ -81,6 +82,12 @@ const WalletPaymentConfirmation = ({ amount, balance, onCancel }) => {
       </div>
     </div>
   );
+};
+
+WalletPaymentConfirmation.propTypes = {
+  amount: PropTypes.number.isRequired,
+  balance: PropTypes.number.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default WalletPaymentConfirmation;

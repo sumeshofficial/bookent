@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { STATUS_MAP } from "../constants/ticketStatus";
 
 const TicketStatusBadge = ({ status }) => {
@@ -10,6 +11,10 @@ const TicketStatusBadge = ({ status }) => {
       {status}
     </span>
   );
+};
+
+TicketStatusBadge.propTypes = {
+  status: PropTypes.string.isRequired,
 };
 
 export default TicketStatusBadge;

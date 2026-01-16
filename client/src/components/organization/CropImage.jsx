@@ -2,6 +2,7 @@ import { Upload, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
+import PropTypes from "prop-types";
 
 const CropImage = ({
   setValue,
@@ -197,6 +198,20 @@ const CropImage = ({
       )}
     </div>
   );
+};
+
+CropImage.propTypes = {
+  setValue: PropTypes.func.isRequired,
+  label: PropTypes.string.isRequired,
+  aspect: PropTypes.number,
+  name: PropTypes.string.isRequired,
+  errors: PropTypes.object,
+  watch: PropTypes.func.isRequired,
+};
+
+CropImage.defaultProps = {
+  aspect: 16 / 9,
+  errors: {},
 };
 
 export default CropImage;

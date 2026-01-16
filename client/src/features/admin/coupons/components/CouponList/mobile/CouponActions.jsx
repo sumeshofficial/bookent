@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Pencil, Power, Trash2 } from "lucide-react";
 
 const CouponActions = ({ onEdit, onToggle, onDelete, coupon }) => (
@@ -27,5 +28,12 @@ const CouponActions = ({ onEdit, onToggle, onDelete, coupon }) => (
     </button>
   </div>
 );
+
+CouponActions.propTypes = {
+  onEdit: PropTypes.func.isRequired,
+  onToggle: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  coupon: PropTypes.object.isRequired,
+};
 
 export default CouponActions;

@@ -1,5 +1,6 @@
 import CropImageProfile from "../../../../components/user/CropImageProfile";
 import { Edit } from "lucide-react";
+import PropTypes from "prop-types";
 
 const ProfileHeader = ({ user, openModal, updateImage }) => {
   return (
@@ -26,6 +27,14 @@ const ProfileHeader = ({ user, openModal, updateImage }) => {
       </div>
     </div>
   );
+};
+
+ProfileHeader.propTypes = {
+  user: PropTypes.shape({
+    fullname: PropTypes.string.isRequired,
+  }).isRequired,
+  openModal: PropTypes.func.isRequired,
+  updateImage: PropTypes.func.isRequired,
 };
 
 export default ProfileHeader;

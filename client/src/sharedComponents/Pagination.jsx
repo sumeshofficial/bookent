@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -45,4 +46,11 @@ const Pagination = ({ meta }) => {
   );
 };
 
+Pagination.propTypes = {
+  meta: PropTypes.shape({
+    totalPages: PropTypes.number.isRequired,
+  }).isRequired,
+};
+
 export default Pagination;
+

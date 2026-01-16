@@ -1,5 +1,6 @@
 import { useModal } from "../../../../utils/constants";
 import BannerActions from "./BannerActions";
+import PropTypes from "prop-types";
 
 const BannerTable = ({ banners, onDelete, onEdit, isUpdating }) => {
   const { openModal, closeModal } = useModal();
@@ -83,6 +84,21 @@ const BannerTable = ({ banners, onDelete, onEdit, isUpdating }) => {
       </table>
     </div>
   );
+};
+
+BannerTable.propTypes = {
+  banners: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      title: PropTypes.string,
+      image: PropTypes.string,
+      mobileImage: PropTypes.string,
+      isActive: PropTypes.bool,
+    })
+  ).isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  isUpdating: PropTypes.bool,
 };
 
 export default BannerTable;

@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const MatchTime = ({ register, errors }) => {
   return (
     <div className="bg-white border border-gray-100 rounded-md px-4 py-6 sm:px-8 sm:py-8">
@@ -63,6 +65,11 @@ const MatchTime = ({ register, errors }) => {
       </div>
     </div>
   );
+};
+
+MatchTime.propTypes = {
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object,
 };
 
 export default MatchTime;

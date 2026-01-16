@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const EventStatus = ({ event }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow">
@@ -10,6 +12,18 @@ const EventStatus = ({ event }) => {
       </ul>
     </div>
   );
+};
+
+EventStatus.propTypes = {
+  event: PropTypes.shape({
+    isBookingOpen: PropTypes.bool.isRequired,
+    postponeDetails: PropTypes.shape({
+      isPostponed: PropTypes.bool.isRequired,
+    }).isRequired,
+    cancelDetails: PropTypes.shape({
+      isCancelled: PropTypes.bool.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default EventStatus;

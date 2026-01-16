@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import Pagination from "../../../../sharedComponents/Pagination";
 import { formatDate } from "../../../user/checkout/utils/dateTimeFormatter";
 import { TRANSACTION_TYPE } from "../constants/wallet.constants";
@@ -60,6 +61,13 @@ const WalletTransactions = ({ transactions, pagination }) => {
       </div>
     </div>
   );
+};
+
+WalletTransactions.propTypes = {
+  transactions: PropTypes.arrayOf(PropTypes.object).isRequired,
+  pagination: PropTypes.shape({
+    totalPages: PropTypes.number.isRequired,
+  }).isRequired,
 };
 
 export default WalletTransactions;

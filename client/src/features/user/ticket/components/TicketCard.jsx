@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { formatDate } from "../../checkout/utils/dateTimeFormatter";
 import { STATUS_MAP } from "../../myTickets/constants/ticketStatus";
 
@@ -35,6 +36,21 @@ const TicketCard = ({ data }) => {
       </div>
     </div>
   );
+};
+
+TicketCard.propTypes = {
+  data: PropTypes.shape({
+    event: PropTypes.shape({
+      poster: PropTypes.string.isRequired,
+    }).isRequired,
+    bookingId: PropTypes.string.isRequired,
+    paymentMethod: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    bookedAt: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]).isRequired,
+  }).isRequired,
 };
 
 export default TicketCard;

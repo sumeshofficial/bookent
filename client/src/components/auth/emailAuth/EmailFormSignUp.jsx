@@ -1,5 +1,6 @@
 import InputBox from "../../../sharedComponents/user/InputBox";
 import { useContextForm } from "../../../utils/constants";
+import PropTypes from "prop-types";
 
 const EmailFormSignUp = ({ onSubmit }) => {
   const { handleSubmit, isSubmitting, watch, register, errors } =
@@ -97,6 +98,10 @@ const EmailFormSignUp = ({ onSubmit }) => {
       </div>
     </form>
   );
+};
+
+EmailFormSignUp.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default EmailFormSignUp;

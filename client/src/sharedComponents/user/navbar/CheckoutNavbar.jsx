@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../utils/constants";
 import { useEffect, useRef } from "react";
 import { useSectionLock } from "../../../features/user/seatSelect/hooks/useSeatLock";
+import PropTypes from "prop-types"; 
 
 const CheckoutNavbar = ({ title, eventId, eventSlug }) => {
   const navigate = useNavigate();
@@ -84,6 +85,12 @@ const CheckoutNavbar = ({ title, eventId, eventSlug }) => {
       </div>
     </div>
   );
+};
+
+CheckoutNavbar.propTypes = {
+  title: PropTypes.string.isRequired,
+  eventId: PropTypes.string.isRequired,
+  eventSlug: PropTypes.string.isRequired,
 };
 
 export default CheckoutNavbar;

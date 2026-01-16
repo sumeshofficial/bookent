@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const TicketMeta = ({ meta }) => {
   const formattedDate = new Date(meta.bookingDate).toLocaleDateString("en-IN", {
     day: "numeric",
@@ -22,6 +24,14 @@ const TicketMeta = ({ meta }) => {
       </div>
     </div>
   );
+};
+
+TicketMeta.propTypes = {
+  meta: PropTypes.shape({
+    bookingDate: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    paymentMethod: PropTypes.string.isRequired,
+    bookingId: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default TicketMeta;

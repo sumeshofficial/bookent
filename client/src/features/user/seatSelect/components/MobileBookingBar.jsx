@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Plus, Minus } from "lucide-react";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const MobileBookingBar = ({
   selectedShape,
@@ -113,6 +114,25 @@ const MobileBookingBar = ({
       )}
     </div>
   );
+};
+
+MobileBookingBar.propTypes = {
+  selectedShape: PropTypes.shape({
+    id: PropTypes.string,
+    title: PropTypes.string,
+  }),
+  ticketSetup: PropTypes.arrayOf(
+    PropTypes.shape({
+      sectionId: PropTypes.string.isRequired,
+      availableTickets: PropTypes.number,
+      totalTickets: PropTypes.number,
+      perUserLimit: PropTypes.number,
+      seatPrice: PropTypes.number,
+    })
+  ),
+  eventSlug: PropTypes.string.isRequired,
+  lockSection: PropTypes.func.isRequired,
+  lockedSections: PropTypes.object,
 };
 
 export default MobileBookingBar;

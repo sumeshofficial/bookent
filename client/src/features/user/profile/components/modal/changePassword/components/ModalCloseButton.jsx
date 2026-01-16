@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { X } from "lucide-react";
 
 const ModalCloseButton = ({ onClose }) => (
@@ -10,5 +11,9 @@ const ModalCloseButton = ({ onClose }) => (
     <X size={20} />
   </button>
 );
+
+ModalCloseButton.propTypes = {
+  onClose: PropTypes.func.isRequired,
+};
 
 export default ModalCloseButton;

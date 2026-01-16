@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 const BannerFormFields = ({ register, errors, disabled }) => (
   <>
     <input
@@ -19,5 +20,11 @@ const BannerFormFields = ({ register, errors, disabled }) => (
     </label>
   </>
 );
+
+BannerFormFields.propTypes = {
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object.isRequired,
+  disabled: PropTypes.bool,
+};
 
 export default BannerFormFields;

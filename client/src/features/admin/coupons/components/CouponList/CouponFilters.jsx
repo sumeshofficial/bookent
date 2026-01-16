@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import {
   DATE_FILTERS,
   SORT_OPTIONS,
@@ -67,6 +68,27 @@ const CouponFilters = ({ filters, setFilters }) => {
       </button>
     </div>
   );
+};
+
+CouponFilters.propTypes = {
+  filters: PropTypes.shape({
+    search: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+    sort: PropTypes.string.isRequired,
+    from: PropTypes.string.isRequired,
+    to: PropTypes.string.isRequired,
+  }).isRequired,
+  setFilters: PropTypes.shape({
+    setSearch: PropTypes.func.isRequired,
+    setStatus: PropTypes.func.isRequired,
+    setType: PropTypes.func.isRequired,
+    setDate: PropTypes.func.isRequired,
+    setSort: PropTypes.func.isRequired,
+    setFrom: PropTypes.func.isRequired,
+    setTo: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 export default CouponFilters;

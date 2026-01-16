@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import CouponHeader from "./CouponHeader";
 import CouponInfo from "./CouponInfo";
 import CouponActions from "./CouponActions";
@@ -17,6 +18,17 @@ const CouponMobileItem = ({ coupon, onEdit, onToggle, onDelete }) => {
       />
     </div>
   );
+};
+
+CouponMobileItem.propTypes = {
+  coupon: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    code: PropTypes.string.isRequired,
+    isActive: PropTypes.bool.isRequired,
+  }).isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onToggle: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default CouponMobileItem;

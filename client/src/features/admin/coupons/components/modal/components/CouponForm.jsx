@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect } from "react";
 
@@ -74,6 +75,29 @@ const CouponForm = ({ handleSubmit, coupon, onClose, isPending }) => {
       <ModalFooter coupon={coupon} onClose={onClose} isPending={isPending} />
     </form>
   );
+};
+
+CouponForm.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
+  coupon: PropTypes.shape({
+    _id: PropTypes.string,
+    code: PropTypes.string,
+    discountType: PropTypes.string,
+    discountValue: PropTypes.number,
+    maxDiscountAmount: PropTypes.number,
+    minPurchaseAmount: PropTypes.number,
+    perUserLimit: PropTypes.number,
+    startDate: PropTypes.string,
+    expiryDate: PropTypes.string,
+    isActive: PropTypes.bool,
+  }),
+  onClose: PropTypes.func.isRequired,
+  isPending: PropTypes.bool,
+};
+
+CouponForm.defaultProps = {
+  coupon: null,
+  isPending: false,
 };
 
 export default CouponForm;

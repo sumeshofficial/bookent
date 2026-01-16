@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { handleDownloadInvoice } from "../constants/downloadPdf";
 
 const InvoiceActions = ({ orderId }) => {
@@ -11,6 +12,10 @@ const InvoiceActions = ({ orderId }) => {
       </button>
     </div>
   );
+};
+
+InvoiceActions.propTypes = {
+  orderId: PropTypes.string.isRequired,
 };
 
 export default InvoiceActions;

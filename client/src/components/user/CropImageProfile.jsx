@@ -2,6 +2,7 @@ import { Pencil } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useModal } from "../../utils/constants";
 import toast from "react-hot-toast";
+import PropTypes from "prop-types";
 
 const CropImageProfile = ({ imageUpdate, label, user }) => {
   const [image, setImage] = useState("");
@@ -122,6 +123,14 @@ const CropImageProfile = ({ imageUpdate, label, user }) => {
       />
     </div>
   );
+};
+
+CropImageProfile.propTypes = {
+  imageUpdate: PropTypes.func.isRequired,
+  label: PropTypes.string,
+  user: PropTypes.shape({
+    profileImage: PropTypes.string,
+  }),
 };
 
 export default CropImageProfile;

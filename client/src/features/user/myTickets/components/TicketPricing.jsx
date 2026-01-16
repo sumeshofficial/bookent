@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
@@ -60,4 +61,16 @@ const TicketPricing = ({ pricing }) => {
   );
 };
 
+TicketPricing.propTypes = {
+  pricing: PropTypes.shape({
+    orderAmount: PropTypes.number.isRequired,
+    discount: PropTypes.number.isRequired,
+    bookingFee: PropTypes.number.isRequired,
+    baseFee: PropTypes.number.isRequired,
+    gst: PropTypes.number.isRequired,
+    grandTotal: PropTypes.number.isRequired,
+  }).isRequired,
+};
+
 export default TicketPricing;
+

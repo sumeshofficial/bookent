@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useContextForm } from "../../utils/constants";
 import InputBox from "./InputBox";
 import { Loader } from "lucide-react";
@@ -47,4 +48,11 @@ const EmailVerification = ({ title, onSubmit, error }) => {
   );
 };
 
+EmailVerification.propTypes = {
+  title: PropTypes.string.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  error: PropTypes.string,
+};
+
 export default EmailVerification;
+

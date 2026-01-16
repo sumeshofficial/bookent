@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import TicketHeader from "./TicketHeader";
 import TicketMeta from "./TicketMeta";
+import PropTypes from "prop-types";
 
 const TicketCard = ({ ticket }) => {
   return (
@@ -30,6 +31,22 @@ const TicketCard = ({ ticket }) => {
       </div>
     </div>
   );
+};
+
+TicketCard.propTypes = {
+  ticket: PropTypes.shape({
+    pricingBreakDown: PropTypes.object,
+    eventDetails: PropTypes.object,
+    event: PropTypes.object,
+    seat: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+    status: PropTypes.string,
+    orderId: PropTypes.string.isRequired,
+    paymentMethod: PropTypes.string,
+    createdAt: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Date),
+    ]),
+  }).isRequired,
 };
 
 export default TicketCard;

@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import PropTypes from "prop-types";
 import StatusDropdown from "./StatusDropdown";
 
 const CouponStatusCell = ({ coupon, updateCoupon }) => {
@@ -40,6 +41,14 @@ const CouponStatusCell = ({ coupon, updateCoupon }) => {
       )}
     </td>
   );
+};
+
+CouponStatusCell.propTypes = {
+  coupon: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    isActive: PropTypes.bool.isRequired,
+  }).isRequired,
+  updateCoupon: PropTypes.func.isRequired,
 };
 
 export default CouponStatusCell;

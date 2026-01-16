@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 const COLORS = ["#4F46E5", "#22C55E", "#F59E0B", "#EF4444"];
@@ -53,6 +54,15 @@ const RevenuePieChart = ({ data }) => {
       </div>
     </div>
   );
+};
+
+RevenuePieChart.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      value: PropTypes.number.isRequired,
+    })
+  ),
 };
 
 export default RevenuePieChart;

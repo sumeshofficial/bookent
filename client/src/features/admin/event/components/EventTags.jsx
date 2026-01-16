@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const EventTags = ({ tags = [] }) => {
   if (!tags.length) return null;
 
@@ -13,6 +15,10 @@ const EventTags = ({ tags = [] }) => {
       ))}
     </div>
   );
+};
+
+EventTags.propTypes = {
+  tags: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default EventTags;

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 const CircleShape = ({
   shape,
   isDisabled,
@@ -57,4 +58,20 @@ const CircleShape = ({
   );
 };
 
+CircleShape.propTypes = {
+  shape: PropTypes.shape({
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    radius: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    fillColor: PropTypes.string.isRequired,
+  }).isRequired,
+
+  isDisabled: PropTypes.bool.isRequired,
+  isSelected: PropTypes.bool.isRequired,
+  selectedShape: PropTypes.object,
+  setSelectedShape: PropTypes.func.isRequired,
+};
+
 export default CircleShape;
+

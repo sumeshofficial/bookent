@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { formatDate } from "../../../../../../utils/constants";
 
 const CouponInfoCell = ({ coupon }) => {
@@ -36,6 +37,27 @@ const CouponInfoCell = ({ coupon }) => {
       </td>
     </>
   );
+};
+
+CouponInfoCell.propTypes = {
+  coupon: PropTypes.shape({
+    code: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    discountType: PropTypes.string.isRequired,
+    discountValue: PropTypes.number.isRequired,
+    maxDiscountAmount: PropTypes.number,
+    usedCount: PropTypes.number.isRequired,
+    usageLimit: PropTypes.number,
+    perUserLimit: PropTypes.number.isRequired,
+    startDate: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Date),
+    ]).isRequired,
+    expiryDate: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Date),
+    ]).isRequired,
+  }).isRequired,
 };
 
 export default CouponInfoCell;

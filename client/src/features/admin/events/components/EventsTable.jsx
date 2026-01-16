@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import EventRow from "./EventRow";
 import EventsEmpty from "./EventsEmpty";
 
@@ -25,6 +26,14 @@ const EventsTable = ({ events }) => {
       </table>
     </div>
   );
+};
+
+EventsTable.propTypes = {
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 export default EventsTable;

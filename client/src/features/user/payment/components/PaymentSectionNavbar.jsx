@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -27,6 +28,15 @@ const PaymentSectionNavbar = ({ tickets }) => {
       </div>
     </div>
   );
+};
+
+PaymentSectionNavbar.propTypes = {
+  tickets: PropTypes.shape({
+    title: PropTypes.string,
+    venue: PropTypes.string,
+    section: PropTypes.string,
+    count: PropTypes.number,
+  }),
 };
 
 export default PaymentSectionNavbar;

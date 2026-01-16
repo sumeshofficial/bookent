@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import PropTypes from "prop-types";
 
 const Modal = ({ isOpen, onClose, children }) => {
   useEffect(() => {
@@ -41,6 +42,12 @@ const Modal = ({ isOpen, onClose, children }) => {
     </div>,
     document.getElementById("modal-root")
   );
+};
+
+Modal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func,
+  children: PropTypes.node.isRequired,
 };
 
 export default Modal;

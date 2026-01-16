@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const RectShape = ({
   shape,
   isDisabled,
@@ -58,6 +60,21 @@ const RectShape = ({
       )}
     </g>
   );
+};
+
+RectShape.propTypes = {
+  shape: PropTypes.shape({
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    fillColor: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+  }).isRequired,
+  isDisabled: PropTypes.bool,
+  isSelected: PropTypes.bool,
+  selectedShape: PropTypes.object,
+  setSelectedShape: PropTypes.func.isRequired,
 };
 
 export default RectShape;

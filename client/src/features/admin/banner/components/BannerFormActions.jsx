@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const BannerFormActions = ({ onClose, isCreating }) => (
   <div className="flex justify-end gap-2">
     <button
@@ -18,5 +20,10 @@ const BannerFormActions = ({ onClose, isCreating }) => (
     </button>
   </div>
 );
+
+BannerFormActions.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  isCreating: PropTypes.bool.isRequired,
+};
 
 export default BannerFormActions;

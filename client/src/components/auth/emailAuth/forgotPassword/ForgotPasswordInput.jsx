@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Loader } from "lucide-react";
 import InputBox from "../../../../sharedComponents/user/InputBox";
 import { useContextForm, useModal } from "../../../../utils/constants";
@@ -92,6 +93,14 @@ const ForgotPasswordInput = ({ response }) => {
       </div>
     </form>
   );
+};
+
+ForgotPasswordInput.propTypes = {
+  response: PropTypes.shape({
+    user: PropTypes.shape({
+      email: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default ForgotPasswordInput;

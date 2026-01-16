@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 const UserAccountInfo = ({ user }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -25,6 +26,14 @@ const UserAccountInfo = ({ user }) => {
       </div>
     </div>
   );
+};
+
+UserAccountInfo.propTypes = {
+  user: PropTypes.shape({
+    email: PropTypes.string.isRequired,
+    authProvider: PropTypes.string.isRequired,
+    createdAt: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default UserAccountInfo;

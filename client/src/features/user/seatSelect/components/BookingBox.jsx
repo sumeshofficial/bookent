@@ -1,6 +1,7 @@
 import { ChevronDown, Info } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const BookingBox = ({
   selectedShape,
@@ -131,6 +132,25 @@ const BookingBox = ({
       )}
     </div>
   );
+};
+
+BookingBox.propTypes = {
+  selectedShape: PropTypes.shape({
+    id: PropTypes.string,
+    title: PropTypes.string,
+  }),
+  ticketSetup: PropTypes.arrayOf(
+    PropTypes.shape({
+      sectionId: PropTypes.string.isRequired,
+      availableTickets: PropTypes.number,
+      totalTickets: PropTypes.number,
+      perUserLimit: PropTypes.number,
+      seatPrice: PropTypes.number,
+    })
+  ),
+  lockedSections: PropTypes.object,
+  eventSlug: PropTypes.string.isRequired,
+  lockSection: PropTypes.func.isRequired,
 };
 
 export default BookingBox;

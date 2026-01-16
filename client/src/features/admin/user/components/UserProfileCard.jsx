@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { User, Mail } from "lucide-react";
 
 const UserProfileCard = ({ user }) => {
@@ -27,6 +28,13 @@ const UserProfileCard = ({ user }) => {
       </div>
     </div>
   );
+};
+
+UserProfileCard.propTypes = {
+  user: PropTypes.shape({
+    fullname: PropTypes.string,
+    email: PropTypes.string,
+  }).isRequired,
 };
 
 export default UserProfileCard;

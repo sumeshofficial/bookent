@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronDown, ChevronRight, List, UserCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -85,6 +86,10 @@ const AdminNavbar = ({ setSidebarOpen }) => {
       </div>
     </div>
   );
+};
+
+AdminNavbar.propTypes = {
+  setSidebarOpen: PropTypes.func.isRequired,
 };
 
 export default AdminNavbar;

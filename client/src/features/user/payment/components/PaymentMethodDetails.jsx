@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { usePaypalLogic } from "../hooks/usePaypalLogic";
 import PaymentOptionCard from "./PaymentOptionCard";
@@ -13,6 +14,7 @@ const PaymentMethodDetails = ({ method, eventSlug, grandTotal }) => {
   return (
     <div className="p-6">
       <h2 className="text-lg font-semibold mb-4">{method.title}</h2>
+
       {method.id === "paypal" && (
         <PayPalButtons
           createOrder={createOrder}
@@ -35,6 +37,20 @@ const PaymentMethodDetails = ({ method, eventSlug, grandTotal }) => {
       )}
     </div>
   );
+};
+
+PaymentMethodDetails.propTypes = {
+  method: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    onClick: PropTypes.func,
+    isLoading: PropTypes.bool,
+    isDisabled: PropTypes.bool,
+    error: PropTypes.string,
+  }).isRequired,
+
+  eventSlug: PropTypes.string.isRequired,
+  grandTotal: PropTypes.number.isRequired,
 };
 
 export default PaymentMethodDetails;

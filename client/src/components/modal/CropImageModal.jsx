@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Cropper from "react-easy-crop";
+import PropTypes from "prop-types";
 
 const CropImageModal = ({
   image,
@@ -50,6 +51,13 @@ const CropImageModal = ({
       </div>
     </div>
   );
+};
+
+CropImageModal.propTypes = {
+  image: PropTypes.string.isRequired,
+  onCropDone: PropTypes.func.isRequired,
+  onCropCancel: PropTypes.func.isRequired,
+  aspectRation: PropTypes.number,
 };
 
 export default CropImageModal;

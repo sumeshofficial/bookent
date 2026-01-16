@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Wallet } from "lucide-react";
 import { useModal } from "../../../../utils/constants";
 
@@ -67,4 +68,14 @@ const WalletButton = ({
   );
 };
 
+WalletButton.propTypes = {
+  balance: PropTypes.number,
+  amount: PropTypes.number,
+  onPay: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool,
+  isDisabled: PropTypes.bool,
+  error: PropTypes.string,
+};
+
 export default WalletButton;
+

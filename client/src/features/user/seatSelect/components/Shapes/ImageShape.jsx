@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const ImageShape = ({ shape }) => {
   return (
     <g>
@@ -27,6 +29,18 @@ const ImageShape = ({ shape }) => {
       />
     </g>
   );
+};
+
+ImageShape.propTypes = {
+  shape: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    imageUrl: PropTypes.string.isRequired,
+    rotation: PropTypes.number,
+  }).isRequired,
 };
 
 export default ImageShape;

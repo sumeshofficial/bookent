@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import {
   BarChart,
   Bar,
@@ -27,4 +28,14 @@ const MonthlySalesBar = ({ data }) => (
   </div>
 );
 
+MonthlySalesBar.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      month: PropTypes.string.isRequired,
+      value: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+};
+
 export default MonthlySalesBar;
+

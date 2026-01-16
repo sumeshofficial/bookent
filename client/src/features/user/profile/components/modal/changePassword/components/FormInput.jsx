@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { Eye, EyeOff } from "lucide-react";
 
 const FormInput = ({
@@ -15,6 +16,7 @@ const FormInput = ({
   return (
     <div>
       <label className="block text-sm font-medium mb-1">{label}</label>
+
       <div className="relative">
         <input
           type={isPassword && showPassword ? "text" : type}
@@ -35,9 +37,19 @@ const FormInput = ({
           </button>
         )}
       </div>
+
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
   );
+};
+
+FormInput.propTypes = {
+  label: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  register: PropTypes.func.isRequired,
+  validation: PropTypes.object,
+  error: PropTypes.string,
 };
 
 export default FormInput;

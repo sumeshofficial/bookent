@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -13,6 +14,10 @@ const BackButton = ({ label = "Back" }) => {
       {label}
     </button>
   );
+};
+
+BackButton.propTypes = {
+  label: PropTypes.string,
 };
 
 export default BackButton;

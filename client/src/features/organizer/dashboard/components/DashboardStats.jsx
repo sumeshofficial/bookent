@@ -1,4 +1,5 @@
 import StatCard from "./StatCard";
+import PropTypes from "prop-types";
 
 const DashboardStats = ({ stats = {} }) => {
   const statItems = [
@@ -36,6 +37,15 @@ const DashboardStats = ({ stats = {} }) => {
       ))}
     </div>
   );
+};
+
+DashboardStats.propTypes = {
+  stats: PropTypes.shape({
+    totalOrders: PropTypes.number,
+    grossTicketSales: PropTypes.number,
+    organizerNetRevenue: PropTypes.number,
+    totalRefunded: PropTypes.number,
+  }),
 };
 
 export default DashboardStats;

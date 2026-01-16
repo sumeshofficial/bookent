@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import FormInput from "./FormInput";
 import { useModal } from "../../../../../utils/constants";
+import PropTypes from "prop-types";
 
 const ProfileForm = ({
   form,
@@ -73,6 +74,22 @@ const ProfileForm = ({
       </div>
     </form>
   );
+};
+
+ProfileForm.propTypes = {
+  form: PropTypes.shape({
+    register: PropTypes.func.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+    formState: PropTypes.shape({
+      errors: PropTypes.object,
+      dirtyFields: PropTypes.object,
+      isSubmitting: PropTypes.bool,
+    }).isRequired,
+  }).isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  sameEmail: PropTypes.bool,
+  sameFullname: PropTypes.bool,
+  isSubmitting: PropTypes.bool,
 };
 
 export default ProfileForm;

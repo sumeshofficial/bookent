@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 
@@ -52,6 +53,14 @@ const DeleteConfirmationModal = ({
       </div>
     </div>
   );
+};
+
+DeleteConfirmationModal.propTypes = {
+  title: PropTypes.string,
+  message: PropTypes.string,
+  handleDelete: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };
 
 export default DeleteConfirmationModal;

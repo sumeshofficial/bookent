@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { EVENT_STATUS_COLORS } from "../constants/event.constants";
 
 const EventHeader = ({ title, status }) => {
@@ -16,6 +17,11 @@ const EventHeader = ({ title, status }) => {
       </span>
     </div>
   );
+};
+
+EventHeader.propTypes = {
+  title: PropTypes.string.isRequired,
+  status: PropTypes.string.isRequired,
 };
 
 export default EventHeader;

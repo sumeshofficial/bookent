@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Calendar, MapPin, Users } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -156,6 +157,29 @@ const EventsCard = ({
       </Link>
     </div>
   );
+};
+
+
+EventsCard.propTypes = {
+  event: PropTypes.shape({
+    _id: PropTypes.string,
+    slug: PropTypes.string.isRequired,
+    thumbnailImage: PropTypes.string,
+    eventTitle: PropTypes.string.isRequired,
+    eventStatus: PropTypes.string,
+    sportType: PropTypes.string,
+    matchDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    matchTime: PropTypes.string,
+    stadiumAddress: PropTypes.string,
+    soldTickets: PropTypes.number,
+    totalTickets: PropTypes.number,
+    minPrice: PropTypes.number,
+    grossTicketSales: PropTypes.number,
+    createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+  }).isRequired,
+  formatDate: PropTypes.func.isRequired,
+  getBookingPercentage: PropTypes.func.isRequired,
+  formatCurrency: PropTypes.func.isRequired,
 };
 
 export default EventsCard;

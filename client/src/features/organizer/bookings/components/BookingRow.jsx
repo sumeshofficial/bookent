@@ -1,6 +1,7 @@
 import { formatDate } from "../../../../utils/constants";
 import { formatTime } from "../../../user/checkout/utils/dateTimeFormatter";
 import { BOOKING_STATUS_COLOR } from "../constants/booking.constants";
+import PropTypes from "prop-types";
 
 const BookingRow = ({ booking }) => {
   const formattedDate = formatDate(booking.eventId.matchDate);
@@ -44,6 +45,29 @@ const BookingRow = ({ booking }) => {
       </td>
     </tr>
   );
+};
+
+BookingRow.propTypes = {
+  booking: PropTypes.shape({
+    orderId: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    eventId: PropTypes.shape({
+      matchDate: PropTypes.string.isRequired,
+      matchTime: PropTypes.string.isRequired,
+    }).isRequired,
+    eventDetails: PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      venue: PropTypes.string.isRequired,
+    }).isRequired,
+    seat: PropTypes.shape({
+      category: PropTypes.string.isRequired,
+      qty: PropTypes.number.isRequired,
+    }).isRequired,
+    pricingBreakDown: PropTypes.shape({
+      orderAmount: PropTypes.number.isRequired,
+      grandTotal: PropTypes.number.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default BookingRow;

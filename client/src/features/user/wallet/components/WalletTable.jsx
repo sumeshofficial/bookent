@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import Pagination from "../../../../sharedComponents/Pagination";
 import { WALLET_DIRECTION } from "../constants/wallet.constants";
 
@@ -14,10 +15,11 @@ const WalletTable = ({ transactions, meta }) => {
             <th className="p-3">Amount</th>
           </tr>
         </thead>
+
         <tbody>
           {transactions.length === 0 ? (
             <tr>
-              <td colSpan="4" className="p-6 text-center text-gray-500">
+              <td colSpan="5" className="p-6 text-center text-gray-500">
                 No wallet transactions found
               </td>
             </tr>
@@ -44,9 +46,33 @@ const WalletTable = ({ transactions, meta }) => {
           )}
         </tbody>
       </table>
+
       <Pagination meta={meta} />
     </div>
   );
+};
+
+WalletTable.propTypes = {
+  transactions: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      createdAt: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      display_direction: PropTypes.oneOf([
+        WALLET_DIRECTION.CREDIT,
+        WALLET_DIRECTION.DEBIT,
+      ]).isRequired,
+      net_amount: PropTypes.shape({
+        value: PropTypes.number.isRequired,
+      }).isRequired,
+    })
+  ).isRequired,
+
+  meta: PropTypes.shape({
+    page: PropTypes.number,
+    totalPages: PropTypes.number,
+    limit: PropTypes.number,
+  }).isRequired,
 };
 
 export default WalletTable;

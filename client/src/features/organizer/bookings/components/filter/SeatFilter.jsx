@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const SeatFilter = ({ seatCategories, value, onChange }) => (
   <div>
     <label className="block text-xs text-gray-500 mb-1">Seat Section</label>
@@ -15,5 +17,15 @@ const SeatFilter = ({ seatCategories, value, onChange }) => (
     </select>
   </div>
 );
+
+SeatFilter.propTypes = {
+  seatCategories: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+    })
+  ),
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default SeatFilter;

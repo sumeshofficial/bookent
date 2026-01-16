@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const CouponHeader = ({ code, isActive }) => {
   return (
     <div className="flex items-center justify-between">
@@ -12,6 +14,11 @@ const CouponHeader = ({ code, isActive }) => {
       </span>
     </div>
   );
+};
+
+CouponHeader.propTypes = {
+  code: PropTypes.string.isRequired,
+  isActive: PropTypes.bool.isRequired,
 };
 
 export default CouponHeader;

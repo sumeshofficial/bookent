@@ -8,6 +8,7 @@ import CouponEmptyState from "./CouponEmptyState";
 import CouponRow from "./CouponRow";
 import CouponTableHeader from "./CouponTableHeader";
 import CouponTableSkeleton from "./CouponTableSkeleton";
+import PropTypes from "prop-types";
 
 const CouponTable = ({ coupons, meta, isLoading }) => {
   const { filters, setFilters } = useCouponFilters(coupons);
@@ -50,6 +51,14 @@ const CouponTable = ({ coupons, meta, isLoading }) => {
       {meta?.totalPages > 1 && <Pagination meta={meta} />}
     </div>
   );
+};
+
+CouponTable.propTypes = {
+  coupons: PropTypes.arrayOf(PropTypes.object).isRequired,
+  meta: PropTypes.shape({
+    totalPages: PropTypes.number,
+  }),
+  isLoading: PropTypes.bool.isRequired,
 };
 
 export default CouponTable;

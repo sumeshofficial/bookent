@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import logo from "../../assets/bookent-logo-white.png";
 import { useForm, useWatch } from "react-hook-form";
@@ -511,6 +512,11 @@ const OrganizarAccountForm = ({ isRejected = false }) => {
       </div>
     </div>
   );
+};
+
+
+OrganizarAccountForm.propTypes = {
+  isRejected: PropTypes.bool,
 };
 
 export default OrganizarAccountForm;

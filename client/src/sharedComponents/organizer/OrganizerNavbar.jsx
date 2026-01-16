@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { List, UserCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -39,4 +40,9 @@ const OrganizerNavbar = ({ setSidebarOpen }) => {
   );
 };
 
+OrganizerNavbar.propTypes = {
+  setSidebarOpen: PropTypes.func.isRequired,
+};
+
 export default OrganizerNavbar;
+

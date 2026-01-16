@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import CropImageProfile from "../../../../../components/user/CropImageProfile";
 
 const Avatar = ({ user, imageUpdate }) => (
@@ -7,5 +8,10 @@ const Avatar = ({ user, imageUpdate }) => (
     user={user}
   />
 );
+
+Avatar.propTypes = {
+  user: PropTypes.object.isRequired,
+  imageUpdate: PropTypes.func.isRequired,
+};
 
 export default Avatar;

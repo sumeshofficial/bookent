@@ -6,6 +6,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import PropTypes from "prop-types";
 
 const MonthlySalesBar = ({ data }) => (
   <div className="bg-white rounded-xl p-5 shadow-sm">
@@ -26,5 +27,14 @@ const MonthlySalesBar = ({ data }) => (
     </ResponsiveContainer>
   </div>
 );
+
+MonthlySalesBar.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      month: PropTypes.string.isRequired,
+      value: PropTypes.number.isRequired,
+    })
+  ),
+};
 
 export default MonthlySalesBar;

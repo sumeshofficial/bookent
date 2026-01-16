@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useState } from "react";
 import { X, AlertTriangle, HelpCircle, ChevronDown } from "lucide-react";
@@ -184,6 +185,15 @@ const ConfirmationModal = ({
       </div>
     </div>
   );
+};
+
+ConfirmationModal.propTypes = {
+  title: PropTypes.string,
+  message: PropTypes.string,
+  handleAction: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  status: PropTypes.string,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default ConfirmationModal;

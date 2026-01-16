@@ -3,6 +3,7 @@ import RectShape from "./Shapes/RectShape";
 import CircleShape from "./Shapes/CircleShape";
 import ArcShape from "./Shapes/ArcShape";
 import ImageShape from "./Shapes/ImageShape";
+import PropTypes from "prop-types";
 
 const SeatMap = ({
   shapes = [],
@@ -70,6 +71,14 @@ const SeatMap = ({
       </TransformWrapper>
     </div>
   );
+};
+
+SeatMap.propTypes = {
+  shapes: PropTypes.arrayOf(PropTypes.object),
+  ticketSetup: PropTypes.arrayOf(PropTypes.object),
+  selectedShape: PropTypes.object,
+  setSelectedShape: PropTypes.func.isRequired,
+  lockedSections: PropTypes.object,
 };
 
 export default SeatMap;

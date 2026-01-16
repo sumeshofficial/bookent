@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 const SearchFilter = ({ value, onChange }) => (
   <div>
     <label className="block text-xs text-gray-500 mb-1">Search</label>
@@ -10,5 +12,10 @@ const SearchFilter = ({ value, onChange }) => (
     />
   </div>
 );
+
+SearchFilter.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default SearchFilter;

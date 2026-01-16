@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import ImagePreview from "./ImagePreview";
 import {
   MAX_IMAGE_SIZE_BYTES,
@@ -108,6 +109,23 @@ const BannerImageInput = ({
       {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
     </div>
   );
+};
+
+BannerImageInput.propTypes = {
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  ratio: PropTypes.number,
+  register: PropTypes.func.isRequired,
+  error: PropTypes.object,
+  required: PropTypes.bool,
+  initialData: PropTypes.any,
+  inputKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  bumpKey: PropTypes.func.isRequired,
+  preview: PropTypes.string,
+  setPreview: PropTypes.func.isRequired,
+  setError: PropTypes.func.isRequired,
+  clearErrors: PropTypes.func.isRequired,
+  setValue: PropTypes.func.isRequired,
 };
 
 export default BannerImageInput;

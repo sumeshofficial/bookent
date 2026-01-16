@@ -1,7 +1,9 @@
+import PropTypes from "prop-types";
 import { useModal } from "../../../../utils/constants";
 
 const CreateBannerButton = ({ onSubmit, isCreating }) => {
   const { openModal, closeModal } = useModal();
+
   return (
     <button
       onClick={() =>
@@ -16,6 +18,11 @@ const CreateBannerButton = ({ onSubmit, isCreating }) => {
       Create Banner
     </button>
   );
+};
+
+CreateBannerButton.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  isCreating: PropTypes.bool,
 };
 
 export default CreateBannerButton;

@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import useEventStatusUpdate from "../../hooks/useEventStatusUpdate";
+import PropTypes from "prop-types";
 
 const STATUS = ["Draft", "Published", "Postpone", "Cancelled"];
 
@@ -130,6 +131,13 @@ const EventStatusUpdate = ({
       </div>
     </form>
   );
+};
+
+EventStatusUpdate.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  currentStatus: PropTypes.string.isRequired,
+  oldMatchDate: PropTypes.string.isRequired,
 };
 
 export default EventStatusUpdate;

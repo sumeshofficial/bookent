@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import Controllers from "./Controllers";
 import { forwardRef } from "react";
 import { useImperativeHandle } from "react";
+import PropTypes from "prop-types";
 
 const Canvas = forwardRef(
   ({ deselectAll, shapes, selectedId, setShapes, setSelectedId }, ref) => {
@@ -59,7 +60,6 @@ const Canvas = forwardRef(
       window.addEventListener("keydown", handleKey);
       return () => window.removeEventListener("keydown", handleKey);
     }, [deselectAll, selectedId, setShapes]);
-
 
     const handleAddImage = (file) => {
       if (!file) return;
@@ -304,5 +304,32 @@ const Canvas = forwardRef(
     );
   }
 );
+
+Canvas.propTypes = {
+  deselectAll: PropTypes.func.isRequired,
+
+  shapes: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      x: PropTypes.number,
+      y: PropTypes.number,
+      width: PropTypes.number,
+      height: PropTypes.number,
+      radius: PropTypes.number,
+      fillColor: PropTypes.string,
+      fillOpacity: PropTypes.number,
+      capacity: PropTypes.number,
+      visible: PropTypes.bool,
+      zIndex: PropTypes.number,
+      title: PropTypes.string,
+      imageUrl: PropTypes.string,
+    })
+  ).isRequired,
+
+  selectedId: PropTypes.string,
+  setShapes: PropTypes.func.isRequired,
+  setSelectedId: PropTypes.func.isRequired,
+};
 
 export default Canvas;

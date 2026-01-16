@@ -2,6 +2,7 @@ import { Eye } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
 import { useModal } from "../../../../utils/constants";
+import PropTypes from "prop-types";
 
 const UserRow = React.memo(({ user, handleToggleStatus }) => {
   const { openModal, closeModal } = useModal();
@@ -64,5 +65,17 @@ const UserRow = React.memo(({ user, handleToggleStatus }) => {
     </tr>
   );
 });
+
+UserRow.propTypes = {
+  user: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    fullname: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    totalBookings: PropTypes.number.isRequired,
+    spending: PropTypes.number.isRequired,
+    status: PropTypes.oneOf(["active", "blocked"]).isRequired,
+  }).isRequired,
+  handleToggleStatus: PropTypes.func.isRequired,
+};
 
 export default UserRow;

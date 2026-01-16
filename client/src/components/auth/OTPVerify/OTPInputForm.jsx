@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { onResend, verifyOtp } from "../../../services/auth";
 import { Loader } from "lucide-react";
@@ -212,6 +213,18 @@ const OTPInputForm = ({ title, email, purpose, updatedData }) => {
       </div>
     </div>
   );
+};
+
+OTPInputForm.propTypes = {
+  title: PropTypes.string.isRequired,
+  email: PropTypes.string.isRequired,
+  purpose: PropTypes.string.isRequired,
+  updatedData: PropTypes.shape({
+    user: PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+    }),
+    updatedFields: PropTypes.object,
+  }),
 };
 
 export default OTPInputForm;

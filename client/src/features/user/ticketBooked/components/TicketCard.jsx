@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import QRCode from "react-qr-code";
 
 const TicketCard = ({ data }) => {
@@ -65,6 +66,24 @@ const TicketCard = ({ data }) => {
       </div>
     </div>
   );
+};
+
+TicketCard.propTypes = {
+  data: PropTypes.shape({
+    bookingId: PropTypes.string.isRequired,
+    section: PropTypes.string.isRequired,
+    qty: PropTypes.number.isRequired,
+    totalAmount: PropTypes.number.isRequired,
+    qrData: PropTypes.shape({
+      data: PropTypes.string,
+    }).isRequired,
+    event: PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired,
+      venue: PropTypes.string.isRequired,
+      poster: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default TicketCard;

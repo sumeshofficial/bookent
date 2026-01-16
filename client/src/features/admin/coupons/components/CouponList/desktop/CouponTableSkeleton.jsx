@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const CouponTableSkeleton = ({ rows = 5 }) => {
   return (
     <>
@@ -37,6 +39,10 @@ const CouponTableSkeleton = ({ rows = 5 }) => {
       ))}
     </>
   );
+};
+
+CouponTableSkeleton.propTypes = {
+  rows: PropTypes.number,
 };
 
 export default CouponTableSkeleton;

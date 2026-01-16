@@ -2,6 +2,7 @@ import { useModal } from "../../../../../utils/constants";
 import { parseLocation } from "../../utils/parseLocation";
 import Avatar from "./Avatar";
 import EditButton from "./EditButton";
+import PropTypes from "prop-types";
 
 const Header = ({ user, imageUpdate, openEdit }) => {
   const location = parseLocation(user);
@@ -46,6 +47,17 @@ const Header = ({ user, imageUpdate, openEdit }) => {
       )}
     </>
   );
+};
+
+Header.propTypes = {
+  user: PropTypes.shape({
+    fullname: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    authProvider: PropTypes.string.isRequired,
+  }).isRequired,
+
+  imageUpdate: PropTypes.func,
+  openEdit: PropTypes.func.isRequired,
 };
 
 export default Header;

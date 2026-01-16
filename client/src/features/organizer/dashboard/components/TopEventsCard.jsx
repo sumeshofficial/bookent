@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const TopEventsCard = ({ events = [] }) => {
   return (
     <div className="bg-white rounded-xl shadow p-5">
@@ -51,6 +53,21 @@ const TopEventsCard = ({ events = [] }) => {
       )}
     </div>
   );
+};
+
+TopEventsCard.propTypes = {
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      eventId: PropTypes.string,
+      _id: PropTypes.string,
+      thumbnailImage: PropTypes.string,
+      eventTitle: PropTypes.string,
+      eventSlug: PropTypes.string,
+      totalTicketsSold: PropTypes.number,
+      organizerNetRevenue: PropTypes.number,
+      grossTicketSales: PropTypes.number,
+    })
+  ),
 };
 
 export default TopEventsCard;

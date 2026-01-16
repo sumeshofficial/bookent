@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const EventMeta = ({ event }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg shadow">
@@ -19,6 +21,18 @@ const EventMeta = ({ event }) => {
       </div>
     </div>
   );
+};
+
+EventMeta.propTypes = {
+  event: PropTypes.shape({
+    sportType: PropTypes.string.isRequired,
+    stadiumName: PropTypes.string.isRequired,
+    matchDate: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Date),
+    ]).isRequired,
+    matchTime: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default EventMeta;

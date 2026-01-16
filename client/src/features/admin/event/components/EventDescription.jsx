@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const EventDescription = ({ description, ageRestriction, terms }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4">
@@ -21,6 +23,12 @@ const EventDescription = ({ description, ageRestriction, terms }) => {
       </div>
     </div>
   );
+};
+
+EventDescription.propTypes = {
+  description: PropTypes.string.isRequired,
+  ageRestriction: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  terms: PropTypes.string,
 };
 
 export default EventDescription;

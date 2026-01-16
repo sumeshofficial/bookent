@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const DateFilter = ({ label, value, onChange }) => (
   <div>
     <label className="block text-xs text-gray-500 mb-1">{label}</label>
@@ -9,5 +11,11 @@ const DateFilter = ({ label, value, onChange }) => (
     />
   </div>
 );
+
+DateFilter.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default DateFilter;

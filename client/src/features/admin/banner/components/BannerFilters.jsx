@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import debounce from "lodash.debounce";
@@ -68,4 +69,9 @@ const BannerFilters = ({ updateParam }) => {
   );
 };
 
+BannerFilters.propTypes = {
+  updateParam: PropTypes.func.isRequired,
+};
+
 export default BannerFilters;
+

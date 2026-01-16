@@ -1,5 +1,6 @@
 import InputField from "./InputField";
 import FormField from "./FormField";
+import PropTypes from "prop-types";
 
 const CouponLimitsSection = ({ register, errors }) => {
   return (
@@ -50,6 +51,15 @@ const CouponLimitsSection = ({ register, errors }) => {
       </FormField>
     </>
   );
+};
+
+CouponLimitsSection.propTypes = {
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object,
+};
+
+CouponLimitsSection.defaultProps = {
+  errors: {},
 };
 
 export default CouponLimitsSection;

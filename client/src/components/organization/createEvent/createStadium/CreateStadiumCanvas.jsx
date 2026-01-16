@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import Canvas from "./canvas/Canvas";
 import Layers from "./canvas/Layers";
+import PropTypes from "prop-types";
 
 const CreateStadiumForm = ({ setValue, setCurrentPage, watch }) => {
   const initialLayout = watch("stadiumLayout");
@@ -100,6 +101,12 @@ const CreateStadiumForm = ({ setValue, setCurrentPage, watch }) => {
       />
     </div>
   );
+};
+
+CreateStadiumForm.propTypes = {
+  setValue: PropTypes.func.isRequired,
+  setCurrentPage: PropTypes.func.isRequired,
+  watch: PropTypes.func.isRequired,
 };
 
 export default CreateStadiumForm;

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BookentLogo from "../../BookentLogo";
@@ -19,6 +20,11 @@ const SeatSelectNavbar = ({ title }) => {
       </div>
     </div>
   );
+};
+
+
+SeatSelectNavbar.propTypes = {
+  title: PropTypes.string.isRequired,
 };
 
 export default SeatSelectNavbar;

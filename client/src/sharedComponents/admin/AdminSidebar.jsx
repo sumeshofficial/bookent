@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import {
   ChevronDown,
   ChevronRight,
@@ -129,6 +130,11 @@ const AdminSidebar = ({ setSidebarOpen, sidebarOpen }) => {
       )}
     </div>
   );
+};
+
+AdminSidebar.propTypes = {
+  setSidebarOpen: PropTypes.func.isRequired,
+  sidebarOpen: PropTypes.bool.isRequired,
 };
 
 export default AdminSidebar;

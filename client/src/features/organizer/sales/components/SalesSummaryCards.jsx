@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const Card = ({ label, value, highlight = false }) => (
   <div
     className={`bg-white shadow rounded p-4 ${
@@ -10,6 +12,12 @@ const Card = ({ label, value, highlight = false }) => (
     </p>
   </div>
 );
+
+Card.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  highlight: PropTypes.bool,
+};
 
 const SalesSummaryCards = ({ summary }) => {
   if (!summary) return null;
@@ -35,6 +43,15 @@ const SalesSummaryCards = ({ summary }) => {
       />
     </div>
   );
+};
+
+SalesSummaryCards.propTypes = {
+  summary: PropTypes.shape({
+    totalOrders: PropTypes.number,
+    grossTicketSales: PropTypes.number,
+    totalRefunded: PropTypes.number,
+    organizerNetRevenue: PropTypes.number,
+  }),
 };
 
 export default SalesSummaryCards;

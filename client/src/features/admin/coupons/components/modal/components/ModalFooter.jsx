@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const ModalFooter = ({ onClose, isPending, coupon }) => {
   return (
     <div className="md:col-span-2 flex justify-end gap-3 pt-5 border-t mt-2">
@@ -18,11 +20,17 @@ const ModalFooter = ({ onClose, isPending, coupon }) => {
             ? "Updating..."
             : "Creating..."
           : coupon
-            ? "Update Coupon"
-            : "Create Coupon"}
+          ? "Update Coupon"
+          : "Create Coupon"}
       </button>
     </div>
   );
+};
+
+ModalFooter.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  isPending: PropTypes.bool.isRequired,
+  coupon: PropTypes.object,
 };
 
 export default ModalFooter;

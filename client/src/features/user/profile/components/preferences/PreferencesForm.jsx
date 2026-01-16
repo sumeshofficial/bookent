@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const PreferencesForm = ({
   form,
   isChanged,
@@ -64,6 +66,26 @@ const PreferencesForm = ({
       )}
     </form>
   );
+};
+
+PreferencesForm.propTypes = {
+  form: PropTypes.shape({
+    register: PropTypes.func.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+    formState: PropTypes.shape({
+      errors: PropTypes.object,
+      isSubmitting: PropTypes.bool,
+    }).isRequired,
+  }).isRequired,
+  isChanged: PropTypes.bool.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  options: PropTypes.objectOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      values: PropTypes.arrayOf(PropTypes.string).isRequired,
+    })
+  ).isRequired,
+  externalSaving: PropTypes.bool,
 };
 
 export default PreferencesForm;

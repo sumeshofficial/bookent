@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import CouponForm from "./components/CouponForm";
 import ModalHeader from "./components/ModalHeader";
 
@@ -13,6 +14,13 @@ const CreateCoupon = ({ handleSubmit, onClose, isPending, coupon }) => {
       />
     </div>
   );
+};
+
+CreateCoupon.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  isPending: PropTypes.bool,
+  coupon: PropTypes.object,
 };
 
 export default CreateCoupon;

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useFilterParams } from "../../hooks/useFilterParams";
 import DateFilter from "./DateFilter";
 import SearchFilter from "./SearchFilter";
@@ -33,6 +34,10 @@ const BookingsFilter = ({ seatCategories }) => {
       <SortFilter value={sortBy} onChange={(v) => updateParam("sort", v)} />
     </div>
   );
+};
+
+BookingsFilter.propTypes = {
+  seatCategories: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default BookingsFilter;

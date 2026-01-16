@@ -1,6 +1,7 @@
 import DiscountTypeSelect from "./DiscountTypeSelect";
 import FormField from "./FormField";
 import InputField from "./InputField";
+import PropTypes from "prop-types";
 
 const CouponDiscountSection = ({
   register,
@@ -73,6 +74,13 @@ const CouponDiscountSection = ({
       )}
     </>
   );
+};
+
+CouponDiscountSection.propTypes = {
+  register: PropTypes.func.isRequired,
+  setValue: PropTypes.func.isRequired,
+  discountType: PropTypes.oneOf(["PERCENTAGE", "FLAT"]).isRequired,
+  errors: PropTypes.object.isRequired,
 };
 
 export default CouponDiscountSection;
