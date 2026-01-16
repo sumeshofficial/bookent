@@ -1,34 +1,43 @@
-import * as yup from "yup";
+import { z } from "zod";
 
-// Event validation schema
-export const eventSchema = yup.object({
-  eventTitle: yup.string().required("Event title is required"),
+export const eventSchema = z.object({
+  eventTitle: z.string().nonempty("Event title is required"),
 
-  sportType: yup.string().required("Sport type is required"),
+  sportType: z.string().nonempty("Sport type is required"),
 
-  eventDescription: yup.string().required("Event description is required"),
+  eventDescription: z.string().nonempty("Event description is required"),
 
-  tags: yup.array().required("At least one tag is required"),
+  tags: z.array(z.string()).nonempty("At least one tag is required"),
 
-  stadium: yup.string().required("Stadium is required"),
+  stadium: z.string().nonempty("Stadium is required"),
 
-  minPrice: yup.number().required("Min price is required"),
+  minPrice: z.coerce.number({
+    required_error: "Min price is required",
+    invalid_type_error: "Min price must be a number",
+  }),
 
-  maxPrice: yup.number().required("Max price is required"),
+  maxPrice: z.coerce.number({
+    required_error: "Max price is required",
+    invalid_type_error: "Max price must be a number",
+  }),
 
-  matchDate: yup.date().required("Match date is required"),
+  matchDate: z.coerce.date({
+    required_error: "Match date is required",
+    invalid_type_error: "Match date must be a valid date",
+  }),
 
-  matchTime: yup.string().required("Match time is required"),
+  matchTime: z.string().nonempty("Match time is required"),
 
-  gateOpenTime: yup.string().required("Gate open time is required"),
+  gateOpenTime: z.string().nonempty("Gate open time is required"),
 
-  matchDuration: yup.number().required("Match duration is required"),
+  matchDuration: z.coerce.number({
+    required_error: "Match duration is required",
+    invalid_type_error: "Match duration must be a number",
+  }),
 
-  ageRestriction: yup.string().required("Age restriction is required"),
+  ageRestriction: z.string().nonempty("Age restriction is required"),
 
-  termsAndConditions: yup
-    .string()
-    .required("Terms and conditions are required"),
+  termsAndConditions: z.string().nonempty("Terms and conditions are required"),
 
-  eventStatus: yup.string().required("Event status is required"),
+  eventStatus: z.string().nonempty("Event status is required"),
 });

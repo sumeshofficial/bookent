@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import logger from "../../config/logger.js";
-import { eventSchema } from "../../validation/event.validation.js";
 import {
   deleteRedisData,
   getRedisData,
@@ -54,8 +53,6 @@ export const validateEventCreateController = async (req, res) => {
     }
 
     await validateDailyEventLimit(organizer._id);
-
-    await eventSchema.validate(data, { abortEarly: false });
 
     const sessionId = `event:create:${crypto.randomUUID()}`;
 
