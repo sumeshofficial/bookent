@@ -5,7 +5,7 @@ import { STATUS_CODE } from "../../../../utility/constants/statusCode.js";
 import { AppError } from "../../../../utility/helpers.js";
 
 export const validateOrganizerAndEvent = async ({ userId, eventId }) => {
-  const organizer = await checkOrganizer({ userId });
+  const organizer = await checkOrganizer(userId);
 
   if (!organizer) {
     throw new AppError(
