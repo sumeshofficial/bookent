@@ -43,7 +43,7 @@ export const validateEventCreateController = async (req, res) => {
 
     logger.http(`${req.method} ${req.originalUrl}`);
 
-    const organizer = await checkOrganizer({ userId });
+    const organizer = await checkOrganizer(userId);
     if (!organizer) {
       throw new AppError(
         STATUS_CODE.NOTFOUND,
@@ -132,7 +132,7 @@ export const editEventController = asyncHandler(async (req, res) => {
     });
   }
 
-  const organizer = await checkOrganizer({ userId });
+  const organizer = await checkOrganizer(userId);
   if (!organizer) {
     logger.warn(`Organizer not found for ${userId}`);
     return res.status(STATUS_CODE.NOTFOUND).json({
@@ -296,7 +296,7 @@ export const getEventsController = asyncHandler(async (req, res) => {
 
   logger.http(`${req.method} ${req.originalUrl}`);
 
-  const organizer = await checkOrganizer({ userId: user._id });
+  const organizer = await checkOrganizer(user._id);
 
   if (!organizer) {
     throw new AppError(
@@ -420,7 +420,7 @@ export const getEventController = asyncHandler(async (req, res) => {
   const { eventSlug } = req.params;
   const user = req.user;
 
-  const organizer = await checkOrganizer({ userId: user._id });
+  const organizer = await checkOrganizer(user._id);
 
   if (!organizer || !eventSlug) {
     logger.warn("Required fields are misiing");
@@ -467,7 +467,7 @@ export const deleteEventController = asyncHandler(async (req, res) => {
     });
   }
 
-  const organizer = await checkOrganizer({ userId: user._id });
+  const organizer = await checkOrganizer(user._id);
 
   if (!organizer) {
     return res.status(STATUS_CODE.NOTFOUND).json({

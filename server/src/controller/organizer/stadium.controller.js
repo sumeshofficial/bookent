@@ -89,7 +89,7 @@ export const deleteStadiumController = asyncHandler(async (req, res) => {
 // Get stadiums
 export const getStadiums = async (req, res) => {
   try {
-    const organizer = await checkOrganizer({ userId: req.user._id });
+    const organizer = await checkOrganizer(req.user._id);
     if (!organizer) {
       return res.status(STATUS_CODE.NOTFOUND).json({
         message: "Organizer profile not found",
@@ -220,7 +220,7 @@ export const getStadium = async (req, res) => {
     const user = req.user;
 
     logger.info("Check organizer is exist");
-    const organizer = await checkOrganizer({ userId: user._id });
+    const organizer = await checkOrganizer(user._id);
 
     logger.info("Fetching stadium form db");
     const stadium = await findStadium(organizer._id, stadiumSlug);
