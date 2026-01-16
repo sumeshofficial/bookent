@@ -1,8 +1,6 @@
 import logger from "../../config/logger.js";
 import { getObjectURL } from "../../services/s3.service.js";
-import {
-  findEventsForUser,
-} from "../../services/user.service.js";
+import { findEventsForUser } from "../../services/user.service.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";
 import { getHomeEventsService } from "../../services/user/event/event.service.js";
 import { asyncHandler, sendResponse } from "../../utility/helpers.js";

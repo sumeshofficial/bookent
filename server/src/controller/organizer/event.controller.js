@@ -11,9 +11,7 @@ import {
   putObject,
 } from "../../services/s3.service.js";
 import { STATUS_CODE } from "../../utility/constants/statusCode.js";
-import {
-  fetchEventsWithOrganizerId,
-} from "../../services/organizer.service.js";
+import { fetchEventsWithOrganizerId } from "../../services/organizer.service.js";
 import { redisClient } from "../../config/redis.conf.js";
 import {
   cancelEvent,

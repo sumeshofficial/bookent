@@ -220,7 +220,7 @@ const EventPreview = () => {
         )}
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 mb-10 transition-opacity duration-700 relative z-[1]">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 mb-10 transition-opacity duration-700 relative z-1">
         <div className="relative w-full aspect-video rounded-md overflow-hidden">
           {isLoading ? (
             <>

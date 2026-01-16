@@ -3,7 +3,10 @@ import {
   checkOrganizer,
   findOrganizerById,
 } from "../../repositories/organizer/organizer.repository.js";
-import { findStadium, findStadiums } from "../../repositories/organizer/stadium.repository.js";
+import {
+  findStadium,
+  findStadiums,
+} from "../../repositories/organizer/stadium.repository.js";
 import {
   findAllStadiumsWithOrgnaizerId,
   stadiumExists,
