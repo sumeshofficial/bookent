@@ -51,9 +51,9 @@ export const useSectionLock = (eventId) => {
     }
 
     return () => {
-      socket.off(SOCKET_EVENTS.SEAT_UPDATE);
-      socket.off(SOCKET_EVENTS.SEAT_UPDATE_BULK);
-      socket.off(SOCKET_EVENTS.CONNECT);
+      socket.off(SOCKET_EVENTS.SEAT_UPDATE, seatUpdateHandler);
+      socket.off(SOCKET_EVENTS.SEAT_UPDATE_BULK, seatUpdateHandler);
+      socket.off(SOCKET_EVENTS.CONNECT, seatUpdateHandler);
     };
   }, [
     socket,

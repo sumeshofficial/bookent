@@ -63,6 +63,7 @@ const CreateStadiumInput = ({
     }
 
     if (stadiumLayout?.layoutImage instanceof File) {
+      console.log(stadiumLayout.layoutImage)
       return URL.createObjectURL(stadiumLayout.layoutImage);
     }
 
@@ -298,10 +299,7 @@ const CreateStadiumInput = ({
           )}
         </div>
 
-        {!Object.keys(errors).length &&
-          isValid &&
-          !stadiumLayout &&
-          isAvailable && <StadiumLayout setCurrentPage={setCurrentPage} />}
+         <StadiumLayout setCurrentPage={setCurrentPage} />
 
         {!isValid && (
           <p className="text-[0.5rem] sm:text-xs text-yellow-500 italic mt-2">
